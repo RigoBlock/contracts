@@ -21,5 +21,4 @@ contract ERC20Face {
 	function totalSupply() constant returns (uint256 total) {}
 	function balanceOf(address _owner) constant returns (uint256 balance) {}
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
-
 }
