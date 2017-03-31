@@ -2,6 +2,8 @@
 //! By Gabriele Rigo (Rigo Investment), 2017.
 //! Released under the Apache Licence 2.
 
+pragma solidity ^0.4.10;
+
 contract Dragowned {
     
     modifier onlyDragowner { if (msg.sender != dragowner) return; _; }
