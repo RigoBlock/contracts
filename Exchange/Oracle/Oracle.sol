@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-contract Oracle is Owned {
+contract Oracle is Owned, OracleFace {
   
   event Changed(uint224 current);
     
