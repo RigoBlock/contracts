@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-contract DragoFactoryFace is Dragowned {
+library DragoFactoryFace is Dragowned {
 	
     event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
 
