@@ -35,10 +35,15 @@ library DragoFactory is Dragowned, DragoFactoryFace {
 		newDrago.transferDragownership(msg.sender);  //library or new.tranfer(_from)
 		_dragoID = nextDragoID;     //decided at last to add sequential ID numbers
 		++nextDragoID;              //decided at last to add sequential ID numbers
-		DragoRegistry registry = DragoRegistry(dragoRegistry);
-		if (!registry.register(_drago, _dragoID)) throw; ; //register @ registry
+		if (!registerDrago(_drago, _dragoID)) throw; ;
 		DragoCreated(_name, address(newDrago), msg.sender, uint(newDrago));
 		return (address(newDrago), uint(newDrago));
+	}
+	
+	function registerDrago(address _drago, uint _dragoID) onlyDragowner {
+		DragoRegistry registry = DragoRegistry(dragoRegistry);
+		if (!registry.register(_drago, _dragoID)) throw; ; //register @ registry
+		//event DragoRegistered
 	}
     
 	function setFee(uint _fee) onlyDragowner {    //exmple, uint public fee = 100 finney;
