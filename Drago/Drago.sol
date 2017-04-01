@@ -6,43 +6,37 @@ pragma solidity ^0.4.10;
 
 contract Dragowned {
 
-    event NewDragowner(address indexed old, address indexed current);
+	event NewDragowner(address indexed old, address indexed current);
 
-    function transferDragownership(address newDragowner) onlyDragowner {}
+	function transferDragownership(address newDragowner) onlyDragowner {}
 }
 
 contract ERC20Face is Dragowned {
 
-    event Transfer(address indexed _from, address indexed _to, uint256 _value) {}
-    //event Transfer(address indexed from, address indexed to, uint256 indexed _amount);
-	  event Approval(address indexed _owner, address indexed _spender, uint256 _value) {}
+	event Transfer(address indexed _from, address indexed _to, uint256 _value) {}
+	//event Transfer(address indexed from, address indexed to, uint256 indexed _amount);
+	event Approval(address indexed _owner, address indexed _spender, uint256 _value) {}
   
-  	function transfer(address _to, uint256 _value) returns (bool success) {}
-	  function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
-	  function approve(address _spender, uint256 _value) returns (bool success) {}
+	function transfer(address _to, uint256 _value) returns (bool success) {}
+	function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
+	function approve(address _spender, uint256 _value) returns (bool success) {}
 
-	  function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
-	  function totalSupply() constant returns (uint256 total) {}
-	  function balanceOf(address _owner) constant returns (uint256 balance) {}
-    //function balanceOf(address _who) constant returns (uint256 balance);
-	  function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
+	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
+	function totalSupply() constant returns (uint256 total) {}
+	function balanceOf(address _owner) constant returns (uint256 balance) {}
+	//function balanceOf(address _who) constant returns (uint256 balance);
+	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 }
 
 contract DragoFace is ERC20Face {
     
-    function buy() payable returns (uint amount) {}
-  
-    function sell(uint256 amount) returns (uint revenue, bool success) {}
-    
-    function changeRatio(uint256 _ratio) onlyDragator {}
-    
-    function setTransactionFee(uint _transactionFee) onlyDragowner {}
-    
-    function changeFeeCollector(address _feeCollector) onlyDragowner {}
-    
-    function changeDragator(address _dragator) onlyDragator {}
-
-    function balanceOf(address _from) constant returns (uint256 balance) {}
+	function buy() payable returns (uint amount) {}
+	function sell(uint256 amount) returns (uint revenue, bool success) {}  
+	function changeRatio(uint256 _ratio) onlyDragator {}  
+	function setTransactionFee(uint _transactionFee) onlyDragowner {}  
+	function changeFeeCollector(address _feeCollector) onlyDragowner {}
+	function changeDragator(address _dragator) onlyDragator {}
+	function balanceOf(address _from) constant returns (uint256 balance) {}
 }
 
 contract DragoAdmin is DragoFace {
