@@ -12,7 +12,7 @@ contract DragoRegistryFace {
 	function dragoOf(address _drago) constant returns (uint) {}
 }
 
-contract DragoFactory is Dragowned, DragoFactoryFace {
+library DragoFactory is Dragowned, DragoFactoryFace {
 	
 	string public version = 'DF0.1'; //alt uint public version = 1
 	//uint[] _dragoID; //amended below to have first fund ID = 1
