@@ -29,9 +29,9 @@ contract DragoFactory is Dragowned, DragoFactoryFace {
     function DragoFactory () {}
     
     function createDrago(string _name, string _symbol, address _dragowner) when_fee_paid returns (address _drago, uint _dragoID) {
-	      HumanStandardDragoo newDrago = (new HumanStandardDragoo(_name, _symbol, _dragowner));
-	      newDragos.push(address(newDrago));
-	      created[msg.sender].push(address(newDrago));
+	HumanStandardDragoo newDrago = (new HumanStandardDragoo(_name, _symbol, _dragowner));
+	newDragos.push(address(newDrago));
+	created[msg.sender].push(address(newDrago));
         newDrago.transferDragownership(msg.sender);  //library or new.tranfer(_from)
         _dragoID = nextDragoID;     //decided at last to add sequential ID numbers
         ++nextDragoID;              //decided at last to add sequential ID numbers
