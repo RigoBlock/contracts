@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-contract DragooRegistryFace {
+contract DragoRegistryFace {
     
     function register(address _drago, uint _dragoID) {}
     
