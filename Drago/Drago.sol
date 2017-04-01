@@ -41,45 +41,45 @@ contract DragoFace is ERC20Face {
 
 contract DragoAdmin is DragoFace {
     
-    string public name;
-    string public symbol;
-    string public version = 'H0.1';
+	string public name;
+	string public symbol;
+	string public version = 'H0.1';
     
-    function DragoAdmin(string _dragoName,  string _dragoSymbol, address _dragowner) {
-        name = _dragoName;    
-        symbol = _dragoSymbol;
-        dragowner = _dragowner;
-    }
+	function DragoAdmin(string _dragoName,  string _dragoSymbol, address _dragowner) {
+		name = _dragoName;    
+		symbol = _dragoSymbol;
+		dragowner = _dragowner;
+	}
     
-    //modifier when_approved_exchange { if (exchange != approved) return; _; }
+	//modifier when_approved_exchange { if (exchange != approved) return; _; }
     
-    function depositToExchange(address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {
-    //address who used to determine from which account _who is the drago contract
-        CFD c = CFD(exchange);
-        if (!c.deposit.value(msg.value)(_who)) ;
-    }
+	function depositToExchange(address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {
+		//address who used to determine from which account _who is the drago contract
+		CFD c = CFD(exchange);
+		if (!c.deposit.value(msg.value)(_who)) ;
+	}
     
-    function withdrawFromExchange(address exchange, uint value) returns (bool success) {
-        CFD c = CFD(exchange);
-        if (!c.withdraw(value)) ; throw;
-    }
+	function withdrawFromExchange(address exchange, uint value) returns (bool success) {
+		CFD c = CFD(exchange);
+		if (!c.withdraw(value)) ; throw;
+	}
     
-    function placeOrderExchange(address exchange, bool is_stable, uint32 adjustment, uint128 stake) {
-        CFD c = CFD(exchange);
-        if (!c.order(is_stable, adjustment, stake)); throw ;
-    }
+	function placeOrderExchange(address exchange, bool is_stable, uint32 adjustment, uint128 stake) {
+		CFD c = CFD(exchange);
+		if (!c.order(is_stable, adjustment, stake)); throw ;
+	}
     
-    function cancelOrderExchange(address exchange, uint32 id) {
-        CFD c = CFD(exchange);
-        if (!c.cancel(id)) ; throw ;
-    }
+	function cancelOrderExchange(address exchange, uint32 id) {
+		CFD c = CFD(exchange);
+		if (!c.cancel(id)) ; throw ;
+	}
     
-    function finalizeDealExchange(address exchange, uint24 id) {
-        CFD c = CFD(exchange);
-        if (!c.finalize(id) ; throw ;
-    }
+	function finalizeDealExchange(address exchange, uint24 id) {
+		CFD c = CFD(exchange);
+		if (!c.finalize(id) ; throw ;
+	}
     
-    function() payable {
-	      buy();
-    }
+	function() payable {
+		buy();
+	}
 }
