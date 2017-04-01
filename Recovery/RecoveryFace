@@ -1,0 +1,8 @@
+//! Recovery Interface contract.
+//! By Gabriele Rigo (Rigo Investment Sagl), 2017.
+//! Released under the Apache Licence 2.
+//! Allow for recovery of funds/access in a backup multisig mode.
+
+pragma solidity ^0.4.10;
+
+contract RecoveryFace {}
