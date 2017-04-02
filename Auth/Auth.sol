@@ -5,4 +5,10 @@
 
 pragma solidity ^0.4.10;
 
-contract Auth is AuthFace {}
+contract Auth is Owned, AuthFace {
+
+  function approveAccount(address target, bool approve) onlyOwner {
+        approvedAccount[target] = approve;
+        ApprovedFunds(target, approve);
+  }
+}
