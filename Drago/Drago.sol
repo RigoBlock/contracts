@@ -29,6 +29,19 @@ contract ERC20Face is Dragowned {
 
 contract DragoFace is ERC20Face {
 
+	uint256 public price= 1 finney;
+	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
+	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
+	address public feeCollector = tx.origin;
+	address public Dragator = msg.sender;
+	uint gross_amount;
+	uint fee;
+	uint fee_dragoo;
+	uint fee_dragator;
+	uint256 public ratio = 80;
+	
+	modifier onlyDragator { if (tx.origin != Dragator) return; _; }
+
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
     
@@ -119,4 +132,6 @@ contract DragoAdmin is DragoFace {
 	function() payable {
 		buy();
 	}
+	
+	mapping (address => uint256) public balances;
 }
