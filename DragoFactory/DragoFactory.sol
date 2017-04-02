@@ -72,51 +72,51 @@ library DragoFactory is Dragowned, DragoFactoryFace {
 		if (!m.sell(amount); throw ;
 	}
     
-	function changeRatio(address targetDragoo, uint256 _ratio) {  //modifier onlyDragoDAO
-		HumanStandardDragoo m = HumanStandardDragoo(targetDragoo);
+	function changeRatio(address targetDrago, uint256 _ratio) {  //modifier onlyDragoDAO
+		HumanStandardDrago m = HumanStandardDragoo(targetDrago);
 		if (!m.changeRatio(_ratio); throw ;
 	}
     
-	function setTransactionFee(address targetDragoo, uint _transactionFee) {    //exmple, uint public fee = 100 finney;
-		HumanStandardDragoo m = HumanStandardDragoo(targetDragoo);
+	function setTransactionFee(address targetDrago, uint _transactionFee) {    //exmple, uint public fee = 100 finney;
+		HumanStandardDrago m = HumanStandardDragoo(targetDrago);
 		if (!m.setTransactionFee(_transactionFee); throw ;       //fee is in basis points (1 bps = 0.01%)
 	}
     
-	function changeFeeCollector(address targetDragoo, address _feeCollector) {
-		HumanStandardDragoo m = HumanStandardDragoo(targetDragoo);
+	function changeFeeCollector(address targetDrago, address _feeCollector) {
+		HumanStandardDrago m = HumanStandardDrago(targetDrago);
 		if (!m.changeFeeCollector(_feeCollector); throw ;
 	}
     
-	function changeDragator(address targetDragoo, address _dragator) {
-		HumanStandardDragoo m = HumanStandardDragoo(targetDragoo);
+	function changeDragator(address targetDrago, address _dragator) {
+		HumanStandardDrago m = HumanStandardDrago(targetDrago);
 		if (!m.changeDragator(_dragator); throw ;
 	}
     
-	function depositToExchange(address targetDragoo, address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {
+	function depositToExchange(address targetDrago, address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {
 		//address who used to determine from which account
-		HumanStandardDragoo m = HumanStandardDragoo(targetDragoo);
+		HumanStandardDrago m = HumanStandardDragoo(targetDrago);
 		if (!m.depositToExchange(exchange, _who); throw ;
 	}
 	
-	function withdrawFromExchange(address targetDragoo, address exchange, uint value) returns (bool success) {
+	function withdrawFromExchange(address targetDrago, address exchange, uint value) returns (bool success) {
 		//remember to reinsert address _who
-		HumanStandardDragoo m = HumanStandardDragoo(targetDragoo);
+		HumanStandardDrago m = HumanStandardDrago(targetDrago);
 		if (!m.withdrawFromExchange(exchange, value); throw ;
 		//apply adjustment at CFD contract level (address _who)
 	}
     
-	function placeOrderExchange(address targetDragoo, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {
-		HumanStandardDragoo m = HumanStandardDragoo(targetDragoo);
+	function placeOrderExchange(address targetDrago, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {
+		HumanStandardDrago m = HumanStandardDrago(targetDrago);
 		if (!m.placeOrderExchange(exchange, is_stable, adjustment, stake); throw ;
 	}
     
-	function cancelOrderExchange(address targetDragoo, address exchange, uint32 id) {
-		HumanStandardDragoo m = HumanStandardDragoo(targetDragoo);
+	function cancelOrderExchange(address targetDrago, address exchange, uint32 id) {
+		HumanStandardDrago m = HumanStandardDrago(targetDrago);
 		if (!m.cancelOrderExchange(exchange, id); throw ;
 	}
     
-	function finalizedDealExchange(address targetDragoo, address exchange, uint24 id) {
-		HumanStandardDragoo m = HumanStandardDragoo(targetDragoo);
+	function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {
+		HumanStandardDrago m = HumanStandardDrago(targetDrago);
 		if (!m.finalizeDealExchange(exchange, id); throw; ;
 	}  
 }
