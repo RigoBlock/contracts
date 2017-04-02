@@ -5,6 +5,9 @@
 pragma solidity ^0.4.10;
 
 contract DragoFace is ERC20Face {
+
+	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
+	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
     
 	function buy() payable returns (uint amount) {}
 	function sell(uint256 amount) returns (uint revenue, bool success) {}  
