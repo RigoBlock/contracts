@@ -8,5 +8,4 @@ contract ExchangeCheck is ExchangeCheckFace {
       function exchangeCheck(address _exchange) public constant returns (bool _approved) {}
       function setApproval(address _asset, bool _status) onlyowner {}
       function transferOwnership(address _owner) onlyowner {}
-      function ownedVerifier(address _owner) {}
 }
