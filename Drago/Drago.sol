@@ -76,17 +76,30 @@ contract DragoFace is ERC20Face {
 		} else { return (revenue, false); }
 	}
 	
-	function changeRatio(uint256 _ratio) onlyDragator {}  
-	function setTransactionFee(uint _transactionFee) onlyDragowner {}  
-	function changeFeeCollector(address _feeCollector) onlyDragowner {}
-	function changeDragator(address _dragator) onlyDragator {}
+	function changeRatio(uint256 _ratio) onlyDragator {
+		ratio = _ratio;
+	}
+	
+	function setTransactionFee(uint _transactionFee) onlyDragowner {	//exmple, uint public fee = 100 finney;
+		transactionFee = _transactionFee * msg.value / (100 ether);	//fee is in basis points (1 bps = 0.01%)
+	}
+	
+	function changeFeeCollector(address _feeCollector) onlyDragowner {	
+	        feeCollector = _feeCollector; 
+	}
+	
+	function changeDragator(address _dragator) onlyDragator {
+        	Dragator = _dragator;
+    	}
 	
 	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner {
         	sellPrice = newSellPrice*(10**(18 - 4));
         	buyPrice = newBuyPrice*(10**(18 - 4));
     	}
 	
-	function balanceOf(address _from) constant returns (uint256 balance) {}
+	function balanceOf(address _from) constant returns (uint256 balance) {
+		return balances[_from];
+	}
 }
 
 contract DragoAdmin is DragoFace {
