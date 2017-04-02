@@ -1,4 +1,4 @@
-//! ERC20 Token Interface.
+//! ERC20 Token Interface contract.
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
 
