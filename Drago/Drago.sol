@@ -27,8 +27,11 @@ contract ERC20Face is Dragowned {
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 }
 
-contract DragoFace is ERC20Face {
-
+contract Drago is ERC20Face {
+	
+	string public name;
+    	string public symbol;
+    	string public version = 'H0.1';
 	uint256 public price= 1 finney;
 	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
 	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
@@ -44,8 +47,17 @@ contract DragoFace is ERC20Face {
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
+ 
+ 	function Drago(string _dragoName,  string _dragoSymbol) {
+        	name = _dragoName;    
+        	symbol = _dragoSymbol;
+    	}
     
-	function buy() payable returns (uint amount) {
+    	function() payable {
+		buyDrago();
+    	}
+	
+	function buyDrago() payable returns (uint amount) {
 		if (!approvedAccount[msg.sender]) throw;
 		if (msg.value < min_order) throw;
         	gross_amount = msg.value / buyPrice;
@@ -61,7 +73,7 @@ contract DragoFace is ERC20Face {
         	return amount;
 	}
 	
-	function sell(uint256 amount) returns (uint revenue, bool success) {
+	function sellDrago(uint256 amount) returns (uint revenue, bool success) {
 		if (!approvedAccount[msg.sender]) throw;
 		revenue = safeMul(amount * sellPrice);
         	if (balances[msg.sender] >= amount && balances[msg.sender] + amount > balances[msg.sender] && revenue >= min_order) {
