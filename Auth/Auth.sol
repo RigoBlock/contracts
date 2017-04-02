@@ -7,6 +7,8 @@ pragma solidity ^0.4.10;
 
 contract Auth is Owned, AuthFace {
 
+  event ApprovedAccount(address target, bool approved);
+
   function approveAccount(address target, bool approve) onlyOwner {
         approvedAccount[target] = approve;
         ApprovedFunds(target, approve);
