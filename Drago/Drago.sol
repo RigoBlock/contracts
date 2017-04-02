@@ -13,9 +13,10 @@ contract Dragowned {
 
 contract ERC20Face is Dragowned {
 
-	event Transfer(address indexed _from, address indexed _to, uint256 _value) {}
-	//event Transfer(address indexed from, address indexed to, uint256 indexed _amount);
-	event Approval(address indexed _owner, address indexed _spender, uint256 _value) {}
+	event Transfer(address indexed _from, address indexed _to, uint256 _value);
+	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
+	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
   
 	function transfer(address _to, uint256 _value) returns (bool success) {}
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
@@ -30,8 +31,36 @@ contract ERC20Face is Dragowned {
 
 contract DragoFace is ERC20Face {
     
-	function buy() payable returns (uint amount) {}
-	function sell(uint256 amount) returns (uint revenue, bool success) {}  
+	function buy() payable returns (uint amount) {
+		if (!approvedAccount[msg.sender]) throw;
+		if (msg.value < min_order) throw;
+        	gross_amount = msg.value / buyPrice;
+        	fee = gross_amount * transactionFee / (100 ether);
+        	fee_dragoo = fee * 80 / 100;
+        	fee_dragator = fee - fee_dragoo;
+        	amount = gross_amount - fee;
+        	balances[msg.sender] += amount;
+        	balances[feeCollector] += fee_dragoo;
+        	balances[Dragator] += fee_dragator;
+        	totalSupply += gross_amount;
+        	Buy(0, msg.sender, this, amount, revenue);
+        	return amount;
+	}
+	
+	function sell(uint256 amount) returns (uint revenue, bool success) {
+		revenue = amount * price;
+        	if (balances[msg.sender] >= amount && balances[msg.sender] + amount > balances[msg.sender] && revenue >= min_order) {
+            	balances[msg.sender] -= amount;
+            	totalSupply -= amount;
+		if (!msg.sender.send(amount * price)) {
+			throw;
+		} else {  
+			Transfer(this, msg.sender, 0, amount, revenue);
+			}
+			return (revenue, true);
+		} else { return (revenue, false);
+	}
+	
 	function changeRatio(uint256 _ratio) onlyDragator {}  
 	function setTransactionFee(uint _transactionFee) onlyDragowner {}  
 	function changeFeeCollector(address _feeCollector) onlyDragowner {}
