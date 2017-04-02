@@ -49,17 +49,18 @@ contract DragoFace is ERC20Face {
 	}
 	
 	function sell(uint256 amount) returns (uint revenue, bool success) {
-		revenue = amount * price;
+		if (!approvedAccount[msg.sender]) throw;
+		revenue = safeMul(amount * sellPrice);
         	if (balances[msg.sender] >= amount && balances[msg.sender] + amount > balances[msg.sender] && revenue >= min_order) {
             	balances[msg.sender] -= amount;
             	totalSupply -= amount;
-		if (!msg.sender.send(amount * price)) {
+		if (!msg.sender.send(revenue)) {
 			throw;
 		} else {  
-			Transfer(this, msg.sender, 0, amount, revenue);
+			Sell(this, msg.sender, 0, amount, revenue);
 			}
 			return (revenue, true);
-		} else { return (revenue, false);
+		} else { return (revenue, false); }
 	}
 	
 	function changeRatio(uint256 _ratio) onlyDragator {}  
