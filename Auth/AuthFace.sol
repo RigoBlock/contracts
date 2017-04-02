@@ -4,4 +4,9 @@
 
 pragma solidity ^0.4.10;
 
-contract AuthFace {}
+contract AuthFace {
+  
+  event approvedAccount(address target, bool approved);
+  
+  function approveAccount(address target, bool approve) onlyOwner {}
+}
