@@ -17,9 +17,5 @@ contract AssetCheck is Owned, AssetCheckFace {
             owner = _owner;
       }
 
-      function OwnedVerifier(address _owner) {
-            owner = _owner;
-      }
-
       mapping(address => bool) public approved;
 }
