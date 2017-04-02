@@ -1,16 +1,20 @@
 contract ERC23 {
   
-  event Transfer(address indexed from, address indexed to, uint value);
-  event Approval(address indexed owner, address indexed spender, uint value);
+  //EVENTS
+  
+  event Transfer(address indexed _from, address indexed _to, uint256 _value);
+  event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
+  //METHODS
+  
   function balanceOf(address who) constant returns (uint);
   function allowance(address owner, address spender) constant returns (uint);
 
-  function transfer(address to, uint value) returns (bool ok) {}
-  function transfer(address to, uint value, bytes data) returns (bool ok) {}
-  function transferFrom(address from, address to, uint value) returns (bool ok) {}
-  function approve(address spender, uint value) returns (bool ok) {}
+  function transfer(address _to, uint256 _value) returns (bool success) {}
+  function transfer(address _to, uint256 _value, bytes32 _data) returns (bool success) {}
+  function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
+  function approve(address _spender, uint256 _value) returns (bool success) {}
   
-  function balanceOf(address who) constant returns (uint) {}
-  function allowance(address owner, address spender) constant returns (uint) {}
+  function balanceOf(address _owner) constant returns (uint256 balance) {}
+  function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 }
