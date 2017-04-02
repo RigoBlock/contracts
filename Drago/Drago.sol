@@ -116,16 +116,6 @@ contract Drago is ERC20Face {
 
 contract DragoAdmin is DragoFace {
     
-	string public name;
-	string public symbol;
-	string public version = 'H0.1';
-    
-	function DragoAdmin(string _dragoName,  string _dragoSymbol, address _dragowner) {
-		name = _dragoName;    
-		symbol = _dragoSymbol;
-		dragowner = _dragowner;
-	}
-    
 	//modifier when_approved_exchange { if (exchange != approved) return; _; }
     
 	function depositToExchange(address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {
