@@ -1,11 +1,11 @@
 contract ERC23 {
   
-  //EVENTS
+  // EVENTS
   
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
-  //METHODS
+  // METHODS
 
   function transfer(address _to, uint256 _value) returns (bool success) {}
   function transfer(address _to, uint256 _value, bytes32 _data) returns (bool success) {}
