@@ -4,4 +4,4 @@
 
 pragma solidity ^0.4.10;
 
-contract Asset is AssetInterface {}
+contract Asset is ERC20Face, AssetFace {}
