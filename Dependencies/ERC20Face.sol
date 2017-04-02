@@ -17,7 +17,6 @@ contract ERC20Face {
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 	function approve(address _spender, uint256 _value) returns (bool success) {}
 
-	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 	function totalSupply() constant returns (uint256 total) {}
 	function balanceOf(address _owner) constant returns (uint256 balance) {}
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
