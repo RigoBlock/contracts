@@ -36,6 +36,12 @@ contract DragoFace is ERC20Face {
 	function setTransactionFee(uint _transactionFee) onlyDragowner {}  
 	function changeFeeCollector(address _feeCollector) onlyDragowner {}
 	function changeDragator(address _dragator) onlyDragator {}
+	
+	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner {
+        	sellPrice = newSellPrice*(10**(18 - 4));
+        	buyPrice = newBuyPrice*(10**(18 - 4));
+    	}
+	
 	function balanceOf(address _from) constant returns (uint256 balance) {}
 }
 
