@@ -31,4 +31,9 @@ contract Auth is Owned, AuthFace {
   function setWhitelisted(address target, bool isWhitelisted) onlyWhitelister {
     accounts[target].authorized = isWhitelisted;
   }
+  
+  modifier onlyWhitelisted {
+    if (!accounts[msg.sender].authorized) throw;
+    _;
+  }
 }
