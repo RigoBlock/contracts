@@ -8,5 +8,4 @@ contract AssetCheckFace {
       function assetCheck(address _asset) public constant returns (bool _approved) {}
       function setApproval(address _asset, bool _status) onlyowner {}
       function transferOwnership(address _owner) onlyowner {}
-      function OwnedVerifier(address _owner) {}
 }
