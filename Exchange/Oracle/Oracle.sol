@@ -18,7 +18,7 @@ contract Oracle is Owned, OracleFace {
       data.value = _value;
       Changed(_value);
     }
-		data.timestamp = uint32(now);
+	data.timestamp = uint32(now);
     }
     
     function get() constant returns (uint224) {
