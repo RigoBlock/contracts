@@ -23,5 +23,9 @@ library DragoFactoryFace is Dragowned {
     function withdrawFromExchange(address targetDragoo, address exchange, uint value) returns (bool success) {}
     function placeOrderExchange(address targetDragoo, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {}
     function cancelOrderExchange(address targetDragoo, address exchange, uint32 id) {}  
-    function finalizedDealExchange(address targetDragoo, address exchange, uint24 id) {}  
+    function finalizedDealExchange(address targetDragoo, address exchange, uint24 id) {}
+    
+    function getVersion() constant returns (string version) {}
+    function geeLastId() constant returns (uint _dragoID) {}
+    function getDragoDAO() constant returns (uint dragoDAO) {}
 }
