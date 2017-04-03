@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-library GabcoinFactoryFace is Dragowned {
+library GabcoinFactoryFace is Owned {
 	
     event GabcoinCreated(string _name, address _drago, address _dragowner, uint _dragoID);
 
