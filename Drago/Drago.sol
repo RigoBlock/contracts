@@ -75,6 +75,7 @@ contract Drago is ERC20Face {
         	return amount;
 	}
 	
+	//TODO: execute redemption only 2 days after sell
 	function sellDrago(uint256 amount) returns (uint revenue, bool success) minimum_period_past {
 		if (!approvedAccount[msg.sender]) throw;
 		revenue = safeMul(amount * sellPrice);
