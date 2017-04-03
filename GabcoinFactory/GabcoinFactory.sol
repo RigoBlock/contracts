@@ -15,7 +15,7 @@ contract GabcoinRegistryFace {
 library Gabcoin Factory is Owned, GabcoinFactoryFace {
     
 	modifier when_fee_paid { if (msg.value < fee) return; _; }
-	//modifier only_rigoblock
+	//modifier only_gabcoin_dao
 	
 	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
     
@@ -43,12 +43,12 @@ library Gabcoin Factory is Owned, GabcoinFactoryFace {
 		fee = _fee;
 	}
     
-	function setBeneficiary(address _rigoblock) onlyOwner {
-		rigoblock = _rigoblock;
+	function setBeneficiary(address _gabcoinDAO) onlyOwner {
+		gabcoinDAO = _gabcoinDAO;
 	}
   
 	function drain() onlyOwner {
-		if (!rigoblock.send(this.balance)); throw ;
+		if (!gabcoinDAO.send(this.balance)); throw ;
 	}
   
 	function() {
@@ -65,7 +65,7 @@ library Gabcoin Factory is Owned, GabcoinFactoryFace {
 		if (!m.sell(amount); throw ;
 	}
     
-	function changeRatio(address targetGabcoin, uint256 _ratio) only_rigoblock {
+	function changeRatio(address targetGabcoin, uint256 _ratio) only_gabcoin_dao {
 		Gabcoin m = Gabcoin(targetGabcoin);
 		if (!m.changeRatio(_ratio); throw ;
 	}
@@ -82,14 +82,14 @@ library Gabcoin Factory is Owned, GabcoinFactoryFace {
     
 	function changeCoinator(address targetGabcoin, address _coinator) {
 		Gabcoin m = Gabcoin(targetGabcoin);
-		if (!m.changeDragator(_dragator); throw ;
+		if (!m.changeCoinator(_coinator); throw ;
 	}
 
 	string public version = 'GC 0.2';
 	//uint[] _gabcoinID; //amended below to have first fund ID = 1
 	uint _gabcoinID = 0;
 	uint public fee = 0;
-	address public rigoblock = msg.sender;
+	address public gabcoinDAO = msg.sender;
 	address[] public newGabcoins;
 	address _targetGabcoin;
 }
