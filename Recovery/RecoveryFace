@@ -5,4 +5,14 @@
 
 pragma solidity ^0.4.10;
 
-contract RecoveryFace {}
+contract RecoveryFace {
+
+  event RecoveredOwner(address indexed _recoverer, address indexed _newOwner, address indexed _newRecoverer);
+  
+  function Recovery(address _recoverer) {} 
+  function recoverOwner(address _newOwner) {}
+  function setRecovery(address _newRecoverer) {}
+  
+  function getOwner(address) constant returns (address owner) {}
+  function getRecovere(address) constant returns (address _recoverer) {}
+}
