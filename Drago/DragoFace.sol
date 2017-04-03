@@ -10,7 +10,8 @@ contract DragoFace is ERC20Face {
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
-
+	
+ 	function Drago(string _dragoName,  string _dragoSymbol) {}
 	function() payable {}
 	function buy() payable returns (uint amount) {}
 	function sell(uint256 amount) returns (uint revenue, bool success) {}  
