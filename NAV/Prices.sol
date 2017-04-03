@@ -48,4 +48,3 @@ contract Prices is PricesFace {
   address quoteAsset;
   mapping (address => Values) data;
 }
-  
