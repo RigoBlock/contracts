@@ -62,6 +62,7 @@ contract Drago is ERC20Face {
         	return amount;
 	}
 	
+	//consider option of 48 hours delayed call
 	function sellDrago(uint256 amount) returns (uint revenue, bool success) {
 		if (!approvedAccount[msg.sender]) throw;
 		revenue = safeMul(amount * sellPrice);
