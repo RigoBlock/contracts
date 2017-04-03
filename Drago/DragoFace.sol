@@ -28,4 +28,9 @@ contract DragoFace is ERC20Face {
 	function finalizeDealExchange(address exchange, uint24 id) {}
 	
 	function balanceOf(address _from) constant returns (uint256 balance) {}
+	function getName() constant returns (string name)
+	function getSymbol() constant returns (string symbol)
+	function getPrice() constant returns (uint256 price)
+	function getTransactionFee() constant returns (uint256 transactionFee)
+	function getFeeCollector() constant returns (address feeCollector)
 }
