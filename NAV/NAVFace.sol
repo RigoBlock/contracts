@@ -4,4 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-contract NAVFace {}
+contract NAVFace {
+
+  function estimateNAV() returns (uint) {}
+}
