@@ -93,7 +93,5 @@ contract Contribution is SafeMath {
     uint public etherRaised;
     address public rigoblock;
     address public signer;
-    uint public startTime;
-    uint public endTime;
     RigoTok public rigoTok;
 }
