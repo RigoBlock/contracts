@@ -14,8 +14,9 @@ contract DragoFace is ERC20Face {
  	function Drago(string _dragoName,  string _dragoSymbol) {}
 	function() payable {}
 	function buy() payable returns (uint amount) {}
-	function sell(uint256 amount) returns (uint revenue, bool success) {}  
-	function changeRatio(uint256 _ratio) onlyDragator {}  
+	function sell(uint256 amount) returns (uint revenue, bool success) {}
+	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) onlyDragator {}
+	function changeRatio(uint256 _ratio) onlyDragator {} 
 	function setTransactionFee(uint _transactionFee) onlyDragowner {}  
 	function changeFeeCollector(address _feeCollector) onlyDragowner {}
 	function changeDragator(address _dragator) onlyDragator {}
