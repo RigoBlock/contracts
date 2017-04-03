@@ -4,4 +4,6 @@
 
 pragma solidity ^0.4.10;
 
-contract Asset is ERC20Face, AssetFace {}
+contract Asset is ERC20Face, AssetFace {
+  //Assets are ERC20 compliant tokens
+}
