@@ -13,16 +13,9 @@ contract DragoRegistryFace {
 }
 
 library DragoFactory is Dragowned, DragoFactoryFace {
-	
-	string public version = 'DF0.2';
-	//uint[] _dragoID; //amended below to have first fund ID = 1
-	uint _dragoID = 0;
-	uint public fee = 0;
-	address public dragoDAO = msg.sender;
-	address[] public newDragos;
-	address _targetDrago;
     
 	modifier when_fee_paid { if (msg.value < fee) return; _; }
+	//modifier only_drago_dao
 	
 	event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
     
@@ -72,7 +65,7 @@ library DragoFactory is Dragowned, DragoFactoryFace {
 		if (!m.sell(amount); throw ;
 	}
     
-	function changeRatio(address targetDrago, uint256 _ratio) {  //modifier onlyDragoDAO
+	function changeRatio(address targetDrago, uint256 _ratio) /*only_drago_dao*/ {
 		Drago m = Drago(targetDrago);
 		if (!m.changeRatio(_ratio); throw ;
 	}
@@ -118,5 +111,13 @@ library DragoFactory is Dragowned, DragoFactoryFace {
 	function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {
 		Drago m = Drago(targetDrago);
 		if (!m.finalizeDealExchange(exchange, id); throw; ;
-	}  
+	}
+	
+	string public version = 'DF0.2';
+	//uint[] _dragoID; //amended below to have first fund ID = 1
+	uint _dragoID = 0;
+	uint public fee = 0;
+	address public dragoDAO = msg.sender;
+	address[] public newDragos;
+	address _targetDrago;
 }
