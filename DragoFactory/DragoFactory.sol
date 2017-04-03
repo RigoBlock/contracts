@@ -14,7 +14,7 @@ contract DragoRegistryFace {
 
 library DragoFactory is Dragowned, DragoFactoryFace {
 	
-	string public version = 'DF0.1'; //alt uint public version = 1
+	string public version = 'DF0.2';
 	//uint[] _dragoID; //amended below to have first fund ID = 1
 	uint _dragoID = 0;
 	uint public fee = 0;
@@ -29,7 +29,7 @@ library DragoFactory is Dragowned, DragoFactoryFace {
 	function DragoFactory () {}
     
 	function createDrago(string _name, string _symbol, address _dragowner) when_fee_paid returns (address _drago, uint _dragoID) {
-		HumanStandardDragoo newDrago = (new HumanStandardDragoo(_name, _symbol, _dragowner));
+		Drago newDrago = (new Drago(_name, _symbol, _dragowner));
 		newDragos.push(address(newDrago));
 		created[msg.sender].push(address(newDrago));
 		newDrago.transferDragownership(msg.sender);  //library or new.tranfer(_from)
@@ -63,60 +63,60 @@ library DragoFactory is Dragowned, DragoFactoryFace {
 	}
         
 	function buyDrago(address targetDrago) payable {
-		HumanStandardDrago m = HumanStandardDragoo(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.buy.value(msg.value)(); throw ;
 	}
     
 	function sellDrago(address targetDragoo, uint256 amount) {
-		HumanStandardDrago m = HumanStandardDrago(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.sell(amount); throw ;
 	}
     
 	function changeRatio(address targetDrago, uint256 _ratio) {  //modifier onlyDragoDAO
-		HumanStandardDrago m = HumanStandardDragoo(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.changeRatio(_ratio); throw ;
 	}
     
 	function setTransactionFee(address targetDrago, uint _transactionFee) {    //exmple, uint public fee = 100 finney;
-		HumanStandardDrago m = HumanStandardDragoo(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.setTransactionFee(_transactionFee); throw ;       //fee is in basis points (1 bps = 0.01%)
 	}
     
 	function changeFeeCollector(address targetDrago, address _feeCollector) {
-		HumanStandardDrago m = HumanStandardDrago(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.changeFeeCollector(_feeCollector); throw ;
 	}
     
 	function changeDragator(address targetDrago, address _dragator) {
-		HumanStandardDrago m = HumanStandardDrago(targetDrago);
+		Dragoo m = Drago(targetDrago);
 		if (!m.changeDragator(_dragator); throw ;
 	}
     
 	function depositToExchange(address targetDrago, address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {
 		//address who used to determine from which account
-		HumanStandardDrago m = HumanStandardDragoo(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.depositToExchange(exchange, _who); throw ;
 	}
 	
 	function withdrawFromExchange(address targetDrago, address exchange, uint value) returns (bool success) {
 		//remember to reinsert address _who
-		HumanStandardDrago m = HumanStandardDrago(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.withdrawFromExchange(exchange, value); throw ;
 		//apply adjustment at CFD contract level (address _who)
 	}
     
 	function placeOrderExchange(address targetDrago, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {
-		HumanStandardDrago m = HumanStandardDrago(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.placeOrderExchange(exchange, is_stable, adjustment, stake); throw ;
 	}
     
 	function cancelOrderExchange(address targetDrago, address exchange, uint32 id) {
-		HumanStandardDrago m = HumanStandardDrago(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.cancelOrderExchange(exchange, id); throw ;
 	}
     
 	function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {
-		HumanStandardDrago m = HumanStandardDrago(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.finalizeDealExchange(exchange, id); throw; ;
 	}  
 }
