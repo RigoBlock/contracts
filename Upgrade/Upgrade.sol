@@ -10,15 +10,15 @@ contract Upgrade {
     if (msg.sender == owner) _;
   }
 
-  function setUpgraded(uint done) restricted {
-    last_completed_upgrade = done;
+  function setUpgraded(uint confirmed) restricted {
+    lastCompletedUpgrade = confirmed;
   }
 
   function upgrade(address newAddress) restricted {
     Upgrade upgraded = Upgrade(newAddress);
-    upgraded.setUpgraded(lastDoneUpgrade);
+    upgraded.setUpgraded(lasConfirmedUpgrade);
   }
   
   address public owner = msg.sender;
-  uint public lastDoneUpgrade;
+  uint public lastConfirmedUpgrade;
 }
