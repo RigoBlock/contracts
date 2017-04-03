@@ -42,9 +42,7 @@ contract Prices is PricesFace {
     return getValues;
   }
   
-  uint constant frequency = 120;
-  uint constant validity = 60;
+  uint constant range = 600;
   Value public data;
-  address quoteAsset;
   mapping (address => Values) data;
 }
