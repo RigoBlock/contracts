@@ -33,7 +33,7 @@ contract Gabcoin is ERC20Face {
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
  
  	function Gabcoin(string _dragoName,  string _dragoSymbol) {}    
-  function() payable {}		
+	function() payable {}		
 	function buyGabcoin() payable returns (uint amount) {}	
 	function sellGabcoin(uint256 amount) returns (uint revenue, bool success) {}	
 	function changeRatio(uint256 _ratio) onlyCoinator {}	
@@ -41,21 +41,12 @@ contract Gabcoin is ERC20Face {
 	function changeFeeCollector(address _feeCollector) onlyOwner {}	
 	function changeCoinator(address _coinator) onlyCoinator {}
 	
+	
 	function balanceOf(address _from) constant returns (uint256 balance) {}
-	
-	string public name;
-  string public symbol;
-  string public version = 'GC 0.2';
-	uint256 public price= 1 ether;  // prevously 1 finney
-	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
-	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
-	address public feeCollector = msg.sender;
-	address public coinator = msg.sender;
-	uint gross_amount;
-	uint fee;
-	uint fee_gabcoin;
-	uint fee_coinator;
-	uint256 public ratio = 80;
-	
-	mapping (address => uint256) public balances;
+	function getVersion() constant returns (string version) {}
+	function getName() constant returns (string name) {}
+	function getSymbol() constant returns (string symbol) {}
+	function getPrice() constant returns (uint256 price) {}
+	function getTransactionFee() constant returns (uint256 transactionFee) {}
+	function getFeeCollector() constant returns (address feeCollector) {}
 }
