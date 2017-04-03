@@ -4,4 +4,9 @@
 
 pragma solidity ^0.4.10;
 
-contract AssetFace {}
+contract AssetFace is ERC20Face {
+
+  function getName() constant returns (string) {}
+  function getSymbol() constant returns (string) {}
+  function getDecimals() constant returns (uint) {}
+}
