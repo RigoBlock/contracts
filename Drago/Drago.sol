@@ -30,6 +30,7 @@ contract ERC20Face is Dragowned {
 contract Drago is ERC20Face {
 	
 	modifier onlyDragator { if (msg.sender != Dragator) return; _; }
+	//modifier when_approved_exchange { if (exchange != approved) return; _; }
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
@@ -42,6 +43,8 @@ contract Drago is ERC20Face {
     	function() payable {
 		buyDrago();
     	}
+	
+	//TODO: separate function and its specifics
 	
 	function buyDrago() payable returns (uint amount) {
 		if (!approvedAccount[msg.sender]) throw;
@@ -98,25 +101,6 @@ contract Drago is ERC20Face {
 	function balanceOf(address _from) constant returns (uint256 balance) {
 		return balances[_from];
 	}
-	
-	string public name;
-    	string public symbol;
-    	string public version = 'H0.1';
-	uint256 public price= 1 finney;
-	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
-	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
-	address public feeCollector = tx.origin;
-	address public Dragator = msg.sender;
-	uint gross_amount;
-	uint fee;
-	uint fee_dragoo;
-	uint fee_dragator;
-	uint256 public ratio = 80;
-}
-
-contract DragoAdmin is DragoFace {
-    
-	//modifier when_approved_exchange { if (exchange != approved) return; _; }
     
 	function depositToExchange(address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {
 		//address who used to determine from which account _who is the drago contract
@@ -143,10 +127,20 @@ contract DragoAdmin is DragoFace {
 		CFD c = CFD(exchange);
 		if (!c.finalize(id) ; throw ;
 	}
-    
-	function() payable {
-		buy();
-	}
+	
+	string public name;
+    	string public symbol;
+    	string public version = 'H0.1';
+	uint256 public price= 1 finney;
+	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
+	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
+	address public feeCollector = tx.origin;
+	address public Dragator = msg.sender;
+	uint gross_amount;
+	uint fee;
+	uint fee_dragoo;
+	uint fee_dragator;
+	uint256 public ratio = 80;
 	
 	mapping (address => uint256) public balances;
 }
