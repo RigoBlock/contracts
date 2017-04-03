@@ -10,5 +10,5 @@ contract Upgrade {
   function upgrade(address newAddress) restricted {}
   
   function getOwner() constant returns (address owner) {}
-  function getLastUpgrade() constant returns (uint lastDoneUpgrade) {}
+  function getConfirmedUpgrade() constant returns (uint lastConfirmedUpgrade) {}
 }
