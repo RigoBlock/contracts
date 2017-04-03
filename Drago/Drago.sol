@@ -134,7 +134,7 @@ contract Drago is ERC20Face {
 	uint256 public price= 1 finney;
 	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
 	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
-	address public feeCollector = tx.origin;
+	address public feeCollector = msg.sender;
 	address public Dragator = msg.sender;
 	uint gross_amount;
 	uint fee;
