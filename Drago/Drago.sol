@@ -28,9 +28,21 @@ contract ERC20Face is Dragowned {
 }
 
 contract Drago is ERC20Face {
+
+	struct Receipt {
+		uint units;
+		uint32 activation;
+	}
+	
+	struct Account {
+		uint balance;
+		mapping (uint => Receipt) receipt;
+		mapping (address => uint) allowanceOf;
+	}
 	
 	modifier onlyDragator { if (msg.sender != Dragator) return; _; }
 	//modifier when_approved_exchange { if (exchange != approved) return; _; }
+	modifier minimum_period_past(uint _price, uint _units) { if now < balances[msg.sender].receipt[_price].activation) return; _; }
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
@@ -57,13 +69,13 @@ contract Drago is ERC20Face {
         	balances[msg.sender] += amount;
         	balances[feeCollector] += fee_dragoo;
         	balances[Dragator] += fee_dragator;
+		accounts[msg.sender].receipt[price].activation = uint32(now) + refundActivationPeriod;
         	totalSupply += gross_amount;
         	Buy(0, msg.sender, this, amount, revenue);
         	return amount;
 	}
 	
-	//consider option of 48 hours delayed call
-	function sellDrago(uint256 amount) returns (uint revenue, bool success) {
+	function sellDrago(uint256 amount) returns (uint revenue, bool success) minimum_period_past {
 		if (!approvedAccount[msg.sender]) throw;
 		revenue = safeMul(amount * sellPrice);
         	if (balances[msg.sender] >= amount && balances[msg.sender] + amount > balances[msg.sender] && revenue >= min_order) {
@@ -76,6 +88,10 @@ contract Drago is ERC20Face {
 			}
 			return (revenue, true);
 		} else { return (revenue, false); }
+	}
+	
+	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) onlyDragator {
+		refundActivationPeriod = _refundActivationPeriod;
 	}
 	
 	function changeRatio(uint256 _ratio) onlyDragator {
@@ -142,6 +158,7 @@ contract Drago is ERC20Face {
 	uint fee_dragoo;
 	uint fee_dragator;
 	uint256 public ratio = 80;
+	uint32 constant refundActivationPeriod = 2 days;
 	
 	mapping (address => uint256) public balances;
 }
