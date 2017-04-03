@@ -6,6 +6,8 @@ pragma solidity ^0.4.10;
 
 contract RigoTok is ERC20, SafeMath, RigoBlockFace {
 
+    event TokenMinted(address indexed recipient, uint amount);
+
     modifier onlyMinter {
         assert(msg.sender == minter);
         _;
@@ -54,8 +56,6 @@ contract RigoTok is ERC20, SafeMath, RigoBlockFace {
     uint public constant decimals = 18;
     uint public startTime;
     uint public endTime;
-    address public minter;
-    address public rigoblock;
     address public minter;
     address public rigoblock;
 }
