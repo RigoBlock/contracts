@@ -81,7 +81,7 @@ library DragoFactory is Dragowned, DragoFactoryFace {
 	}
     
 	function changeDragator(address targetDrago, address _dragator) {
-		Dragoo m = Drago(targetDrago);
+		Drago m = Drago(targetDrago);
 		if (!m.changeDragator(_dragator); throw ;
 	}
     
