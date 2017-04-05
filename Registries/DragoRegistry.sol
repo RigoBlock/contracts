@@ -16,6 +16,8 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		mapping (bytes32 => bytes32) meta;
 	}
     
+    	//modifier only_drago_created_on_platform;
+	
 	modifier when_address_free(address _addr) { if (mapFromAddress[_addr] != 0) return; _; }
 	modifier when_name_free(bytes32 _name) { if (mapFromName[_name] != 0) return; _; }
 	modifier when_has_name(bytes32 _name) { if (mapFromName[_name] == 0) return; _; }
