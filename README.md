@@ -15,7 +15,8 @@ Directory of our contracts.
     ```
     curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
     sudo apt-get install -y nodejs
-
+    ```
+    ```
     npm install
     ```
 
@@ -26,7 +27,7 @@ Go to your `contracts` directory, open a terminal and:
 1. Run testrpc:
     ```
     cd node_modules/.bin
-    ./testrpc
+    testrpc
     ```
 
 2. In a second terminal:
