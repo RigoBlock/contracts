@@ -1,7 +1,7 @@
 {
   "name": "rigoblock contracts",
   "version": "0.2",
-  "description": "Smart contracts for decentralized HF",
+  "description": "Smart contracts for decentralized asset management",
   "directories": {
     "test": "test"
   },
