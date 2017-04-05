@@ -1,0 +1,23 @@
+{
+  "name": "rigoblock contracts",
+  "version": "0.2",
+  "description": "Smart contracts for decentralized HF",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "author": "Gabriele Rigo",
+  "license": "Apache 2.0",
+  "keywords": [
+    "ethereum",
+    "eth",
+    "decentralized",
+    "fund"
+  ],
+  "devDependencies": {
+    "truffle": "3.1.2",
+    "ethereumjs-testrpc": "3.0.3"
+  }
+}
