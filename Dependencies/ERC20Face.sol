@@ -18,6 +18,6 @@ contract ERC20Face {
 	function approve(address _spender, uint256 _value) returns (bool success) {}
 
 	function totalSupply() constant returns (uint256 total) {}
-	function balanceOf(address _owner) constant returns (uint256 balance) {}
+	function balanceOf(address _who) constant returns (uint256 balance) {}
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 }
