@@ -87,7 +87,7 @@ contract Contribution is SafeMath {
     uint public constant PRICE_RATE_THIRD = 52500;
     uint public constant PRICE_RATE_FOURTH = 51250;
     uint public constant DIVISOR_PRICE = 1000; // Price rates are divided by this number
-    uint public constant RIGOBLOCK_STAKE = 2000; // 20% of all created melon token allocated to rigoblock
+    uint public constant RIGOBLOCK_STAKE = 2000; // 20% of all created tokens allocated to rigoblock
     uint public startTime;
     uint public endTime;
     uint public etherRaised;
