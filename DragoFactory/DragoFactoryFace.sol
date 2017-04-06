@@ -4,14 +4,20 @@
 
 pragma solidity ^0.4.10;
 
-library DragoFactoryFace is Dragowned {
-	
+contract Owned {
+	event NewOwner(address indexed old, address indexed current);
+	function setOwner(address _new) {}	
+	function getOwner() constant returns (address owner) {}
+}
+
+contract DragoFactoryFace is Owned {
+
     event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
 
-    function createDrago(string _name, string _symbol, address _dragowner) when_fee_paid returns (address _drago, uint _dragoID) {}
-    function setFee(uint _fee) onlyDragowner {}
-    function setBeneficiary(address _dragoDAO) onlyDragowner {}
-    function drain() onlyDragowner {}
+    function createDrago(string _name, string _symbol, address _dragowner) returns (address _drago, uint _dragoID) {}
+    function setFee(uint _fee) {}
+    function setBeneficiary(address _dragoDAO) {}
+    function drain() {}
     function() {}
     function buyDrago(address targetDrago) payable {}
     function sellDrago(address targetDragoo, uint256 amount) {}
