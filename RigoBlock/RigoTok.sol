@@ -14,7 +14,7 @@ contract RigoTok is ERC20, SafeMath, RigoTokFace {
     }
 
     modifier onlyRigoblock {
-        assert(msg.sender == melonport);
+        assert(msg.sender == rigoblock);
         _;
     }
 
