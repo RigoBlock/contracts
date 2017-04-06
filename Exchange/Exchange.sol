@@ -17,31 +17,30 @@ contract Exchange is ExchangeFace {
 
 	// METHODS
 
-	function deposit(address _who) payable {}
-	
+	//function deposit(address _who) payable {}	
 	function deposit(address token, uint256 amount) payable {
-    		if (token == address(0)) {
-      			tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
-    		} else {
-      			if (msg.value != 0) throw;
-      			tokens[token][msg.sender] = safeAdd(tokens[token][msg.sender], amount);
-      			if (!Token(token).transferFrom(msg.sender, this, amount)) throw;
-    		}
-    		Deposit(token, msg.sender, amount, tokens[token][msg.sender]);
-  	}
+        //remember to call Token(address).approve(this, amount) or this contract will not be able to do the transfer on your behalf.
+        	if (token == address(0)) {
+            		tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
+        	} else {
+            		if (msg.value != 0) throw;
+            		tokens[token][msg.sender] = safeAdd(tokens[token][msg.sender], amount);
+            		if (!Token(token).transferFrom(msg.sender, this, amount)) throw;
+        	}
+       		Deposit(token, msg.sender, amount, tokens[token][msg.sender]);
+	}
 	
-	function withdraw(uint value) returns (bool success) {}
-	
+	//function withdraw(uint value) returns (bool success) {}	
 	function withdraw(address token, uint256 amount) {
-    		if (tokens[token][msg.sender] < amount) throw;
-    		tokens[token][msg.sender] = safeSub(tokens[token][msg.sender], amount);
-    		if (token == address(0)) {
-      		if (!msg.sender.send(amount)) throw;
-    		} else {
-      		if (!Token(token).transfer(msg.sender, amount)) throw;
-    		}
-    		Withdraw(token, msg.sender, amount, tokens[token][msg.sender]);
-  	}
+        	if (tokens[token][msg.sender] < amount) throw;
+        	tokens[token][msg.sender] = safeSub(tokens[token][msg.sender], amount);
+        	if (token == address(0)) {
+            		if (!msg.sender.call.value(amount)()) throw; //amended from msg.sender.send(amount)
+        	} else {
+            		if (!Token(token).transfer(msg.sender, amount)) throw;
+        	}
+        	Withdraw(token, msg.sender, amount, tokens[token][msg.sender]);
+    	}
   
 	function order(bool is_stable, uint32 adjustment, uint128 stake) payable {}
 	function cancel(uint32 id) {}
