@@ -14,7 +14,7 @@ contract Contribution is SafeMath {
         _;
     }
 
-    modifier onlyRigoblock {
+    modifier only_rigoblock {
         assert(msg.sender == rigoblock);
         _;
     }
@@ -62,7 +62,7 @@ contract Contribution is SafeMath {
         halted = true;
     }
 
-    function unhalt() only_melonport {
+    function unhalt() only_rigoblock {
         halted = false;
     }
 
