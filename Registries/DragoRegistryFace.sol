@@ -12,7 +12,7 @@ contract DragoRegistryFace {
         
 	function register(address _drago, uint _dragoID) {}	
 	function register(address _addr, string _tla, uint _base, string _name) payable returns (bool) {}
-	function unregister(uint _id) only_owner {}
+	function unregister(uint _id) {}
 	
 	function accountOf(uint _dragoID) constant returns (address) {}   
 	function dragoOf(address _drago) constant returns (uint) {}
@@ -21,5 +21,5 @@ contract DragoRegistryFace {
 	function fromAddress(address _addr) constant returns (uint id, string tla, uint base, string name, address owner) {}
 	function fromTLA(string _tla) constant returns (uint id, address addr, uint base, string name, address owner) {}
 	function meta(uint _id, bytes32 _key) constant returns (bytes32) {}
-	function setMeta(uint _id, bytes32 _key, bytes32 _value) only_token_owner(_id) {}
+	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
 }
