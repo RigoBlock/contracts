@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-contract RigoTok is ERC20, SafeMath, RigoBlockFace {
+contract RigoTok is ERC20, SafeMath, RigoTokFace {
 
     event TokenMinted(address indexed recipient, uint amount);
 
