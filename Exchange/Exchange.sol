@@ -4,6 +4,10 @@
 
 pragma solidity ^0.4.10;
 
+contract AccountLevels {
+	function accountLevel(address user) constant returns(uint) {}
+}
+
 contract Exchange is ExchangeFace {
 
 	// EVENTS
@@ -15,6 +19,12 @@ contract Exchange is ExchangeFace {
 	event OrderCancelled(uint32 indexed id, address indexed who, uint128 stake);
 	event DealFinalized(uint32 indexed id, address indexed stable, address indexed leveraged, uint64 price);
 
+	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
+  	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
+  	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
+  	event Deposit(address token, address user, uint amount, uint balance);
+  	event Withdraw(address token, address user, uint amount, uint balance);
+	
 	// METHODS
 
 	//function deposit(address _who) payable {}	
@@ -43,7 +53,49 @@ contract Exchange is ExchangeFace {
     	}
   
 	function order(bool is_stable, uint32 adjustment, uint128 stake) payable {}
+	function order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce) {
+    		bytes32 hash = sha256(this, tokenGet, amountGet, tokenGive, amountGive, expires, nonce);
+    		orders[msg.sender][hash] = true;
+    		Order(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, msg.sender);
+  	}
+	
+	function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) {
+    		//amount is in amountGet terms
+    		bytes32 hash = sha256(this, tokenGet, amountGet, tokenGive, amountGive, expires, nonce);
+    		if (!(
+      			(orders[user][hash] || ecrecover(sha3("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
+      			block.number <= expires &&
+      			safeAdd(orderFills[user][hash], amount) <= amountGet
+    		)) throw;
+    		tradeBalances(tokenGet, amountGet, tokenGive, amountGive, user, amount);
+    		orderFills[user][hash] = safeAdd(orderFills[user][hash], amount);
+    		Trade(tokenGet, amount, tokenGive, amountGive * amount / amountGet, user, msg.sender);
+  	}
+	
+	function tradeBalances(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user, uint amount) private {
+    		uint feeMakeXfer = safeMul(amount, feeMake) / (1 ether);
+    		uint feeTakeXfer = safeMul(amount, feeTake) / (1 ether);
+    		uint feeRebateXfer = 0;
+    		if (accountLevelsAddr != 0x0) {
+      			uint accountLevel = AccountLevels(accountLevelsAddr).accountLevel(user);
+      			if (accountLevel==1) feeRebateXfer = safeMul(amount, feeRebate) / (1 ether);
+      			if (accountLevel==2) feeRebateXfer = feeTakeXfer;
+    		}
+    		tokens[tokenGet][msg.sender] = safeSub(tokens[tokenGet][msg.sender], safeAdd(amount, feeTakeXfer));
+    		tokens[tokenGet][user] = safeAdd(tokens[tokenGet][user], safeSub(safeAdd(amount, feeRebateXfer), feeMakeXfer));
+    		tokens[tokenGet][feeAccount] = safeAdd(tokens[tokenGet][feeAccount], safeSub(safeAdd(feeMakeXfer, feeTakeXfer), feeRebateXfer));
+    		tokens[tokenGive][user] = safeSub(tokens[tokenGive][user], safeMul(amountGive, amount) / amountGet);
+    		tokens[tokenGive][msg.sender] = safeAdd(tokens[tokenGive][msg.sender], safeMul(amountGive, amount) / amountGet);
+  	}
+  
 	function cancel(uint32 id) {}
+	function cancelOrder(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {
+   		bytes32 hash = sha256(this, tokenGet, amountGet, tokenGive, amountGive, expires, nonce);
+    		if (!(orders[msg.sender][hash] || ecrecover(sha3("\x19Ethereum Signed Message:\n32", hash),v,r,s) == msg.sender)) throw;
+    		orderFills[msg.sender][hash] = amountGet;
+    		Cancel(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, msg.sender, v, r, s);
+  	}
+  	
 	function finalize(uint24 id) {}
 	
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
@@ -54,4 +106,30 @@ contract Exchange is ExchangeFace {
 	function balanceOf(address token, address user) constant returns (uint256) {
     		return tokens[token][user];
   	}
+	
+	function availableVolume(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) constant returns(uint) {
+    		bytes32 hash = sha256(this, tokenGet, amountGet, tokenGive, amountGive, expires, nonce);
+    		if (!(
+      			(orders[user][hash] || ecrecover(sha3("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
+      			block.number <= expires
+    		)) return 0;
+    		uint available1 = safeSub(amountGet, orderFills[user][hash]);
+    		uint available2 = safeMul(tokens[tokenGive][user], amountGet) / amountGive;
+    		if (available1<available2) return available1;
+    		return available2;
+  	}
+	
+	function amountFilled(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) constant returns(uint) {
+    		bytes32 hash = sha256(this, tokenGet, amountGet, tokenGive, amountGive, expires, nonce);
+    		return orderFills[user][hash];
+  	}
+	
+	mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
+  	mapping (address => mapping (bytes32 => bool)) public orders; //mapping of user accounts to mapping of order hashes to booleans (true = submitted by user, equivalent to offchain signature)
+  	mapping (address => mapping (bytes32 => uint)) public orderFills;
+  	uint public feeMake; //percentage times (1 ether)
+  	uint public feeTake; //percentage times (1 ether)
+  	uint public feeRebate;
+  	address public feeAccount; //the account that will receive fees
+  	address public accountLevelsAddr;
 }
