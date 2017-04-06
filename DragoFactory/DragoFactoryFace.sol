@@ -20,16 +20,16 @@ contract DragoFactoryFace is Owned {
     function drain() {}
     function() {}
     function buyDrago(address targetDrago) payable {}
-    function sellDrago(address targetDragoo, uint256 amount) {}
-    function changeRatio(address targetDragoo, uint256 _ratio) {}
-    function setTransactionFee(address targetDragoo, uint _transactionFee) {}
-    function changeFeeCollector(address targetDragoo, address _feeCollector) {}
-    function changeDragator(address targetDragoo, address _dragator) {}
-    function depositToExchange(address targetDragoo, address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {}
-    function withdrawFromExchange(address targetDragoo, address exchange, uint value) returns (bool success) {}
-    function placeOrderExchange(address targetDragoo, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {}
-    function cancelOrderExchange(address targetDragoo, address exchange, uint32 id) {}  
-    function finalizedDealExchange(address targetDragoo, address exchange, uint24 id) {}
+    function sellDrago(address targetDrago, uint256 amount) {}
+    function changeRatio(address targetDrago, uint256 _ratio) {}
+    function setTransactionFee(address targetDrago, uint _transactionFee) {}
+    function changeFeeCollector(address targetDrago, address _feeCollector) {}
+    function changeDragator(address targetDrago, address _dragator) {}
+    function depositToExchange(address targetDrago, address exchange, address _who) payable returns(bool success) {}
+    function withdrawFromExchange(address targetDrago, address exchange, uint value) returns (bool success) {}
+    function placeOrderExchange(address targetDrago, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {}
+    function cancelOrderExchange(address targetDrago, address exchange, uint32 id) {}  
+    function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {}
     
     function getVersion() constant returns (string version) {}
     function geeLastId() constant returns (uint _dragoID) {}
