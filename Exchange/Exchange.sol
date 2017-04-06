@@ -72,7 +72,7 @@ contract Exchange is ExchangeFace {
     		Trade(tokenGet, amount, tokenGive, amountGive * amount / amountGet, user, msg.sender);
   	}
 	
-	function tradeBalances(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user, uint amount) private {
+	function tradeBalances(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user, uint amount) internal {
     		uint feeMakeXfer = safeMul(amount, feeMake) / (1 ether);
     		uint feeTakeXfer = safeMul(amount, feeTake) / (1 ether);
     		uint feeRebateXfer = 0;
