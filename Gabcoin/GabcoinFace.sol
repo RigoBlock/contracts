@@ -29,8 +29,8 @@ contract ERC20Face is Owned {
 
 contract GabcoinFace is ERC20Face {
 
-	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
-	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
+	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
+	event Sell(address indexed from, address indexed to, uint256 indexed _amount,uint256 _revenue);
  
  	function Gabcoin(string _dragoName,  string _dragoSymbol) {}    
 	function() payable {}		
