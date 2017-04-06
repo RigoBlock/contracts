@@ -185,12 +185,12 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	}
 	
 	function setOwner(address _new) only_owner {
-        owner = _new;
-        NewOwner(owner, _new);
-    }
+		owner = _new;
+		NewOwner(owner, _new);
+	}
 	
+	Drago drago = Drago(_targetDrago);
 	string public version = 'DF0.2';
-	//uint[] _dragoID; //amended below to have first fund ID = 1
 	uint _dragoID = 0;
 	uint public fee = 0;
 	uint public nextDragoID;
@@ -199,6 +199,5 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	address _targetDrago;
 	address _dragoRegistry;
 	address public owner = msg.sender;
-	Drago drago = Drago(_targetDrago);
 	mapping(address => address[]) public created;
 }
