@@ -4,13 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-contract Owned {
-	event NewOwner(address indexed old, address indexed current);
-	function setOwner(address _new) {}	
-	function getOwner() constant returns (address owner) {}
-}
-
-contract DragoFactoryFace is Owned {
+contract DragoFactoryFace {
 
 	event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
 
