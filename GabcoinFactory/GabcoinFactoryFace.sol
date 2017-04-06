@@ -22,5 +22,5 @@ contract GabcoinFactoryFace is Owned {
 
     function getVersion() constant returns (string version) {}
     function geeLastId() constant returns (uint _dragoID) {}
-    function getGavcoinDAO() constant returns (uint gabcoinDAO) {}
+    function getGabcoinDao() constant returns (uint gabcoinDao) {}
 }
