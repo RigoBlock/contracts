@@ -8,7 +8,7 @@ contract Contribution is SafeMath {
 
     event TokensBought(address indexed sender, uint eth, uint amount);
 
-    modifier isSignerSignature(uint8 v, bytes32 r, bytes32 s) {
+    modifier is_signer_signature(uint8 v, bytes32 r, bytes32 s) {
         bytes32 hash = sha256(msg.sender);
         assert(ecrecover(hash, v, r, s) == signer);
         _;
@@ -19,22 +19,22 @@ contract Contribution is SafeMath {
         _;
     }
 
-    modifier notHalted {
+    modifier not_halted {
         assert(!halted);
         _;
     }
 
-    modifier etherTargetNotReached {
+    modifier ether_target_not_reached {
         assert(safeAdd(etherRaised, msg.value) <= ETHER_CAP);
         _;
     }
 
-    modifier notEarlierThan(uint x) {
+    modifier not_earlier_than(uint x) {
         assert(now >= x);
         _;
     }
 
-    modifier isEarlierThan(uint x) {
+    modifier is_earlier_than(uint x) {
         assert(now < x);
         _;
     }
@@ -45,12 +45,12 @@ contract Contribution is SafeMath {
         startTime = setStartTime;
         endTime = startTime + MAX_CONTRIBUTION_DURATION;
         rigoTok = new RigoTok(this, rigoblock, startTime, endTime);
-        rigoTok.mintToken(rigoblock, RIGOBLOCK_STAKE * stakeMultiplier);
+        rigoTok.mintToken(rigoblock, RIGOBLOCK_STAKE);  //stakeMultiplier
     }
 
     function buy(uint8 v, bytes32 r, bytes32 s) payable { buyRecipient(msg.sender, v, r, s); }
 
-    function buyRecipient(address recipient, uint8 v, bytes32 r, bytes32 s) payable isSignerSignature(v, r, s) notEarlierThan(startTime) notHalted etherCapNotReached {
+    function buyRecipient(address recipient, uint8 v, bytes32 r, bytes32 s) payable is_signer_signature(v, r, s) not_earlier_than(startTime) not_halted ether_target_not_reached {
         uint amount = safeMul(msg.value, priceRate()) / DIVISOR_PRICE;
         rigoTok.mintToken(recipient, amount);
         etherRaised = safeAdd(etherRaised, msg.value);
@@ -58,7 +58,7 @@ contract Contribution is SafeMath {
         TokensBought(recipient, msg.value, amount);
     }
 
-    function halt() onlyRigoblock {
+    function halt() only_rigoblock {
         halted = true;
     }
 
@@ -66,7 +66,7 @@ contract Contribution is SafeMath {
         halted = false;
     }
 
-    function changeRigoblockAddress(address newAddress) onlyRigoblock { rigoblock = newAddress; }
+    function changeRigoblockAddress(address newAddress) only_rigoblock { rigoblock = newAddress; }
     
     function priceRate() constant returns (uint) {
         if (startTime <= now && now < startTime + 1 weeks)
@@ -91,6 +91,7 @@ contract Contribution is SafeMath {
     uint public startTime;
     uint public endTime;
     uint public etherRaised;
+    bool public halted;
     address public rigoblock;
     address public signer;
     RigoTok public rigoTok;
