@@ -27,7 +27,7 @@ contract ERC20Face is Owned {
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 }
 
-contract Gabcoin is ERC20Face {
+contract GabcoinFace is ERC20Face {
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
@@ -36,10 +36,10 @@ contract Gabcoin is ERC20Face {
 	function() payable {}		
 	function buyGabcoin() payable returns (uint amount) {}	
 	function sellGabcoin(uint256 amount) returns (uint revenue, bool success) {}	
-	function changeRatio(uint256 _ratio) onlyCoinator {}	
-	function setTransactionFee(uint _transactionFee) onlyOwner {}	
-	function changeFeeCollector(address _feeCollector) onlyOwner {}	
-	function changeCoinator(address _coinator) onlyCoinator {}
+	function changeRatio(uint256 _ratio) {}	
+	function setTransactionFee(uint _transactionFee) {}	
+	function changeFeeCollector(address _feeCollector) {}	
+	function changeCoinator(address _coinator) {}
 	
 	
 	function balanceOf(address _from) constant returns (uint256 balance) {}
