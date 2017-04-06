@@ -45,14 +45,14 @@ contract Contribution is SafeMath {
         startTime = setStartTime;
         endTime = startTime + MAX_CONTRIBUTION_DURATION;
         rigoTok = new RigoTok(this, rigoblock, startTime, endTime);
-        melonToken.mintToken(rigoblock, RIGOBLOCK_COMPANY_STAKE * stakeMultiplier);
+        rigoTok.mintToken(rigoblock, RIGOBLOCK_STAKE * stakeMultiplier);
     }
 
     function buy(uint8 v, bytes32 r, bytes32 s) payable { buyRecipient(msg.sender, v, r, s); }
 
     function buyRecipient(address recipient, uint8 v, bytes32 r, bytes32 s) payable isSignerSignature(v, r, s) notEarlierThan(startTime) notHalted etherCapNotReached {
         uint amount = safeMul(msg.value, priceRate()) / DIVISOR_PRICE;
-        RigoTok.mintToken(recipient, amount);
+        rigoTok.mintToken(recipient, amount);
         etherRaised = safeAdd(etherRaised, msg.value);
         assert(rigoblock.send(msg.value));
         TokensBought(recipient, msg.value, amount);
