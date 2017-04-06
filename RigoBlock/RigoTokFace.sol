@@ -9,11 +9,11 @@ contract RigoTokFace {
     event TokenMinted(address indexed recipient, uint amount);
 
     function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) {}
-    function mintToken(address recipient, uint amount) external onlyMinter {}
-    function transfer(address recipient, uint amount) isLaterThan(endTime) returns (bool success) {}
-    function transferFrom(address sender, address recipient, uint amount) isLaterThan(endTime) returns (bool success) {}
-    function changeMintingAddress(address newAddress) onlyRigoblock {}
-    function changeRigoblockAddress(address newAddress) onlyRigoblock {}
+    function mintToken(address recipient, uint amount) external {}
+    function transfer(address recipient, uint amount) returns (bool success) {}
+    function transferFrom(address sender, address recipient, uint amount) returns (bool success) {}
+    function changeMintingAddress(address newAddress) {}
+    function changeRigoblockAddress(address newAddress) {}
     
     function getName() constant returns (string name) {}
     function getSymbol() constant returns (string symbol) {}
