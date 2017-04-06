@@ -8,19 +8,19 @@ contract DragoFace is ERC20Face {
 
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
-	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 indexed _revenue);
+	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
+	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	
  	function Drago(string _dragoName,  string _dragoSymbol) {}
 	function() payable {}
 	function buy() payable returns (uint amount) {}
 	function sell(uint256 amount) returns (uint revenue, bool success) {}
-	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) onlyDragator {}
-	function changeRatio(uint256 _ratio) onlyDragator {} 
-	function setTransactionFee(uint _transactionFee) onlyDragowner {}  
-	function changeFeeCollector(address _feeCollector) onlyDragowner {}
-	function changeDragator(address _dragator) onlyDragator {}
-	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner {}
+	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) {}
+	function changeRatio(uint256 _ratio) {}
+	function setTransactionFee(uint _transactionFee) {}
+	function changeFeeCollector(address _feeCollector) {}
+	function changeDragator(address _dragator) {}
+	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) {}
 	function DragoAdmin(string _dragoName,  string _dragoSymbol, address _dragowner) {}
 	function depositToExchange(address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {}
 	function withdrawFromExchange(address exchange, uint value) returns (bool success) {}
