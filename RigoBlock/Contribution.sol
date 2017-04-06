@@ -50,7 +50,7 @@ contract Contribution is SafeMath {
 
     function buy(uint8 v, bytes32 r, bytes32 s) payable { buyRecipient(msg.sender, v, r, s); }
 
-    function buyRecipient(address recipient, uint8 v, bytes32 r, bytes32 s) payable is_signer_signature(v, r, s) not_earlier_than(startTime) not_halted ether_target_not_reached {
+    function buyRecipient(address recipient, uint8 v, bytes32 r, bytes32 s) internal is_signer_signature(v, r, s) not_earlier_than(startTime) not_halted ether_target_not_reached {
         uint amount = safeMul(msg.value, priceRate()) / DIVISOR_PRICE;
         rigoTok.mintToken(recipient, amount);
         etherRaised = safeAdd(etherRaised, msg.value);
