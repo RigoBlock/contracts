@@ -80,7 +80,7 @@ contract Contribution is SafeMath {
         assert(false);
     }
     
-    uint public constant ETHER_CAP = 20000 ether;
+    uint public constant ETHER_CAP = 1000000 ether;
     uint public constant MAX_CONTRIBUTION_DURATION = 4 weeks;
     uint public constant PRICE_RATE_FIRST = 55000;
     uint public constant PRICE_RATE_SECOND = 53750;
