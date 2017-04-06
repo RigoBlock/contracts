@@ -5,10 +5,9 @@
 pragma solidity ^0.4.10;
 
 contract Owned {
-
 	event NewOwner(address indexed old, address indexed current);
-
-	function transferOwnership(address newOwner) onlyOwner {}
+	function setOwner(address _new) {}
+	function getOwner() constant returns (address owner) {}
 }
 
 contract ERC20Face is Owned {
@@ -20,11 +19,9 @@ contract ERC20Face is Owned {
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 	function approve(address _spender, uint256 _value) returns (bool success) {}
 
-	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 	function totalSupply() constant returns (uint256 total) {}
-	function balanceOf(address _owner) constant returns (uint256 balance) {}
-	//function balanceOf(address _who) constant returns (uint256 balance);
-	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
+	function balanceOf(address _who) constant returns (uint256 balance) {}
+	function allowance(address _owner, address _spender) constant returns (uint256 remaining)
 }
 
 contract GabcoinFace is ERC20Face {
