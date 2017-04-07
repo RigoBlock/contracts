@@ -35,6 +35,7 @@ contract ExchangeFace {
 	function cancelOrder(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
 	function cancel(uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(uint24 id) {}
+	function moveOrder(uint id, uint quantity) returns (bool) {}
 	
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
 	function bestAdjustmentFor(bool _is_stable, uint128 _stake) constant returns (uint32) {}
