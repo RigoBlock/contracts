@@ -50,8 +50,8 @@ contract GabcoinFace is Owned, ERC20Face {
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount,uint256 _revenue);
-	//event DepositPos(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _casper);
- 	//event WithdrawPos(uint deposit, address indexed msg.sender, address _casper);
+	//event DepositCasper(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _casper);
+ 	//event WithdrawCasper(uint deposit, address indexed msg.sender, address _casper);
  
  	function Gabcoin(string _dragoName,  string _dragoSymbol) {}    
 	function() payable {}		
@@ -62,7 +62,6 @@ contract GabcoinFace is Owned, ERC20Face {
 	function changeFeeCollector(address _feeCollector) {}	
 	function changeCoinator(address _coinator) {}
 	
-	
 	function balanceOf(address _from) constant returns (uint256 balance) {}
 	function getVersion() constant returns (string version) {}
 	function getName() constant returns (string name) {}
@@ -70,6 +69,7 @@ contract GabcoinFace is Owned, ERC20Face {
 	function getPrice() constant returns (uint256 price) {}
 	function getTransactionFee() constant returns (uint256 transactionFee) {}
 	function getFeeCollector() constant returns (address feeCollector) {}
+	//function getCasper() constant returns (address casper) {}
 }
 
 contract Gabcoin is Owned, ERC20Face, GabcoinFace {
@@ -80,7 +80,9 @@ contract Gabcoin is Owned, ERC20Face, GabcoinFace {
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
- 
+ 	//event DepositCasper(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _casper);
+ 	//event WithdrawCasper(uint deposit, address indexed msg.sender, address _casper);
+	
 	function Gabcoin(string _gabcoinName,  string _gabcoinSymbol) {
 		name = _gabcoinName;    
 		symbol = _gabcoinSymbol;
