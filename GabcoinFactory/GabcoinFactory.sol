@@ -28,15 +28,15 @@ contract Gabcoin is Owned, ERC20Face {
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount,uint256 _revenue);
-	//event DepositPOS(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _pos);
- 	//event WithdrawPOS(uint deposit, address indexed msg.sender, address _pos);
- 
+	//event DepositCasper(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _casper);
+ 	//event WithdrawCasper(uint deposit, address indexed msg.sender, address _casper);
+
  	function Gabcoin(string _dragoName,  string _dragoSymbol) {}    
 	function() payable {}		
 	function buyGabcoin() payable returns (uint amount) {}	
 	function sellGabcoin(uint256 amount) returns (uint revenue, bool success) {}
-	//function depositPos(address targetGabcoin, address _pos) {}
-	//function withdrawPos(address targetGabcoin, address _pos) {}
+	//function depositCasper(address _validation, address _withdrawal, address _casper) returns (bool success) {}
+	//function withdrawCasper(uint _validatorIndex, address _casper) {}
 	function changeRatio(uint256 _ratio) {}	
 	function setTransactionFee(uint _transactionFee) {}	
 	function changeFeeCollector(address _feeCollector) {}	
@@ -49,6 +49,7 @@ contract Gabcoin is Owned, ERC20Face {
 	function getPrice() constant returns (uint256 price) {}
 	function getTransactionFee() constant returns (uint256 transactionFee) {}
 	function getFeeCollector() constant returns (address feeCollector) {}
+	function getCasper() constant returns (address _casper) {}
 }
 
 contract GabcoinFactoryFace is Owned {
@@ -56,8 +57,8 @@ contract GabcoinFactoryFace is Owned {
 	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
 	//event GabcoinBought();
 	//event GabcoinSold();
-	//event PosDeposited(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _pos);
- 	//event PosWithdrew(uint deposit, address indexed msg.sender, address _pos);
+	//event CasperDeposit(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _casper);
+ 	//event CasperWithdraw(uint deposit, address indexed msg.sender, address _casper);
 
 	function createGabcoin(string _name, string _symbol, address _owner) returns (address _gabcoin, uint _gabcoinID) {}
 	function setFee(uint _fee) {}
@@ -66,8 +67,8 @@ contract GabcoinFactoryFace is Owned {
 	function() {}
 	function buyGabcoin(address targetGabcoin) payable {}
 	function sellGabcoin(address targetGabcoin, uint256 amount) {}
-	//function depositPos(address targetGabcoin, address _pos) {}
-	//function withdrawPos(address targetGabcoin, address _pos) {}
+	//function depositCasper(address targetGabcoin, address _casper) {}
+	//function withdrawCasper(address targetGabcoin, address _casper) {}
 	function changeRatio(address targetGabcoin, uint256 _ratio) {}
 	function setTransactionFee(address targetGabcoin, uint _transactionFee) {}
 	function changeFeeCollector(address targetGabcoin, address _feeCollector) {}
@@ -75,7 +76,8 @@ contract GabcoinFactoryFace is Owned {
 
 	function getVersion() constant returns (string version) {}
 	function geeLastId() constant returns (uint _dragoID) {}
-	function getGabcoinDao() constant returns (uint gabcoinDao) {}
+	function getGabcoinDao() constant returns (address gabcoinDao) {}
+	//function getCasper() constant returns (address casper) {}
 }
 
 contract GabcoinFactory is Owned, GabcoinFactoryFace {
@@ -84,12 +86,13 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	modifier only_gabcoin_dao { if (msg.sender != gabcoinDao) return; _; }
 	//modifier only_gabcoin_dao
+	//modifier casper_contract_only { if (_casper != casper) return; _; }
 	
 	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
 	//event GabcoinBought();
 	//event GabcoinSold();
-	//event PosDeposited(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _pos);
- 	//event PosWithdrew(uint deposit, address indexed msg.sender, address _pos);
+	//event CasperDeposit(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _casper);
+ 	//event CasperWithdraw(uint deposit, address indexed msg.sender, address _casper);
     
 	function GabcoinFactory () {}
     
@@ -138,14 +141,14 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 	}
 	
 	/*
-	function depositPos(address targetGabcoin, address _pos) {
-		Gabcoin m = Gabcoin(targetGabcoin);
-		assert(m.depositPos(msg.value)(_pos));
+	function depositCasper(address targetGabcoin, address _casper) casper_contract_only only_owner {
+		Pos pos = Pos(_casper);
+		assert(pos.depositCasper(msg.value)(_casper));
 	}
 	
-	function withdrawPos(address targetGabcoin, address _pos) {
-		Gabcoin m = Gabcoin(targetGabcoin);
-		assert(m.withdrawPos(msg.value)(_pos));
+	function withdrawCasper(address targetGabcoin, address _casper) casper_contract_only only_owner {
+		Pos pos = Pos(_casper);
+		assert(pos.withdrawCasper(msg.value)(_casper));
 	}
 	*/
     
@@ -178,5 +181,6 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 	address public gabcoinRegistry;
 	address[] public newGabcoins;
 	address _targetGabcoin;
+	//address public casper;
 	mapping(address => address[]) public created;
 }
