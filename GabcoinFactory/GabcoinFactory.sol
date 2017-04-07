@@ -34,7 +34,9 @@ contract Gabcoin is Owned, ERC20Face {
  	function Gabcoin(string _dragoName,  string _dragoSymbol) {}    
 	function() payable {}		
 	function buyGabcoin() payable returns (uint amount) {}	
-	function sellGabcoin(uint256 amount) returns (uint revenue, bool success) {}	
+	function sellGabcoin(uint256 amount) returns (uint revenue, bool success) {}
+	//function depositPos(address targetGabcoin, address _pos) {}
+	//function withdrawPos(address targetGabcoin, address _pos) {}
 	function changeRatio(uint256 _ratio) {}	
 	function setTransactionFee(uint _transactionFee) {}	
 	function changeFeeCollector(address _feeCollector) {}	
@@ -64,6 +66,8 @@ contract GabcoinFactoryFace is Owned {
 	function() {}
 	function buyGabcoin(address targetGabcoin) payable {}
 	function sellGabcoin(address targetGabcoin, uint256 amount) {}
+	//function depositPos(address targetGabcoin, address _pos) {}
+	//function withdrawPos(address targetGabcoin, address _pos) {}
 	function changeRatio(address targetGabcoin, uint256 _ratio) {}
 	function setTransactionFee(address targetGabcoin, uint _transactionFee) {}
 	function changeFeeCollector(address targetGabcoin, address _feeCollector) {}
