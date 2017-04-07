@@ -50,8 +50,8 @@ contract GabcoinFace is Owned, ERC20Face {
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount,uint256 _revenue);
-	//event DepositPOS(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _pos);
- 	//event WithdrawPOS(uint deposit, address indexed msg.sender, address _pos);
+	//event DepositPos(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _casper);
+ 	//event WithdrawPos(uint deposit, address indexed msg.sender, address _casper);
  
  	function Gabcoin(string _dragoName,  string _dragoSymbol) {}    
 	function() payable {}		
@@ -123,22 +123,22 @@ contract Gabcoin is Owned, ERC20Face, GabcoinFace {
 	
 	/*
 	//used to deposit for pooled Proof of Stake mining
-	function depositPOS(address _validation, address _withdrawal, address _casper) casper_contract_only only_owner returns (bool success) {
+	function depositCasper(address _validation, address _withdrawal, address _casper) casper_contract_only only_owner returns (bool success) {
 		assert(self.current_epoch = block.number / self.epoch_length);
 		assert(msg.sender = _withdrawal);
 		deposit = msg.value;
 		Pos pos = Pos(_casper);
 		pos.deposit(_validation, _withdrawal);
 		return (bool success);
-		DepositPOS(msg.value, msg.sender, _validation, _withdrawal, _casper);
+		DepositCasper(msg.value, msg.sender, _validation, _withdrawal, _casper);
 	}
 
-	function withdrawPOS(uint _validatorIndex) casper_contract_only only_owner {
+	function withdrawCasper(uint _validatorIndex) casper_contract_only only_owner {
 		assert self.current_epoch >= self.validators[validator_index].withdrawal_epoch
 		//assert(validators[_validatorIndex]._withdrawal.call.value(validators[validatorIndex].deposit));
 		Pos pos = Pos(_casper);
 		pos.withdraw(uint _validatorIndex);
-		WithdrawPOS(deposit, msg.sender, _casper);
+		WithdrawCasper(deposit, msg.sender, _casper);
 	}	
 	*/
 
