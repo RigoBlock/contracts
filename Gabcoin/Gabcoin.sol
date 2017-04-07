@@ -75,6 +75,7 @@ contract Gabcoin is Owned, ERC20Face, GabcoinFace {
 	
 	modifier only_coinator { if (msg.sender != coinator) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
+	modifier casper_contract_only { if (_casper != casper) return; _; }
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
@@ -121,25 +122,25 @@ contract Gabcoin is Owned, ERC20Face, GabcoinFace {
 	
 	/*
 	//used to deposit for pooled Proof of Stake mining
-	function depositPOS(address _validation, address _withdrawal, address _pos) only_approved_validator only_owner returns (bool success) {
-		assert self.current_epoch = block.number / self.epoch_length;
-		assert msg.sender = _withdrawal;
+	function depositPOS(address _validation, address _withdrawal, address _casper) casper_contract_only only_owner returns (bool success) {
+		assert(self.current_epoch = block.number / self.epoch_length);
+		assert(msg.sender = _withdrawal);
 		deposit = msg.value;
-		Pos pos = pos(_pos);
+		Pos pos = Pos(_casper);
 		pos.deposit(_validation, _withdrawal);
 		return (bool success);
-		DepositPOS(msg.value, msg.sender, _validation, _withdrawal, _pos);
+		DepositPOS(msg.value, msg.sender, _validation, _withdrawal, _casper);
 	}
-	
-	function withdrawPOS(uint _validatorIndex) only_approved_validator only_owner {
+
+	function withdrawPOS(uint _validatorIndex) casper_contract_only only_owner {
 		assert self.current_epoch >= self.validators[validator_index].withdrawal_epoch
 		//assert(validators[_validatorIndex]._withdrawal.call.value(validators[validatorIndex].deposit));
-		Pos pos = pos(_pos);
+		Pos pos = Pos(_casper);
 		pos.withdraw(uint _validatorIndex);
-		WithdrawPOS(deposit, msg.sender);
+		WithdrawPOS(deposit, msg.sender, _casper);
 	}	
 	*/
-	
+
 	function changeRatio(uint256 _ratio) only_coinator {
 		ratio = _ratio;
 	}
@@ -170,6 +171,7 @@ contract Gabcoin is Owned, ERC20Face, GabcoinFace {
 	address public feeCollector = msg.sender;
 	address public coinator = msg.sender;
 	address public owner = msg.sender;
+	//address public casper = '0x'; //set casper address
 	uint gross_amount;
 	uint fee;
 	uint fee_gabcoin;
