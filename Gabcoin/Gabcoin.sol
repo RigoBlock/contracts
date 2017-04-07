@@ -1,7 +1,8 @@
 //! Gabcoin contract.
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
-//! Safely manage your multiple Ether holdings
+//! Safely orderly manage your multiple Ether holdings
+//! Plus casper proof of stake mining!
 
 pragma solidity ^0.4.10;
 
