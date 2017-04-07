@@ -131,13 +131,11 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 	}
         
 	function buyGabcoin(address targetGabcoin) payable {
-		Gabcoin m = Gabcoin(targetGabcoin);
-		m.buyGabcoin.value(msg.value)();
+		gabcoin.buyGabcoin.value(msg.value)();
 	}
     
 	function sellGabcoin(address targetGabcoin, uint256 amount) {
-		Gabcoin m = Gabcoin(targetGabcoin);
-		m.sellGabcoin(amount);
+		gabcoin.sellGabcoin(amount);
 	}
 	
 	/*
@@ -153,25 +151,22 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 	*/
     
 	function changeRatio(address targetGabcoin, uint256 _ratio) only_gabcoin_dao {
-		Gabcoin m = Gabcoin(targetGabcoin);
-		m.changeRatio(_ratio);
+		gabcoin.changeRatio(_ratio);
 	}
     
 	function setTransactionFee(address targetGabcoin, uint _transactionFee) {    //exmple, uint public fee = 100 finney;
-		Gabcoin m = Gabcoin(targetGabcoin);
-		m.setTransactionFee(_transactionFee);       //fee is in basis points (1 bps = 0.01%)
+		gabcoin.setTransactionFee(_transactionFee);       //fee is in basis points (1 bps = 0.01%)
 	}
     
 	function changeFeeCollector(address targetGabcoin, address _feeCollector) {
-		Gabcoin m = Gabcoin(targetGabcoin);
-		m.changeFeeCollector(_feeCollector);
+		gabcoin.changeFeeCollector(_feeCollector);
 	}
     
 	function changeCoinator(address targetGabcoin, address _coinator) {
-		Gabcoin m = Gabcoin(targetGabcoin);
-		m.changeCoinator(_coinator);
+		gabcoin.changeCoinator(_coinator);
 	}
 
+	Gabcoin gabcoin = Gabcoin(targetGabcoin);
 	string public version = 'GC 0.2';
 	uint _gabcoinID = 0;
 	uint public fee = 0;
