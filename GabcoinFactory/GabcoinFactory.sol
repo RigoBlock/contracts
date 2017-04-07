@@ -28,6 +28,8 @@ contract Gabcoin is Owned, ERC20Face {
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount,uint256 _revenue);
+	//event DepositPOS(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _pos);
+ 	//event WithdrawPOS(uint deposit, address indexed msg.sender, address _pos);
  
  	function Gabcoin(string _dragoName,  string _dragoSymbol) {}    
 	function() payable {}		
