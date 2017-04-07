@@ -39,8 +39,7 @@ contract Gabcoin is Owned, ERC20Face {
 	function setTransactionFee(uint _transactionFee) {}	
 	function changeFeeCollector(address _feeCollector) {}	
 	function changeCoinator(address _coinator) {}
-	
-	
+
 	function balanceOf(address _from) constant returns (uint256 balance) {}
 	function getVersion() constant returns (string version) {}
 	function getName() constant returns (string name) {}
@@ -53,6 +52,10 @@ contract Gabcoin is Owned, ERC20Face {
 contract GabcoinFactoryFace is Owned {
 
 	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
+	//event GabcoinBought();
+	//event GabcoinSold();
+	//event PosDeposited(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _pos);
+ 	//event PosWithdrew(uint deposit, address indexed msg.sender, address _pos);
 
 	function createGabcoin(string _name, string _symbol, address _owner) returns (address _gabcoin, uint _gabcoinID) {}
 	function setFee(uint _fee) {}
@@ -79,6 +82,10 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 	//modifier only_gabcoin_dao
 	
 	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
+	//event GabcoinBought();
+	//event GabcoinSold();
+	//event PosDeposited(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _pos);
+ 	//event PosWithdrew(uint deposit, address indexed msg.sender, address _pos);
     
 	function GabcoinFactory () {}
     
@@ -125,6 +132,18 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 		Gabcoin m = Gabcoin(targetGabcoin);
 		m.sellGabcoin(amount);
 	}
+	
+	/*
+	function depositPos(address targetGabcoin, address _pos) {
+		Gabcoin m = Gabcoin(targetGabcoin);
+		assert(m.depositPos(msg.value)(_pos));
+	}
+	
+	function withdrawPos(address targetGabcoin, address _pos) {
+		Gabcoin m = Gabcoin(targetGabcoin);
+		assert(m.withdrawPos(msg.value)(_pos));
+	}
+	*/
     
 	function changeRatio(address targetGabcoin, uint256 _ratio) only_gabcoin_dao {
 		Gabcoin m = Gabcoin(targetGabcoin);
