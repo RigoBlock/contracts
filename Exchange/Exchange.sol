@@ -59,6 +59,11 @@ contract Exchange is ExchangeFace {
     		Order(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, msg.sender);
   	}
 	
+	function moveOrder(uint id, uint quantity) returns (bool) {
+		cancel(uint32 id);
+		order(bool is_stable, uint32 adjustment, uint128 stake);
+	}	
+	
 	function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) {
     		//amount is in amountGet terms
     		bytes32 hash = sha256(this, tokenGet, amountGet, tokenGive, amountGive, expires, nonce);
