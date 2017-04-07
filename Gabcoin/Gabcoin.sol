@@ -117,6 +117,27 @@ contract Gabcoin is Owned, ERC20Face, GabcoinFace {
 		} else { return (revenue, false); }
 	}
 	
+	/*
+	//used to deposit for pooled Proof of Stake mining
+	function depositPOS(address _validation, address _withdrawal, address _pos) only_approved_validator only_owner returns (bool success) {
+		assert self.current_epoch = block.number / self.epoch_length;
+		assert msg.sender = _withdrawal;
+		deposit = msg.value;
+		Pos pos = pos(_pos);
+		pos.deposit(_validation, _withdrawal);
+		return (bool success);
+		DepositPOS(msg.value, msg.sender, _validation, _withdrawal, _pos);
+	}
+	
+	function withdrawPOS(uint _validatorIndex) only_approved_validator only_owner {
+		assert self.current_epoch >= self.validators[validator_index].withdrawal_epoch
+		//assert(validators[_validatorIndex]._withdrawal.call.value(validators[validatorIndex].deposit));
+		Pos pos = pos(_pos);
+		pos.withdraw(uint _validatorIndex);
+		WithdrawPOS(deposit, msg.sender);
+	}	
+	*/
+	
 	function changeRatio(uint256 _ratio) only_coinator {
 		ratio = _ratio;
 	}
