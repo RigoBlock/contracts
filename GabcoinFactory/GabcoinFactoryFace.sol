@@ -6,7 +6,7 @@ pragma solidity ^0.4.10;
 
 contract GabcoinFactoryFace is Owned {
 
-    event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
+	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
 	//event GabcoinBought();
 	//event GabcoinSold();
 	//event PosDeposited(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _pos);
