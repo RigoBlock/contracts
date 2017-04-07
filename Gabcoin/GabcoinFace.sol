@@ -28,11 +28,16 @@ contract GabcoinFace is ERC20Face {
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount,uint256 _revenue);
- 
+	//event DepositPOS(uint msg.value, address indexed msg.sender, address indexed _validation, address indexed _withdrawal, address _pos);
+ 	//event WithdrawPOS(uint deposit, address indexed msg.sender, address _pos);
+
+	
  	function Gabcoin(string _dragoName,  string _dragoSymbol) {}    
 	function() payable {}		
 	function buyGabcoin() payable returns (uint amount) {}	
-	function sellGabcoin(uint256 amount) returns (uint revenue, bool success) {}	
+	function sellGabcoin(uint256 amount) returns (uint revenue, bool success) {}
+	//function depositPOS(address _validation, address _withdrawal, address _pos) returns (bool success) {}
+	//function withdrawPOS(uint _validatorIndex) only_approved_validator only_owner {}
 	function changeRatio(uint256 _ratio) {}	
 	function setTransactionFee(uint _transactionFee) {}	
 	function changeFeeCollector(address _feeCollector) {}	
