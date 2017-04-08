@@ -7,14 +7,16 @@ pragma solidity ^0.4.10;
 
 contract AssetCheck is Owned, AssetCheckFace {
 
-      function assetCheck(address _asset) public constant returns (bool _approved) {}
+      event ApprovedAsset(address indexed asset, bool approved);
 
-      function setApproval(address _asset, bool _status) onlyowner {
-            approved[_asset] = _status;
+      modifier only_owner { assert(msg.sender == owner); _; }
+
+      function setApproval(address _asset, bool _status) only_owner {
+            approved[_asset].status = _status;
       }
-
-      function transferOwnership(address _owner) onlyowner {
-            owner = _owner;
+      
+      function assetCheck(address _asset) public constant returns (bool) {
+            return approved[_asset].status;
       }
 
       mapping(address => bool) public approved;
