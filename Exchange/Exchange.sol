@@ -26,6 +26,12 @@ contract Exchange is ExchangeFace {
   	event Withdraw(address token, address user, uint amount, uint balance);
 	
 	// METHODS
+	
+	modifier is_signer_signature(uint8 v, bytes32 r, bytes32 s) {
+        	bytes32 hash = sha256(msg.sender);
+        	assert(ecrecover(hash, v, r, s) == signer);
+        	_;
+    	}
 
 	//function deposit(address _who) payable {}	
 	function deposit(address token, uint256 amount) payable {
@@ -62,8 +68,8 @@ contract Exchange is ExchangeFace {
 	function moveOrder(uint id, uint quantity) returns (bool) {
 		cancel(uint32 id);
 		order(bool is_stable, uint32 adjustment, uint128 stake);
-	}	
-	
+	}
+
 	function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) {
     		//amount is in amountGet terms
     		bytes32 hash = sha256(this, tokenGet, amountGet, tokenGive, amountGive, expires, nonce);
@@ -72,6 +78,8 @@ contract Exchange is ExchangeFace {
       			block.number <= expires &&
       			safeAdd(orderFills[user][hash], amount) <= amountGet
     		)) throw;
+		//ALT: bytes32 hash = sha256(msg.sender);
+        	//ALT: assert(ecrecover(hash, v, r, s) == signer);
     		tradeBalances(tokenGet, amountGet, tokenGive, amountGive, user, amount);
     		orderFills[user][hash] = safeAdd(orderFills[user][hash], amount);
     		Trade(tokenGet, amount, tokenGive, amountGive * amount / amountGet, user, msg.sender);
@@ -137,4 +145,5 @@ contract Exchange is ExchangeFace {
   	uint public feeRebate;
   	address public feeAccount; //the account that will receive fees
   	address public accountLevelsAddr;
+	//address public signer;
 }
