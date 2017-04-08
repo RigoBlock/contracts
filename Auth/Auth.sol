@@ -8,51 +8,32 @@ pragma solidity ^0.4.10;
 contract Auth is Owned, AuthFace {
 
   event SetAuthority (address indexed authority);
-  event SetOwner (address indexed owner);
-  event ApprovedUser(address indexed target, bool approved);
+  event SetWhitelister (address indexed whitelister);
+  event WhitelistedUser(address indexed target, bool approved);
   
-  modifier only_auth { assert(isAuthorized(msg.sender, msg.sig)); _; }
-  modifier only_authorized(bytes4 sig) { assert(isAuthorized(msg.sender, sig)); _; }  
+  //modifier only_auth { assert(isAuthorized(msg.sender, msg.sig)); _; }
   modifier only_whitelister { if (!whitelistAdmins[msg.sender]) throw; _; }
-  modifier only_admin { if (msg.sender != owner && !admins[msg.sender]) throw; _; }
+  modifier only_admin { if (msg.sender != owner && !whitelistAdmins[msg.sender]) throw; _; }
   modifier only_whitelisted { if (!accounts[msg.sender].authorized) throw; _; }
 
-  function approveUser(address target, bool approve) onlyOwner {
-        approvedAccount[target] = approve;
-        ApprovedFunds(target, approve);
-  }
-  
-  function setOwner(address _owner) only_auth {
-    owner = owner_;
-    SetOwner(owner);
-  }
-
-  function setAuthority(address _authority) only_auth {
+  function setAuthority(address _authority) only_owner {
     authority = _authority;
     SetAuthority(authority);
   }
   
-  function setWhitelister(address whitelister, bool isWhitelister) only_owner {
-    whitelistAdmins[whitelister] = isWhitelister;
+  function setWhitelister(address _whitelister) only_admin {
+    whitelistAdmins[whitelister] = _whitelister;
   }
   
-  function isAuthorized(address src, bytes4 sig) internal returns (bool) {
-    if (src == owner) {
-      return true;
-    } else if (authority == DSAuthority(0)) {
-      return false;
-    } else {
-      return authority.canCall(src, this, sig);
-    }
+  function whitelistUser(address _target, bool _isWhitelisted) only_whitelister {
+    accounts[_target].authorized = _isWhitelisted;
+    WhitelistedUser(_target, _isWhitelisted);
   }
-  
-  function setWhitelisted(address target, bool isWhitelisted) onlyWhitelister {
-    accounts[target].authorized = isWhitelisted;
-  }
-  
-  function canCall(address src, address dst, bytes4 sig) constant returns (bool);
-  
-  Authority public authority;
+
+  function isWhitelistedUser(address _target) constant returns (bool) {}
+
   address public owner = msg.sender;
-  address public logOwner = msg.sender;
+  address public auth = msg.sender;
+  address[] public whitelister = msg.sender;
+  mapping (address => bool) public approvedAccount;
 }
