@@ -77,12 +77,12 @@ contract DragoFactoryFace {
 	function setTransactionFee(address targetDrago, uint _transactionFee) {}
 	function changeFeeCollector(address targetDrago, address _feeCollector) {}
 	function changeDragator(address targetDrago, address _dragator) {}
-	function depositToExchange(address targetDrago, address exchange, address _who) payable returns(bool success) {}
-	function withdrawFromExchange(address targetDrago, address exchange, uint value) returns (bool success) {}
+	function depositToExchange(address targetDrago, address exchange, address token, uint256 value) payable returns(bool success) {}
+	function withdrawFromExchange(address targetDrago, address exchange, address token, uint256 value) returns (bool success) {}
 	function placeOrderExchange(address targetDrago, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {}
 	function cancelOrderExchange(address targetDrago, address exchange, uint32 id) {}  
 	function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {}
-    
+
 	function getVersion() constant returns (string version) {}
 	function geeLastId() constant returns (uint _dragoID) {}
 	function getDragoDAO() constant returns (uint dragoDAO) {}
@@ -161,17 +161,16 @@ contract DragoFactory is Owned, DragoFactoryFace {
 		drago.changeDragator(_dragator);
 	}
     
-	function depositToExchange(address _targetDrago, address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {
+	function depositToExchange(address _targetDrago, address exchange, address token, uint256 value) /*when_approved_exchange*/ payable returns(bool success) {
 		//address who used to determine from which account
-		drago.depositToExchange(exchange, _who);
+		assert(drago.depositToExchange.value(msg.value)(exchange, token, value));
 	}
 	
-	function withdrawFromExchange(address _targetDrago, address exchange, uint value) returns (bool success) {
+	function withdrawFromExchange(address _targetDrago, address exchange, address token, uint256 value) returns (bool success) {
 		//remember to reinsert address _who
-		if (!drago.withdrawFromExchange(exchange, value)) throw;
-		//apply adjustment at CFD contract level (address _who)
+		if (!drago.withdrawFromExchange(exchange, token, value)) throw;
 	}
-    
+	
 	function placeOrderExchange(address _targetDrago, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {
 		drago.placeOrderExchange(exchange, is_stable, adjustment, stake);
 	}
