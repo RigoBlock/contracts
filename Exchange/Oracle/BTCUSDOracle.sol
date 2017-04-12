@@ -8,7 +8,7 @@ contract Owned {
     
     event NewOwner(address indexed old, address indexed current);
     
-    modifier only_owner { if (msg.sender != owner) return; _; }
+    modifier onlyOwner { if (msg.sender != owner) return; _; }
     
     function setOwner(address _new) only_owner {
         owner = _new;
@@ -59,10 +59,10 @@ contract Oracle is Owned, OracleFace {
     Value public data;
 }
 
-contract BTCUSDOracle.sol is Oracle {
+contract BTCUSDOracle is Oracle {
 
     function updatePrice() onlyOwner {
-      feed = json(https://poloniex.com/public?command=returnTicker).BTC_USD.last;
+      feed = "json(https://poloniex.com/public?command=returnTicker).BTC_USD.last";
       newPrice = safeMul( feed*10**18 );
       // newPrice = json(https://api.coinmarketcap.com/v1/ticker/bitcoin/).price_usd
       note(newPrice);
