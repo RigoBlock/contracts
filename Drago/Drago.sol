@@ -101,7 +101,7 @@ contract Drago is Owned, ERC20Face, DragoFace {
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	
  	function Drago(string _dragoName,  string _dragoSymbol) {
-        	name = _dragoName;    
+        	name = _dragoName;  
         	symbol = _dragoSymbol;
 	}
     
@@ -170,17 +170,19 @@ contract Drago is Owned, ERC20Face, DragoFace {
         	buyPrice = newBuyPrice*(10**(18 - 4));
 	}
 
-	function depositToExchange(address _exchange, address _who) /*when_approved_exchange*/ only_owner payable returns(bool success) {
+	function depositToExchange(address _exchange, address token, uint256 value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
 		//address who used to determine from which account _who is the drago contract
-		exchange.deposit.value(msg.value)(_who);
+		//exchange.deposit.value(msg.value)(_who);
+		exchange.deposit.value(msg.value)(token, value);
 	}
 	
-	function withdrawFromExchange(address _exchange, uint value) only_owner returns (bool success) {
-		if(!exchange.withdraw(value)) throw;
+	function withdrawFromExchange(address _exchange, address token, uint256 value) only_owner returns (bool success) {
+		//if(!exchange.withdraw(value)) throw;
+		exchange.withdraw(token, value); //for ETH token = 0
 	}
 	
 	function placeOrderExchange(address _exchange, bool is_stable, uint32 adjustment, uint128 stake) only_owner {
-		exchange.order(is_stable, adjustment, stake);
+		exchange.orderCFD(is_stable, adjustment, stake);
 	}	
 	
 	function cancelOrderExchange(address _exchange, uint32 id) only_owner {
