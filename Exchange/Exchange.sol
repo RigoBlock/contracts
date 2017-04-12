@@ -85,7 +85,7 @@ contract ExchangeFace {
 
 contract Exchange is ExchangeFace, SafeMath, Owned {
 
-    struct Receipt {
+    	struct Receipt {
 		uint units;
 		uint32 activation;
 	}
@@ -115,11 +115,11 @@ contract Exchange is ExchangeFace, SafeMath, Owned {
         	bytes32 hash = sha256(msg.sender);
         	assert(ecrecover(hash, v, r, s) == signer);
         	_;
-    }
+    	}
     
-    modifier only_owner { if (msg.sender != owner) return; _; }
+    	modifier only_owner { if (msg.sender != owner) return; _; }
     
-    modifier margin_ok(uint x) { if (accounts[msg.sender].balance < x) return; _; }
+    	modifier margin_ok(uint x) { if (accounts[msg.sender].balance < x) return; _; }
 
 	//function deposit(address _who) payable {}
 	function deposit(address token, uint256 amount) payable {
