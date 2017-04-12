@@ -48,8 +48,8 @@ contract Drago is Owned {
 	function changeDragator(address _dragator) {}
 	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) {}
 	function DragoAdmin(string _dragoName,  string _dragoSymbol, address _dragowner) {}
-	function depositToExchange(address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {}
-	function withdrawFromExchange(address exchange, uint value) returns (bool success) {}
+	function depositToExchange(address exchange, address token, uint256 value) payable returns(bool success) {}
+	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
 	function placeOrderExchange(address exchange, bool is_stable, uint32 adjustment, uint128 stake) {}
 	function cancelOrderExchange(address exchange, uint32 id) {}
 	function finalizeDealExchange(address exchange, uint24 id) {}
