@@ -51,28 +51,19 @@ contract ExchangeFace {
 
 	// EVENTS
 
-	event Deposit(address indexed who, uint value);
-	event Withdraw(address indexed who, uint value);
-	//event OrderPlaced(uint32 indexed id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
-	//event OrderMatched(uint32 indexed id, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
-	//event OrderCancelled(uint32 indexed id, address indexed who, uint128 stake);
-	//event DealFinalized(uint32 indexed id, address indexed stable, address indexed leveraged, uint64 price);
-
     	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
     	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
     	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
     	event Deposit(address token, address user, uint amount, uint balance);
     	event Withdraw(address token, address user, uint amount, uint balance);
-	//event OrderUpdate(uint id);
-	
+
 	// METHODS
 
 	function deposit(address token, uint256 amount) payable {}
 	function withdraw(address token, uint256 amount) {}
-	function order(bool is_stable, uint32 adjustment, uint128 stake) payable {}	//returns(uint id)
+	function orderCFD(bool is_stable, uint32 adjustment, uint128 stake) payable {}	//returns(uint id)
 	function order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce) {}
 	function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) {}
-    	function trade(uint id, uint quantity) returns (bool) {}
 	function cancelOrder(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
 	function cancel(uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(uint24 id) {}
@@ -93,20 +84,8 @@ contract ExchangeFace {
 }
 
 contract Exchange is ExchangeFace, SafeMath, Owned {
-    
-    	struct CfdInfo {
-      	  	address cfd;
-      	  	//CFD sell_which_cfd;   //CFD cfd;
-		address who;
-		bool is_stable;
-		uint32 adjustment;	// billionths by which to adjust start-price
-		uint128 stake;
-        	uint32 id;
-		uint32 prev_id;		// a linked ring
-		uint32 next_id;		// a linked ring
-	}
 
-    	struct Receipt {
+    struct Receipt {
 		uint units;
 		uint32 activation;
 	}
@@ -136,11 +115,11 @@ contract Exchange is ExchangeFace, SafeMath, Owned {
         	bytes32 hash = sha256(msg.sender);
         	assert(ecrecover(hash, v, r, s) == signer);
         	_;
-    	}
+    }
     
-    	modifier only_owner { if (msg.sender != owner) return; _; }
+    modifier only_owner { if (msg.sender != owner) return; _; }
     
-    	modifier margin_ok(uint x) { if (accounts[msg.sender].balance < x) return; _; }
+    modifier margin_ok(uint x) { if (accounts[msg.sender].balance < x) return; _; }
 
 	//function deposit(address _who) payable {}
 	function deposit(address token, uint256 amount) payable {
