@@ -59,10 +59,10 @@ contract Oracle is Owned, OracleFace {
     Value public data;
 }
 
-contract BTCETHOracle.sol is Oracle {
+contract BTCETHOracle is Oracle {
 
   function updatePrice() onlyOwner {
-    feed = json(https://poloniex.com/public?command=returnTicker).BTC_ETH.last;
+    feed = "json(https://poloniex.com/public?command=returnTicker).BTC_ETH.last";
     newPrice = safeMul( feed * 10 ** 18 );
     // newPrice = safeDiv ( 1 / (json(https://api.bitfinex.com/v1/pubticker/ethbtc).last_price));
     note(newPrice);
