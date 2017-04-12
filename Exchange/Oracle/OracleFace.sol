@@ -4,12 +4,13 @@
 
 pragma solidity ^0.4.10;
 
-contract OracleFace is Owned {
+contract OracleFace {
   
-  event Changed(uint224 current);
+    event Changed(uint224 current);
   
-  function note(uint224 _value) only_owner {}
+    function updatePrice() {}
+    function note(uint224 _value) {}
     
-  function get() constant returns (uint224) {}
-  function get_timestamp() constant returns (uint32) {}
+    function get() constant returns (uint224) {}
+    function getTimestamp() constant returns (uint32) {}
 }
