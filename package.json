@@ -1,6 +1,6 @@
 {
-  "name": "rigoblock contracts",
-  "version": "0.2",
+  "name": "rigoblock",
+  "version": "0.0.3",
   "description": "Smart contracts for decentralized asset management",
   "directories": {
     "test": "test"
