@@ -10,7 +10,7 @@ contract Owned {
 	function getOwner() constant returns (address owner) {}
 }
 
-contract DragoRegistryFace {
+contract DragoRegistry {
 
 	event Registered(string indexed tla, uint indexed id, address addr, string name);
 	event Unregistered(string indexed tla, uint indexed id);
@@ -88,85 +88,116 @@ contract DragoFactoryFace {
 	function getDragoDAO() constant returns (uint dragoDAO) {}
 }
 
-contract GabcoinFactory is Owned, GabcoinFactoryFace {
+contract DragoFactory is Owned, DragoFactoryFace {
     
 	modifier when_fee_paid { if (msg.value < fee) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
-	modifier only_gabcoin_dao { if (msg.sender != gabcoinDao) return; _; }
-	//modifier only_gabcoin_dao
+	//modifier only_drago_dao
 	
-	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
+	event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
     
-	function GabcoinFactory () {}
+	function DragoFactory () {}
     
-	function createGabcoin(string _name, string _symbol, address _owner) when_fee_paid returns (address _gabcoin, uint _gabcoinID) {
-		Gabcoin newGabcoin = (new Gabcoin(_name, _symbol));
-		newGabcoins.push(address(newGabcoin));
-		created[msg.sender].push(address(newGabcoin));
-		newGabcoin.setOwner(msg.sender);  //library or new.tranfer(_from)
-		_gabcoinID = nextGabcoinID;     //decided at last to add sequential ID numbers
-		++nextGabcoinID;              //decided at last to add sequential ID numbers
-		registerGabcoin(_gabcoin, _gabcoinID);
-		GabcoinCreated(_name, address(newGabcoin), msg.sender, uint(newGabcoin));
-		return (address(newGabcoin), uint(newGabcoin));
+	function createDrago(string _name, string _symbol, address _owner) when_fee_paid returns (address _drago, uint _dragoID) {
+		//can be amended to set owner as per input
+		Drago newDrago = (new Drago(_name, _symbol)); //Drago newDrago = (new Drago(_name, _symbol, _dragowner));
+		newDragos.push(address(newDrago));
+		created[msg.sender].push(address(newDrago));
+		newDrago.setOwner(msg.sender);  //library or new.tranfer(_from)
+		_dragoID = nextDragoID;     //decided at last to add sequential ID numbers
+		++nextDragoID;              //decided at last to add sequential ID numbers
+		registerDrago(_drago, _dragoID, _dragoRegistry);
+		DragoCreated(_name, address(newDrago), msg.sender, uint(newDrago));
+		return (address(newDrago), uint(newDrago));
 	}
 	
-	function registerGabcoin(address _gabcoin, uint _gabcoinID) only_owner {
-		GabcoinRegistry registry = GabcoinRegistry(gabcoinRegistry);
-		registry.register(_gabcoin, _gabcoinID); //register @ registry
-		//event GabcoinRegistered
+	function registerDrago(address _drago, uint _dragoID, address _dragoRegistry) only_owner {
+		DragoRegistry registry = DragoRegistry(_dragoRegistry); //define address
+		registry.register(_drago, _dragoID);
 	}
     
 	function setFee(uint _fee) only_owner {    //exmple, uint public fee = 100 finney;
 		fee = _fee;
 	}
+	
+	function changeRegistry(address _newRegistry) only_owner {
+        _dragoRegistry = _newRegistry;
+        //NewRegistry(_dragoRegistry, _newRegistry);
+	}
     
-	function setBeneficiary(address _gabcoinDao) only_owner {
-		gabcoinDao = _gabcoinDao;
+	function setBeneficiary(address _dragoDAO) only_owner {
+		dragoDAO = _dragoDAO;
 	}
-  
+    
 	function drain() only_owner {
-		if (!gabcoinDao.send(this.balance)) throw;
+		if (!dragoDAO.send(this.balance)) throw;
 	}
-  
+    
 	function() {
 		throw;
 	}
         
-	function buyGabcoin(address targetGabcoin) payable {
-		gabcoin.buyGabcoin.value(msg.value)();
+	function buyDrago(address _targetDrago) payable {
+		drago.buy.value(msg.value)();
 	}
     
-	function sellGabcoin(address targetGabcoin, uint256 amount) {
-		gabcoin.sellGabcoin(amount);
+	function sellDrago(address _targetDrago, uint256 amount) {
+		drago.sell(amount);
 	}
     
-	function changeRatio(address targetGabcoin, uint256 _ratio) only_gabcoin_dao {
-		gabcoin.changeRatio(_ratio);
+	function changeRatio(address _targetDrago, uint256 _ratio) /*only_drago_dao*/ {
+		drago.changeRatio(_ratio);
 	}
     
-	function setTransactionFee(address targetGabcoin, uint _transactionFee) {    //exmple, uint public fee = 100 finney;
-		gabcoin.setTransactionFee(_transactionFee);       //fee is in basis points (1 bps = 0.01%)
+	function setTransactionFee(address _targetDrago, uint _transactionFee) {    //exmple, uint public fee = 100 finney;
+		drago.setTransactionFee(_transactionFee);       //fee is in basis points (1 bps = 0.01%)
 	}
     
-	function changeFeeCollector(address targetGabcoin, address _feeCollector) {
-		gabcoin.changeFeeCollector(_feeCollector);
+	function changeFeeCollector(address _targetDrago, address _feeCollector) {
+		drago.changeFeeCollector(_feeCollector);
 	}
     
-	function changeCoinator(address targetGabcoin, address _coinator) {
-		gabcoin.changeCoinator(_coinator);
+	function changeDragator(address _targetDrago, address _dragator) {
+		drago.changeDragator(_dragator);
 	}
     
-    Gabcoin gabcoin = Gabcoin(targetGabcoin);
-	string public version = 'GC 0.2';
-	uint _gabcoinID = 0;
+	function depositToExchange(address _targetDrago, address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {
+		//address who used to determine from which account
+		drago.depositToExchange(exchange, _who);
+	}
+	
+	function withdrawFromExchange(address _targetDrago, address exchange, uint value) returns (bool success) {
+		//remember to reinsert address _who
+		if (!drago.withdrawFromExchange(exchange, value)) throw;
+		//apply adjustment at CFD contract level (address _who)
+	}
+    
+	function placeOrderExchange(address _targetDrago, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {
+		drago.placeOrderExchange(exchange, is_stable, adjustment, stake);
+	}
+    
+	function cancelOrderExchange(address _targetDrago, address exchange, uint32 id) {
+		drago.cancelOrderExchange(exchange, id);
+	}
+    
+	function finalizedDealExchange(address _targetDrago, address exchange, uint24 id) {
+		drago.finalizeDealExchange(exchange, id);
+	}
+	
+	function setOwner(address _new) only_owner {
+		owner = _new;
+		NewOwner(owner, _new);
+	}
+	
+	Drago drago = Drago(_targetDrago);
+	string public version = 'DF0.2';
+	uint _dragoID = 0;
 	uint public fee = 0;
-	uint public nextGabcoinID;
-	address public gabcoinDao = msg.sender;
+	uint public nextDragoID;
+	address public dragoDAO = msg.sender;
+	address[] public newDragos;
+	address _targetDrago;
+	address _dragoRegistry;
 	address public owner = msg.sender;
-	address public targetGabcoin;
-	address public gabcoinRegistry;
-	address[] public newGabcoins;
-	address _targetGabcoin;
 	mapping(address => address[]) public created;
 }
