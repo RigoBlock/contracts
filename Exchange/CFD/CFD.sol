@@ -137,13 +137,13 @@ contract CFD is CFDFace{
 			insert_order(msg.sender, is_stable == true, adjustment, stake);
 	}
 	
-	function cancelExchange(uint32 id) returns (uint128 stake) /*only_exchange*/ {
+	function cancelExchange(uint32 id) /*only_exchange*/ {
 	    cancel(id);
 	    accounts[msg.sender] -= orders[id].stake;
 	}
 
 	/// withdraw an unfulfilled order, or part thereof.
-	function cancel(uint32 id) returns (uint128 stake) {
+	function cancel(uint32 id) {
 		if (orders[id].who == msg.sender) {
 			accounts[msg.sender] += orders[id].stake;
 			OrderCancelled(id, msg.sender, orders[id].stake);
