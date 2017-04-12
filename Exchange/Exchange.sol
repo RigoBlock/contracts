@@ -4,6 +4,39 @@
 
 pragma solidity ^0.4.10;
 
+contract Owned {
+    
+    modifier only_owner { if (msg.sender != owner) return; _; }
+    
+    event NewOwner(address indexed old, address indexed current);
+    
+    function set_owner(address _new) only_owner {
+        owner = _new;
+        NewOwner(owner, _new);
+    }
+
+    address public owner = msg.sender;
+}
+
+contract SafeMath {
+  function safeMul(uint a, uint b) internal returns (uint) {
+    uint c = a * b;
+    assert(a == 0 || c / a == b);
+    return c;
+  }
+
+  function safeSub(uint a, uint b) internal returns (uint) {
+    assert(b <= a);
+    return a - b;
+  }
+
+  function safeAdd(uint a, uint b) internal returns (uint) {
+    uint c = a + b;
+    assert(c>=a && c>=b);
+    return c;
+  }
+}
+
 contract AccountLevels {
 	function accountLevel(address user) constant returns(uint) {}
 }
