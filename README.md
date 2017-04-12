@@ -7,7 +7,7 @@ Directory of our contracts.
 
 1. Clone this repository
     ```
-    git clone git@github.com:RigoBlock/contracts.git
+    git clone https://github.com/RigoBlock/contracts.git
     cd contracts
     ```
 
