@@ -19,12 +19,12 @@ contract DragoFactoryFace {
 	function setTransactionFee(address targetDrago, uint _transactionFee) {}
 	function changeFeeCollector(address targetDrago, address _feeCollector) {}
 	function changeDragator(address targetDrago, address _dragator) {}
-	function depositToExchange(address targetDrago, address exchange, address _who) payable returns(bool success) {}
-	function withdrawFromExchange(address targetDrago, address exchange, uint value) returns (bool success) {}
+	function depositToExchange(address targetDrago, address exchange, address token, uint256 value) payable returns(bool success) {}
+	function withdrawFromExchange(address targetDrago, address exchange, address token, uint256 value) returns (bool success) {}
 	function placeOrderExchange(address targetDrago, address exchange, bool is_stable, uint32 adjustment, uint128 stake) {}
 	function cancelOrderExchange(address targetDrago, address exchange, uint32 id) {}  
 	function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {}
-    
+
 	function getVersion() constant returns (string version) {}
 	function geeLastId() constant returns (uint _dragoID) {}
 	function getDragoDAO() constant returns (uint dragoDAO) {}
