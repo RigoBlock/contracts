@@ -26,23 +26,36 @@ contract ERC20Face is Owned {
 
 contract Exchange {
 
-	event Deposit(address indexed who, uint value);
-	event Withdraw(address indexed who, uint value);
-	event OrderPlaced(uint32 indexed id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
-	event OrderMatched(uint32 indexed id, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
-	event OrderCancelled(uint32 indexed id, address indexed who, uint128 stake);
-	event DealFinalized(uint32 indexed id, address indexed stable, address indexed leveraged, uint64 price);
+	event Deposit(address token, address user, uint amount, uint balance);
+    	event Withdraw(address token, address user, uint amount, uint balance);
+    	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
+    	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
+    	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 
-	function deposit(address _who) payable {}	
-	function withdraw(uint value) returns (bool success) {}        
-	function order(bool is_stable, uint32 adjustment, uint128 stake) payable {}
-	function cancel(uint32 id) {}
+	// METHODS
+
+	function deposit(address token, uint256 amount) payable {}
+	function withdraw(address token, uint256 amount) {}
+	function orderCFD(bool is_stable, uint32 adjustment, uint128 stake) payable {}	//returns(uint id)
+	function order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce) {}
+	function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) {}
+	function cancelOrder(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
+	function cancel(uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(uint24 id) {}
+	function moveOrder(uint id, uint quantity) returns (bool) {}
 	
-	function best_adjustment(bool _is_stable) constant returns (uint32) {}
-	function best_adjustment_for(bool _is_stable, uint128 _stake) constant returns (uint32) {}
-	function deal_details(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time) {}
-	function balance_of(address _who) constant returns (uint) {}
+	function balanceOf(address _who) constant returns (uint256) {}
+	function balanceOf(address token, address user) constant returns (uint256) {}
+	function availableVolume(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) constant returns(uint) {}
+    	function amountFilled(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) constant returns(uint) {}
+    	
+	function getLastOrderId() constant returns (uint) {}
+	function isActive(uint id) constant returns (bool active) {}
+	function getOwner(uint id) constant returns (address owner) {}
+	//function getOrder(uint id) constant returns (uint, ERC20, uint, ERC20) {}
+    	//mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
+    	//mapping (address => mapping (bytes32 => bool)) public orders; //mapping of user accounts to mapping of order hashes to booleans (true = submitted by user, equivalent to offchain signature)
+    	//mapping (address => mapping (bytes32 => uint)) public orderFills;
 }
 
 contract DragoFace {
@@ -63,8 +76,8 @@ contract DragoFace {
 	function changeDragator(address _dragator) {}
 	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) {}
 	function DragoAdmin(string _dragoName,  string _dragoSymbol, address _dragowner) {}
-	function depositToExchange(address exchange, address _who) /*when_approved_exchange*/ payable returns(bool success) {}
-	function withdrawFromExchange(address exchange, uint value) returns (bool success) {}
+	function depositToExchange(address exchange, address token, uint256 value) payable returns(bool success) {}
+	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
 	function placeOrderExchange(address exchange, bool is_stable, uint32 adjustment, uint128 stake) {}
 	function cancelOrderExchange(address exchange, uint32 id) {}
 	function finalizeDealExchange(address exchange, uint24 id) {}
