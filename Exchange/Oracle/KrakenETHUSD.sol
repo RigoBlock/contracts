@@ -1,4 +1,4 @@
-//! Drago contract.
+//! Kraken ETHUSD Feed contract.
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
 //! Inspired by https://github.com/oraclize/ethereum-examples/blob/master/solidity/KrakenPriceTicker.sol
@@ -43,7 +43,7 @@ contract KrakenPriceTicker is usingOraclize {
         }
     }
     
-    function getPrice() constant returns (uint ETHUSD) {
+    function get() constant returns (uint ETHUSD) {
         return ETHUSD;
     }
     
