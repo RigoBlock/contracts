@@ -2,39 +2,37 @@
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
 
-pragma solidity ^0.4.10;
-
 contract Owned {
     
-    modifier only_owner { if (msg.sender != owner) return; _; }
+    	modifier only_owner { if (msg.sender != owner) return; _; }
     
-    event NewOwner(address indexed old, address indexed current);
+    	event NewOwner(address indexed old, address indexed current);
     
-    function set_owner(address _new) only_owner {
-        owner = _new;
-        NewOwner(owner, _new);
-    }
+    	function set_owner(address _new) only_owner {
+        	owner = _new;
+        	NewOwner(owner, _new);
+    	}
 
-    address public owner = msg.sender;
+    	address public owner = msg.sender;
 }
 
 contract SafeMath {
-  function safeMul(uint a, uint b) internal returns (uint) {
-    uint c = a * b;
-    assert(a == 0 || c / a == b);
-    return c;
-  }
+  	function safeMul(uint a, uint b) internal returns (uint) {
+    		uint c = a * b;
+    		assert(a == 0 || c / a == b);
+    		return c;
+  	}
 
-  function safeSub(uint a, uint b) internal returns (uint) {
-    assert(b <= a);
-    return a - b;
-  }
+  	function safeSub(uint a, uint b) internal returns (uint) {
+    		assert(b <= a);
+    		return a - b;
+  	}
 
-  function safeAdd(uint a, uint b) internal returns (uint) {
-    uint c = a + b;
-    assert(c>=a && c>=b);
-    return c;
-  }
+  	function safeAdd(uint a, uint b) internal returns (uint) {
+    		uint c = a + b;
+    		assert(c>=a && c>=b);
+    		return c;
+  	}
 }
 
 contract AccountLevels {
@@ -83,6 +81,12 @@ contract CFD {
 contract ExchangeFace {
 
 	// EVENTS
+	
+	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
+	event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
+	event OrderCancelled(address indexed cfd, address indexed who, uint128 stake);
+	event DealFinalized(address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
+
 
     	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
     	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
@@ -131,10 +135,10 @@ contract Exchange is ExchangeFace, SafeMath, Owned {
 
 	// EVENTS
 
-	//event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
-	//event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
-	//event OrderCancelled(address indexed cfd, address indexed who, uint128 stake);
-	//event DealFinalized(address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
+	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
+	event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
+	event OrderCancelled(address indexed cfd, address indexed who, uint128 stake);
+	event DealFinalized(address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
 
 	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
   	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
@@ -185,6 +189,7 @@ contract Exchange is ExchangeFace, SafeMath, Owned {
 	    CFD cfd = CFD(_cfd);
 	    cfd.orderExchange(is_stable, adjustment, stake);
 	    accounts[msg.sender].balance -= stake;
+	    OrderPlaced(_cfd, msg.sender, is_stable, adjustment, stake);
 	}
 	
 	function order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce) {
@@ -233,6 +238,7 @@ contract Exchange is ExchangeFace, SafeMath, Owned {
 	    CFD cfd = CFD(_cfd);
 	    accounts[msg.sender].balance += cfd.orderDetails(id);
 	    cfd.cancel(id);
+	    OrderCancelled(_cfd, msg.sender, id);
 	}
 	
 	function cancelOrder(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {
@@ -247,6 +253,7 @@ contract Exchange is ExchangeFace, SafeMath, Owned {
 	    cfd.finalizeExchange(id);
 	    accounts[msg.sender].balance += cfd.balanceOf(msg.sender);
 	    tokens[address(0)][msg.sender] += cfd.balanceOf(msg.sender);
+	    DealFinalized(_cfd, msg.sender, msg.sender, id);
 	}
 	
 	function balanceOf(address _who) constant returns (uint256) {
