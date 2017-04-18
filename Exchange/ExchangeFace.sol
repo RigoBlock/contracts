@@ -7,6 +7,12 @@ pragma solidity ^0.4.10;
 contract ExchangeFace {
 
 	// EVENTS
+	
+	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
+	event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
+	event OrderCancelled(address indexed cfd, address indexed who, uint128 stake);
+	event DealFinalized(address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
+
 
     	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
     	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
