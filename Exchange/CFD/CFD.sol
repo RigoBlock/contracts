@@ -6,7 +6,7 @@ pragma solidity ^0.4.10;
 
 contract CFDFace {
 
-  // EVENTS
+  	// EVENTS
 	
 	event Deposit(address indexed who, uint value);
 	event Withdraw(address indexed who, uint value);
@@ -64,7 +64,7 @@ contract CFD is CFDFace{
 	}
 	
 	//modifier margin_ok(uint x) { if (accounts[msg.sender].balance < x) return; _; }
-	modifier margin_ok(uint x) { if (accounts[msg.sender] < x) return; _; }
+	modifier margin_ok(uint margin) { if (accounts[msg.sender] > margin) return; _; }
 	//modifier when_owns(address _owner, uint _amount) { if (accounts[_owner].balance < _amount) return; _; }
 	
 	function CFD(address _oracle) {
