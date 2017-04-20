@@ -10,7 +10,7 @@ contract Owned {
     
     	event NewOwner(address indexed old, address indexed current);
     
-    	function set_owner(address _new) only_owner {
+    	function setOwner(address _new) only_owner {
         	owner = _new;
         	NewOwner(owner, _new);
     	}
