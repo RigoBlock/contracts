@@ -122,7 +122,7 @@ contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
 	}
     
 	modifier only_owner { if (msg.sender != owner) return; _; } 
-	modifier margin_ok(uint x) { if (accounts[msg.sender].balance < x) return; _; }
+	modifier margin_ok(uint margin) { if (accounts[msg.sender].balance > margin) return; _; }
 
 	function deposit() payable {
 		tokens[0][msg.sender] = safeAdd(tokens[0][msg.sender], msg.value);
