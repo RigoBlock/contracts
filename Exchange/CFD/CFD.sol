@@ -4,6 +4,10 @@
 
 pragma solidity ^0.4.10;
 
+contract Oracle {
+	function get() constant returns (uint ETHUSD) {}
+}
+
 contract CFDFace {
 
   	// EVENTS
