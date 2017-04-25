@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-contract CfdExchangeFace {
+contract CFDExchangeFace {
 
 	// EVENTS
 	
