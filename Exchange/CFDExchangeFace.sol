@@ -12,7 +12,7 @@ contract CFDExchangeFace {
   	event Withdraw(address token, address user, uint amount, uint balance);
 	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
 	event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
-	event OrderCancelled(address indexed cfd, address indexed who, uint128 stake);
+	event OrderCancelled(address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
 	event DealFinalized(address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
 
 	// METHODS
@@ -24,8 +24,12 @@ contract CFDExchangeFace {
 	function finalize(address _cfd, uint24 id) {}
 	function moveOrder(address _cfd, uint24 id, bool is_stable, uint32 adjustment) returns (bool) {}
 	
-	function balanceOf(address _who) constant returns (uint256) {}
+	function balanceOf() constant returns (uint256) {}
+	function balanceOf(address who) constant returns (uint256) {}
+	function balanceOf(address token, address user) constant returns (uint256) {}
 	function getLastOrderId() constant returns (uint) {}
 	function isActive(uint id) constant returns (bool active) {}
 	function getOwner(uint id) constant returns (address owner) {}
+	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {}
+	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {}
 }
