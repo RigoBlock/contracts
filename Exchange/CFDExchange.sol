@@ -131,7 +131,7 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
 	modifier only_owner { if (msg.sender != owner) return; _; } 
 	modifier margin_ok(uint margin) { if (accounts[msg.sender].balance < margin) return; _; }
 
-    // METHODS
+    	// METHODS
 
 	function deposit() payable {
 		tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
