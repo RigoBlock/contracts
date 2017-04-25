@@ -131,7 +131,7 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
 	modifier only_owner { if (msg.sender != owner) return; _; } 
 	modifier margin_ok(uint margin) { if (accounts[msg.sender].balance < margin) return; _; }
 
-    	// METHODS
+    // METHODS
 
 	function deposit() payable {
 		tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
@@ -193,13 +193,13 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
   	}
   	
   	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {
-  		CFD cfd = CFD(_cfd);
+  	    CFD cfd = CFD(_cfd);
 		var bestAdjustment = cfd.bestAdjustment(_is_stable);
 		return bestAdjustment;
   	}
   	
 	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {
-		CFD cfd = CFD(_cfd);
+	    CFD cfd = CFD(_cfd);
 		var bestAdjustmentFor = cfd.bestAdjustmentFor(_is_stable, _stake);
 		return bestAdjustmentFor;
 	}
