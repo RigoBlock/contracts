@@ -2,8 +2,6 @@
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
 
-//!important: update ABIs, amend > mofidier ETHUSD cfd, add ETHUSDContract is Oracle
-
 pragma solidity ^0.4.10;
 
 contract Owned {
@@ -63,7 +61,7 @@ contract CFD {
 	function finalize(uint24 id) {}
 	
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
-	function bestAdjustment_for(bool _is_stable, uint128 _stake) constant returns (uint32) {}
+	function bestAdjustmentFor(bool _is_stable, uint128 _stake) constant returns (uint32) {}
 	function dealDetails(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time) {}
 	function orderDetails(uint32 _id) constant returns (uint128 stake) {}
 	function balanceOf(address _who) constant returns (uint) {}
@@ -95,6 +93,8 @@ contract CfdExchangeFace {
 	function getLastOrderId() constant returns (uint) {}
 	function isActive(uint id) constant returns (bool active) {}
 	function getOwner(uint id) constant returns (address owner) {}
+	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {}
+	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {}
 }
 
 contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
@@ -191,6 +191,16 @@ contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
 	function balanceOf(address token, address user) constant returns (uint256) {
     		return tokens[token][user];
   	}
+  	
+  	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {
+  	    CFD cfd = CFD(_cfd);
+		cfd.bestAdjustment(_is_stable);
+  	}
+  	
+	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {
+	    CFD cfd = CFD(_cfd);
+		cfd.bestAdjustmentFor(_is_stable, _stake);
+	}
 	
 	mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
   	mapping (address => mapping (bytes32 => bool)) public orders; //mapping of user accounts to mapping of order hashes to booleans (true = submitted by user, equivalent to offchain signature)
