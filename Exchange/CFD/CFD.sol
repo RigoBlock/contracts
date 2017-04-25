@@ -31,7 +31,7 @@ contract CFDFace {
 	function finalize(uint24 id) {}
 	
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
-	function bestAdjustment_for(bool _is_stable, uint128 _stake) constant returns (uint32) {}
+	function bestAdjustmentFor(bool _is_stable, uint128 _stake) constant returns (uint32) {}
 	function dealDetails(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time) {}
 	function orderDetails(uint32 _id) constant returns (uint128 stake) {}
 	function balanceOf(address _who) constant returns (uint) {}
@@ -68,7 +68,7 @@ contract CFD is CFDFace{
 	}
 	
 	//modifier margin_ok(uint x) { if (accounts[msg.sender].balance < x) return; _; }
-	modifier margin_ok(uint margin) { if (accounts[msg.sender] > margin) return; _; }
+	//modifier margin_ok(uint margin) { if (accounts[msg.sender] < margin) return; _; } //exchange should deposit on behalf of user, temporarily avoid
 	//modifier when_owns(address _owner, uint _amount) { if (accounts[_owner].balance < _amount) return; _; }
 	
 	function CFD(address _oracle) {
@@ -76,13 +76,11 @@ contract CFD is CFDFace{
 		period = 10 minutes;
 	}
 
-	// deposit funds.
 	function deposit(address _who) payable {
 		accounts[_who] += msg.value;
 		Deposit(_who, msg.value);
 	}
 	
-	/// withdraw funds.
 	function withdraw(uint value) /*when_owns(msg.sender, value)*/ returns (bool success) {
 	    
 	    if (accounts[msg.sender] >= value && accounts[msg.sender] + value > accounts[msg.sender] && value >= min_order) {
@@ -94,13 +92,13 @@ contract CFD is CFDFace{
 		       //Withdraw(this, tx.origin, value);
 		    }
 		    return true;
-        } else { return (false); }
+        	} else { return (false); }
 	}
 	
-	function orderExchange(bool is_stable, uint32 adjustment, uint128 stake) /*is_exchange*/ margin_ok(stake) {
+	function orderExchange(bool is_stable, uint32 adjustment, uint128 stake) /*is_exchange (is_drago)*/ /*margin_ok(stake)*/ {
 	    accounts[msg.sender] += stake;
 	    order(is_stable, adjustment, stake);
-	    accounts[msg.sender] -= stake;
+	    //accounts[msg.sender] += stake; double check why took it away
 	}
 
 	function order(bool is_stable, uint32 adjustment, uint128 stake) payable {
@@ -128,17 +126,18 @@ contract CFD is CFDFace{
 
 			// order matches; make a deal.
 			var this_stake = orders[head].stake < stake ? orders[head].stake : stake;
-			var strike = find_strike(uint64(oracle.get()), is_stable ? adjustment : hadj, is_stable ? hadj : adjustment);
-			insert_deal(is_stable ? msg.sender : orders[head].who, is_stable ? orders[head].who : msg.sender, strike, this_stake, head);
+		
+			var strike = findStrike(uint64(oracle.get()), is_stable ? adjustment : hadj, is_stable ? hadj : adjustment);
+			insertDeal(is_stable ? msg.sender : orders[head].who, is_stable ? orders[head].who : msg.sender, strike, this_stake, head);
 
 			stake -= this_stake;
 			if (this_stake == orders[head].stake)
-				remove_order(head);
+				removeOrder(head);
 		}
 
 		// if still unfulfilled place what's left in orderbook
 		if (stake > 0)
-			insert_order(msg.sender, is_stable == true, adjustment, stake);
+			insertOrder(msg.sender, is_stable == true, adjustment, stake);
 	}
 	
 	function cancelExchange(uint32 id) /*only_exchange*/ {
@@ -151,7 +150,7 @@ contract CFD is CFDFace{
 		if (orders[id].who == msg.sender) {
 			accounts[msg.sender] += orders[id].stake;
 			OrderCancelled(id, msg.sender, orders[id].stake);
-			remove_order(id);
+			removeOrder(id);
 		}
 	}
 	
@@ -179,13 +178,13 @@ contract CFD is CFDFace{
 			accounts[deals[id].stable] += stable_gets;
 			accounts[deals[id].leveraged] += stake * 2 - stable_gets;
 			DealFinalized(id, deals[id].stable, deals[id].leveraged, price);
-			remove_deal(id);
+			removeDeal(id);
 		}
 	    }
 	}
 
 	// inserts the order into one of the two lists, ordered according to adjustment.
-	function insert_order(address who, bool is_stable, uint32 adjustment, uint128 stake) internal returns (uint32 id) {
+	function insertOrder(address who, bool is_stable, uint32 adjustment, uint128 stake) internal returns (uint32 id) {
 		id = next_id;
 		++next_id;
 
@@ -224,7 +223,7 @@ contract CFD is CFDFace{
 	}
 
 	// removes an order from one of the two lists
-	function remove_order(uint32 id) internal {
+	function removeOrder(uint32 id) internal {
 		// knit out
 		if (orders[id].prev_id != id) {
 			// if there's at least another deal in the list, reknit.
@@ -245,7 +244,7 @@ contract CFD is CFDFace{
 	}
 
 	// inserts the deal into deals at the end of the list.
-	function insert_deal(address stable, address leveraged, uint64 strike, uint128 stake, uint32 order) internal returns (uint32 id) {
+	function insertDeal(address stable, address leveraged, uint64 strike, uint128 stake, uint32 order) internal returns (uint32 id) {
 		// knit in at the end
 		id = next_id;
 		++next_id;
@@ -270,7 +269,7 @@ contract CFD is CFDFace{
 	}
 
 	// removes the deal id from deals.
-	function remove_deal(uint32 id) internal {
+	function removeDeal(uint32 id) internal {
 		// knit out
 		if (deals[id].prev_id != id) {
 			// if there's at least another deal in the list, reknit.
@@ -286,7 +285,7 @@ contract CFD is CFDFace{
 	}
 
 	// return price * the stake v which is closest to 1000000000 fullfilling (v >= min(stable, leveraged), v <= max(stable, leveraged)) / 1000000000
-	function find_strike(uint64 price, uint32 stable, uint32 leveraged) internal returns (uint64) {
+	function findStrike(uint64 price, uint32 stable, uint32 leveraged) internal returns (uint64) {
 		var stable_is_pos = stable > 1000000000;
 		var leveraged_is_pos = leveraged > 1000000000;
 		if (stable_is_pos != leveraged_is_pos)
@@ -295,13 +294,13 @@ contract CFD is CFDFace{
 			return price * ((stable_is_pos == (leveraged < stable)) ? leveraged : stable) / 1000000000;
 	}
 	
-	function best_adjustment(bool _is_stable) constant returns (uint32) {
+	function bestAdjustment(bool _is_stable) constant returns (uint32) {
 		_is_stable = !!_is_stable;
 		var head = _is_stable ? stable : leveraged;
 		return head == 0 ? 0 : orders[head].adjustment;
 	}
 
-	function best_adjustment_for(bool _is_stable, uint128 _stake) constant returns (uint32) {
+	function bestAdjustmentFor(bool _is_stable, uint128 _stake) constant returns (uint32) {
 		_is_stable = !!_is_stable;
 		var head = _is_stable ? stable : leveraged;
 		if (head == 0)
@@ -313,7 +312,7 @@ contract CFD is CFDFace{
 		return accrued + orders[i].stake >= _stake ? orders[i].adjustment : 0;
 	}
 	
-	function deal_details(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time) {
+	function dealDetails(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time) {
 		stable = deals[_id].stable;
 		leveraged = deals[_id].leveraged;
 		strike = deals[_id].strike;
@@ -321,18 +320,17 @@ contract CFD is CFDFace{
 		end_time = deals[_id].end_time;
 	}
 	
-	function order_details(uint32 _id) constant returns (uint128 stake) {
+	function orderDetails(uint32 _id) constant returns (uint128 stake) {
 		stake = orders[_id].stake;
 	}
 
-	function balance_of(address _who) constant returns (uint) {
+	function balanceOf(address _who) constant returns (uint) {
 		return accounts[_who];
 	}
 
 	Oracle public oracle;
 	uint32 public period;
-	
-	//uint balance;
+
     	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
 	uint32 public next_id = 1;
 

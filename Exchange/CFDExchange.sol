@@ -61,13 +61,13 @@ contract CFD {
 	function finalize(uint24 id) {}
 	
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
-	function bestAdjustment_for(bool _is_stable, uint128 _stake) constant returns (uint32) {}
+	function bestAdjustmentFor(bool _is_stable, uint128 _stake) constant returns (uint32) {}
 	function dealDetails(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time) {}
 	function orderDetails(uint32 _id) constant returns (uint128 stake) {}
 	function balanceOf(address _who) constant returns (uint) {}
 }
 
-contract CfdExchangeFace {
+contract CFDExchangeFace {
 
 	// EVENTS
 	
@@ -75,7 +75,7 @@ contract CfdExchangeFace {
   	event Withdraw(address token, address user, uint amount, uint balance);
 	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
 	event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
-	event OrderCancelled(address indexed cfd, address indexed who, uint128 stake);
+	event OrderCancelled(address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
 	event DealFinalized(address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
 
 	// METHODS
@@ -87,13 +87,17 @@ contract CfdExchangeFace {
 	function finalize(address _cfd, uint24 id) {}
 	function moveOrder(address _cfd, uint24 id, bool is_stable, uint32 adjustment) returns (bool) {}
 	
-	function balanceOf(address _who) constant returns (uint256) {}
+	function balanceOf() constant returns (uint256) {}
+	function balanceOf(address who) constant returns (uint256) {}
+	function balanceOf(address token, address user) constant returns (uint256) {}
 	function getLastOrderId() constant returns (uint) {}
 	function isActive(uint id) constant returns (bool active) {}
 	function getOwner(uint id) constant returns (address owner) {}
+	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {}
+	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {}
 }
 
-contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
+contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
 
 	struct Receipt {
 		uint units;
@@ -112,10 +116,11 @@ contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
   	event Withdraw(address token, address user, uint amount, uint balance);
 	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
 	event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
-	event OrderCancelled(address indexed cfd, address indexed who, uint128 stake);
+	event OrderCancelled(address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
 	event DealFinalized(address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
 
-	// METHODS
+
+	// MODIFIERS
 	
 	modifier is_signer_signature(uint8 v, bytes32 r, bytes32 s) {
 		bytes32 hash = sha256(msg.sender);
@@ -124,24 +129,28 @@ contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
 	}
     
 	modifier only_owner { if (msg.sender != owner) return; _; } 
-	modifier margin_ok(uint margin) { if (accounts[msg.sender].balance > margin) return; _; }
+	modifier margin_ok(uint margin) { if (accounts[msg.sender].balance < margin) return; _; }
+
+    // METHODS
 
 	function deposit() payable {
-		tokens[0][msg.sender] = safeAdd(tokens[0][msg.sender], msg.value);
-		Deposit(0, msg.sender, msg.value, tokens[0][msg.sender]);
+		tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
+		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, msg.value);
+		Deposit(0, msg.sender, msg.value, tokens[address(0)][msg.sender]);
 	}
 	
 	function withdraw(uint amount) {
 		if (tokens[0][msg.sender] < amount) throw;
 		tokens[0][msg.sender] = safeSub(tokens[0][msg.sender], amount);
+		accounts[msg.sender].balance = safeSub(accounts[msg.sender].balance, amount);
 		if (!msg.sender.call.value(amount)()) throw;
-		Withdraw(0, msg.sender, amount, tokens[0][msg.sender]);
+		Withdraw(0, msg.sender, amount, tokens[address(0)][msg.sender]);
 	}
 	
-	function orderCFD(address _cfd, bool is_stable, uint32 adjustment, uint128 stake) /*payable*/ margin_ok(stake) {
+	function orderCFD(address _cfd, bool is_stable, uint32 adjustment, uint128 stake) margin_ok(stake) {    //in CFD is payable
 		CFD cfd = CFD(_cfd);
 		cfd.orderExchange(is_stable, adjustment, stake);    //assert!
-		accounts[msg.sender].balance -= stake;
+		accounts[msg.sender].balance = safeSub(accounts[msg.sender].balance, stake);
 		OrderPlaced(_cfd, msg.sender, is_stable, adjustment, stake);
 	}
 	
@@ -154,9 +163,10 @@ contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
   
 	function cancel(address _cfd, uint32 id) {
 		CFD cfd = CFD(_cfd);
+		var stake = cfd.orderDetails(id);
 		accounts[msg.sender].balance += cfd.orderDetails(id);
 		cfd.cancel(id);
-		OrderCancelled(_cfd, msg.sender, id);
+		OrderCancelled(_cfd, id, msg.sender, stake);
 	}
 	
 	function finalize(address _cfd, uint24 id) {
@@ -167,8 +177,31 @@ contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
 		DealFinalized(_cfd, msg.sender, msg.sender, id);
 	}
 	
-	function balanceOf(address _who) constant returns (uint256) {
+	event DealFinalized(address cfd, uint32 indexed id, address indexed stable, address indexed leveraged, uint64 price);
+
+	
+	function balanceOf() constant returns (uint256) {
 		return tokens[address(0)][msg.sender];
+	}
+	
+	function balanceOf(address who) constant returns (uint256) {
+		return tokens[address(0)][who];
+	}
+	
+	function balanceOf(address token, address user) constant returns (uint256) {
+    		return tokens[token][user];
+  	}
+  	
+  	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {
+  	    CFD cfd = CFD(_cfd);
+		var bestAdjustment = cfd.bestAdjustment(_is_stable);
+		return bestAdjustment;
+  	}
+  	
+	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {
+	    CFD cfd = CFD(_cfd);
+		var bestAdjustmentFor = cfd.bestAdjustmentFor(_is_stable, _stake);
+		return bestAdjustmentFor;
 	}
 	
 	mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
