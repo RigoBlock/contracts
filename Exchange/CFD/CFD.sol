@@ -98,7 +98,6 @@ contract CFD is CFDFace{
 	function orderExchange(bool is_stable, uint32 adjustment, uint128 stake) /*is_exchange*/ margin_ok(stake) {
 	    accounts[msg.sender] += stake;
 	    order(is_stable, adjustment, stake);
-	    accounts[msg.sender] -= stake;
 	}
 
 	function order(bool is_stable, uint32 adjustment, uint128 stake) payable {
