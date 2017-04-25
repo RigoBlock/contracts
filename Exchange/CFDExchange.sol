@@ -67,7 +67,7 @@ contract CFD {
 	function balanceOf(address _who) constant returns (uint) {}
 }
 
-contract CFDExchangeFace {
+contract CfdExchangeFace {
 
 	// EVENTS
 	
@@ -97,7 +97,7 @@ contract CFDExchangeFace {
 	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {}
 }
 
-contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
+contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
 
 	struct Receipt {
 		uint units;
@@ -131,7 +131,7 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
 	modifier only_owner { if (msg.sender != owner) return; _; } 
 	modifier margin_ok(uint margin) { if (accounts[msg.sender].balance < margin) return; _; }
 
-    // METHODS
+    	// METHODS
 
 	function deposit() payable {
 		tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
@@ -193,13 +193,15 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
   	}
   	
   	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {
-  	    CFD cfd = CFD(_cfd);
-		cfd.bestAdjustment(_is_stable);
+  		CFD cfd = CFD(_cfd);
+		var bestAdjustment = cfd.bestAdjustment(_is_stable);
+		return bestAdjustment;
   	}
   	
 	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {
-	    CFD cfd = CFD(_cfd);
-		cfd.bestAdjustmentFor(_is_stable, _stake);
+		CFD cfd = CFD(_cfd);
+		var bestAdjustmentFor = cfd.bestAdjustmentFor(_is_stable, _stake);
+		return bestAdjustmentFor;
 	}
 	
 	mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
