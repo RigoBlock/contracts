@@ -68,7 +68,7 @@ contract CFD is CFDFace{
 	}
 	
 	//modifier margin_ok(uint x) { if (accounts[msg.sender].balance < x) return; _; }
-	modifier margin_ok(uint margin) { if (accounts[msg.sender] < margin) return; _; }
+	//modifier margin_ok(uint margin) { if (accounts[msg.sender] < margin) return; _; } //exchange should deposit on behalf of user, temporarily avoid
 	//modifier when_owns(address _owner, uint _amount) { if (accounts[_owner].balance < _amount) return; _; }
 	
 	function CFD(address _oracle) {
@@ -95,9 +95,10 @@ contract CFD is CFDFace{
         	} else { return (false); }
 	}
 	
-	function orderExchange(bool is_stable, uint32 adjustment, uint128 stake) /*is_exchange*/ margin_ok(stake) {
+	function orderExchange(bool is_stable, uint32 adjustment, uint128 stake) /*is_exchange (is_drago)*/ /*margin_ok(stake)*/ {
 	    accounts[msg.sender] += stake;
 	    order(is_stable, adjustment, stake);
+	    //accounts[msg.sender] += stake; double check why took it away
 	}
 
 	function order(bool is_stable, uint32 adjustment, uint128 stake) payable {
