@@ -67,7 +67,7 @@ contract CFD {
 	function balanceOf(address _who) constant returns (uint) {}
 }
 
-contract CfdExchangeFace {
+contract CFDExchangeFace {
 
 	// EVENTS
 	
@@ -97,7 +97,7 @@ contract CfdExchangeFace {
 	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {}
 }
 
-contract CfdExchange is CfdExchangeFace, SafeMath, Owned {
+contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
 
 	struct Receipt {
 		uint units;
