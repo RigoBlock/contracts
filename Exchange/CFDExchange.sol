@@ -193,13 +193,13 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
   	}
   	
   	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {
-  	    CFD cfd = CFD(_cfd);
+  		CFD cfd = CFD(_cfd);
 		var bestAdjustment = cfd.bestAdjustment(_is_stable);
 		return bestAdjustment;
   	}
   	
 	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {
-	    CFD cfd = CFD(_cfd);
+		CFD cfd = CFD(_cfd);
 		var bestAdjustmentFor = cfd.bestAdjustmentFor(_is_stable, _stake);
 		return bestAdjustmentFor;
 	}
