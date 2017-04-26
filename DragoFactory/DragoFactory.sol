@@ -33,15 +33,15 @@ contract DragoRegistry {
 
 contract DragoFactoryFace {
     
-    // EVENTS
+	// EVENTS
 
 	event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
-    event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
-    event NewRegistry(address indexed dragoRegistry, address indexed _newRegistry);
-    event SetBeneficiary(address indexed dragoDAO, address indexed _dragoDAO);
-    event SetFee(uint fee, uint _fee);
+	event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
+	event NewRegistry(address indexed dragoRegistry, address indexed _newRegistry);
+	event SetBeneficiary(address indexed dragoDAO, address indexed _dragoDAO);
+	event SetFee(uint fee, uint _fee);
     
-    // METHODS
+	// METHODS
     
 	function createDrago(string _name, string _symbol, address _dragowner) returns (address _drago, uint _dragoID) {}
 	function setRegistry(address _newRegistry) {}
@@ -49,7 +49,7 @@ contract DragoFactoryFace {
 	function setFee(uint _fee) {}
 	function drain() {}
     
-    function getRegistry() constant returns (address) {}
+	function getRegistry() constant returns (address) {}
 	function getBeneficiary() constant returns (address) {}
 	function getVersion() constant returns (string) {}
 	function getLastId() constant returns (uint) {}
@@ -57,15 +57,15 @@ contract DragoFactoryFace {
 
 contract DragoFactory is Owned, DragoFactoryFace {
     
-    // EVENTS
+	// EVENTS
 	
 	event DragoCreated(string _name, string _symbol, address _drago, address _dragowner, uint _dragoID);
-    event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
-    event NewRegistry(address indexed dragoRegistry, address indexed _newRegistry);
-    event SetBeneficiary(address indexed dragoDAO, address indexed _dragoDAO);
-    event SetFee(uint fee, uint _fee);
+	event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
+	event NewRegistry(address indexed dragoRegistry, address indexed _newRegistry);
+	event SetBeneficiary(address indexed dragoDAO, address indexed _dragoDAO);
+	event SetFee(uint fee, uint _fee);
     
-    // MODIFIERS
+	// MODIFIERS
     
 	modifier when_fee_paid { if (msg.value < fee) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
