@@ -6,7 +6,7 @@ pragma solidity ^0.4.10;
 
 contract CFDFace {
 
-  // EVENTS
+  	// EVENTS
 	
 	event Deposit(address indexed who, uint value);
 	event Withdraw(address indexed who, uint value);
@@ -27,7 +27,7 @@ contract CFDFace {
 	function finalize(uint24 id) {}
 	
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
-	function bestAdjustment_for(bool _is_stable, uint128 _stake) constant returns (uint32) {}
+	function bestAdjustmentFor(bool _is_stable, uint128 _stake) constant returns (uint32) {}
 	function dealDetails(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time) {}
 	function orderDetails(uint32 _id) constant returns (uint128 stake) {}
 	function balanceOf(address _who) constant returns (uint) {}
