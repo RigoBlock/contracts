@@ -5,20 +5,25 @@
 pragma solidity ^0.4.10;
 
 contract DragoFactoryFace {
+    
+	// EVENTS
 
 	event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
-
+	event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
+	event NewRegistry(address indexed dragoRegistry, address indexed _newRegistry);
+	event SetBeneficiary(address indexed dragoDAO, address indexed _dragoDAO);
+	event SetFee(uint fee, uint _fee);
+    
+	// METHODS
+    
 	function createDrago(string _name, string _symbol, address _dragowner) returns (address _drago, uint _dragoID) {}
-	function setFee(uint _fee) {}
+	function setRegistry(address _newRegistry) {}
 	function setBeneficiary(address _dragoDAO) {}
+	function setFee(uint _fee) {}
 	function drain() {}
-	function() {}
-	function changeRatio(address targetDrago, uint256 _ratio) {}
-	function setTransactionFee(address targetDrago, uint _transactionFee) {}
-	function changeFeeCollector(address targetDrago, address _feeCollector) {}
-	function changeDragator(address targetDrago, address _dragator) {}
-
+    
+	function getRegistry() constant returns (address) {}
+	function getBeneficiary() constant returns (address) {}
 	function getVersion() constant returns (string) {}
 	function getLastId() constant returns (uint) {}
-	function getDragoDAO() constant returns (uint) {}
 }
