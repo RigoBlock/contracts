@@ -86,8 +86,7 @@ contract CFDExchangeFace {
 	function cancel(address _cfd, uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(address _cfd, uint24 id) {}
 	function moveOrder(address _cfd, uint24 id, bool is_stable, uint32 adjustment) returns (bool) {}
-	
-	function balanceOf() constant returns (uint256) {}
+
 	function balanceOf(address who) constant returns (uint256) {}
 	function balanceOf(address token, address user) constant returns (uint256) {}
 	function getLastOrderId() constant returns (uint) {}
@@ -177,13 +176,6 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
 		DealFinalized(_cfd, msg.sender, msg.sender, id);
 	}
 	
-	event DealFinalized(address cfd, uint32 indexed id, address indexed stable, address indexed leveraged, uint64 price);
-
-	
-	function balanceOf() constant returns (uint256) {
-		return tokens[address(0)][msg.sender];
-	}
-	
 	function balanceOf(address who) constant returns (uint256) {
 		return tokens[address(0)][who];
 	}
@@ -206,9 +198,8 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
 	
 	mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
   	mapping (address => mapping (bytes32 => bool)) public orders; //mapping of user accounts to mapping of order hashes to booleans (true = submitted by user, equivalent to offchain signature)
-  	mapping (address => mapping (bytes32 => uint)) public orderFills;
+  	mapping (address => mapping (bytes32 => uint)) public orderFills; //can group in Struct
   	mapping (address => Account) accounts;
-	mapping (address => uint256) public balanceOf;
   	uint public feeMake; //percentage times (1 ether)
   	uint public feeTake; //percentage times (1 ether)
   	uint public feeRebate;
