@@ -5,7 +5,12 @@
 pragma solidity ^0.4.10;
 
 contract Oracle {
-	function get() constant returns (uint ETHUSD) {}
+
+    event Changed(uint224 current);
+
+    function get() constant returns (uint) {}
+    function getPrice() constant returns (uint224) {}
+    function getTimestamp() constant returns (uint32) {}
 }
 
 contract CFDFace {
