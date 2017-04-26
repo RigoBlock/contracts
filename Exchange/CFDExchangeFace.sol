@@ -24,8 +24,9 @@ contract CFDExchangeFace {
 	function finalize(address _cfd, uint24 id) {}
 	function moveOrder(address _cfd, uint24 id, bool is_stable, uint32 adjustment) returns (bool) {}
 
-	function balanceOf(address who) constant returns (uint256) {}
-	function balanceOf(address token, address user) constant returns (uint256) {}
+	function balanceOf(address _who) constant returns (uint) {}
+	function marginOf(address _who) constant returns (uint) {}
+	function balanceOf(address token, address _who) constant returns (uint) {}
 	function getLastOrderId() constant returns (uint) {}
 	function isActive(uint id) constant returns (bool active) {}
 	function getOwner(uint id) constant returns (address owner) {}
