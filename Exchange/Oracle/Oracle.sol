@@ -4,6 +4,32 @@
 
 pragma solidity ^0.4.10;
 
+contract Owned {
+    
+    modifier only_owner { if (msg.sender != owner) return; _; }
+    
+    event NewOwner(address indexed old, address indexed current);
+    
+    function setOwner(address _new) only_owner {
+        owner = _new;
+        NewOwner(owner, _new);
+    }
+
+    address public owner = msg.sender;
+}
+
+contract OracleFace {
+  
+    event Changed(uint224 current);
+  
+    function updatePrice() {}
+    function note(uint224 _value) internal {}
+    
+    function get() constant returns (uint) {}
+    function getPrice() constant returns (uint224) {}
+    function getTimestamp() constant returns (uint32) {}
+}
+
 contract Oracle is Owned, OracleFace {
   
     event Changed(uint224 current);
@@ -13,7 +39,7 @@ contract Oracle is Owned, OracleFace {
       uint224 value;
     }
     
-    function note(uint224 _value) only_owner {
+    function note(uint224 _value) internal {
       if (data.value != _value) {
        data.value = _value;
        Changed(_value);
@@ -21,9 +47,9 @@ contract Oracle is Owned, OracleFace {
 	    data.timestamp = uint32(now);
     }
     
-    function updatePrice() {}
+    function get() constant returns (uint) {}
     
-    function get() constant returns (uint224) {
+    function getPrice() constant returns (uint224) {
         return data.value;
     }
 
