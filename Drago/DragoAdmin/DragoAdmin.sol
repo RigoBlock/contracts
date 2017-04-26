@@ -66,6 +66,9 @@ contract Drago {
 contract DragoAdminFace {
 
 	// EVENTS
+	
+	//event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
+	//event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 
 	// METHODS
 	
@@ -87,6 +90,9 @@ contract DragoAdminFace {
 }    
       
 contract DragoAdmin is Owned, DragoAdminFace {
+
+	//event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
+	//event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
     
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	
@@ -160,5 +166,4 @@ contract DragoAdmin is Owned, DragoAdminFace {
 	string public version = 'DF0.2';
 	address _targetDrago;
 	address public owner = msg.sender;
-	//mapping(address => address[]) public created;
 }
