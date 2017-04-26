@@ -8,7 +8,7 @@ contract DragoRegistryFace {
 
 	//EVENTS
 
-	event Registered(string indexed symbol, uint indexed id, address addr, string name);
+	event Registered(string indexed symbol, uint indexed id, address drago, string name);
 	event Unregistered(string indexed symbol, uint indexed id);
 	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
 	
