@@ -113,7 +113,7 @@ contract DragoFace {
 	function depositToExchange(address exchange, address token, uint256 value) payable returns(bool success) {}
 	function depositToCFDExchange(address _cfdExchange) payable returns(bool success) {}
 	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
-	function withdrawFromCFDExchange(address _cfdExchange, uint amount) payable returns(bool success) {}
+	function withdrawFromCFDExchange(address _cfdExchange, uint amount) returns(bool success) {}
 	function placeOrderExchange() {}
 	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}
 	function cancelOrderExchange() {}
@@ -216,7 +216,7 @@ contract Drago is Owned, ERC20, DragoFace {
         	dragator = _dragator;
 	}
     
-	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) only_owner {
+	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) /*only_owner*/ {  //proxy modifier
         	sellPrice = newSellPrice*(10**(18 - 4));
         	buyPrice = newBuyPrice*(10**(18 - 4));
 	}
@@ -237,12 +237,12 @@ contract Drago is Owned, ERC20, DragoFace {
 		exchange.withdraw(token, value); //for ETH token = 0
 	}
 	
-	function withdrawFromCFDExchange(address _cfdExchange, uint amount) /*when_approved_exchange*/ /*only_drago_owner*/ payable returns(bool success) {
+	function withdrawFromCFDExchange(address _cfdExchange, uint amount) /*when_approved_exchange*/ /*only_drago_owner*/ returns(bool success) {
 	    CFDExchange cfds = CFDExchange(_cfdExchange);
 	    cfds.withdraw(amount);
 	}
 	
-	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) only_owner {
+	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) /*only_owner*/ {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
 		cfds.orderCFD(_cfd, is_stable, adjustment, stake);
 	}
