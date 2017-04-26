@@ -9,8 +9,9 @@ contract OracleFace {
     event Changed(uint224 current);
   
     function updatePrice() {}
-    function note(uint224 _value) {}
+    function note(uint224 _value) internal {}
     
-    function get() constant returns (uint224) {}
+    function get() constant returns (uint) {}
+    function getPrice() constant returns (uint224) {}
     function getTimestamp() constant returns (uint32) {}
 }
