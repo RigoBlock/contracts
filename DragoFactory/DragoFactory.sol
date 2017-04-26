@@ -6,7 +6,6 @@ pragma solidity ^0.4.10;
 
 import "github.com/RigoBlock/contracts/Drago/Drago.sol";
 
-
 contract DragoRegistry {
 
 	// EVENTS
