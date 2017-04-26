@@ -2,8 +2,6 @@
 //! By Gabriele Rigo (Rigo Investment), 2017.
 //! Released under the Apache Licence 2.
 
-pragma solidity ^0.4.10;
-
 contract Owned {
     
 	modifier only_owner { if (msg.sender != owner) return; _; }
