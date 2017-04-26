@@ -25,9 +25,13 @@ contract Owned {
 
 contract DragoRegistryFace {
 
-	event Registered(string indexed tla, uint indexed id, address addr, string name);
-	event Unregistered(string indexed tla, uint indexed id);
+	//EVENTS
+
+	event Registered(string indexed symbol, uint indexed id, address addr, string name);
+	event Unregistered(string indexed symbol, uint indexed id);
 	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
+	
+	// METHODS
         
 	function register(address _drago, uint _dragoID) {}	
 	function register(address _drago, string _symbol, uint _base, string _name) payable returns (bool) {}
@@ -57,7 +61,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		mapping (bytes32 => bytes32) meta;
 	}
     
-    modifier when_fee_paid { if (msg.value < fee) return; _; }
+	modifier when_fee_paid { if (msg.value < fee) return; _; }
 	modifier when_address_free(address _drago) { if (mapFromAddress[_drago] != 0) return; _; }
 	modifier when_symbol_free(string _symbol) { if (mapFromSymbol[_symbol] != 0) return; _; }
 	modifier when_is_symbol(string _symbol) { if (bytes(_symbol).length != 3) return; _; }
