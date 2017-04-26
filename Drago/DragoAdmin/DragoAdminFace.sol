@@ -1,6 +1,6 @@
 contract DragoAdminFace {
-  function buyDrago(address targetDrago) payable {}
-  function sellDrago(address targetDrago, uint256 amount) {}
+	function buyDrago(address targetDrago) payable {}
+	function sellDrago(address targetDrago, uint256 amount) {}
 	function changeRatio(address _targetDrago, uint256 _ratio) {}
 	function setTransactionFee(address _targetDrago, uint _transactionFee) {}
 	function changeFeeCollector(address _targetDrago, address _feeCollector) {}
