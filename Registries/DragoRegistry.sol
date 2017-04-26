@@ -33,15 +33,13 @@ contract DragoRegistryFace {
 	
 	// METHODS
         
-	function register(address _drago, uint _dragoID) {}	
-	function register(address _drago, string _symbol, uint _base, string _name) payable returns (bool) {}
+	function register(address _drago, string _name, string _symbol, uint _dragoID) payable returns (bool) {}
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {}
 	function unregister(uint _id) {}
 	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
 	function setFee(uint _fee) {}
 	function drain() {}
 	
-	function accountOf(uint _dragoID) constant returns (address) {}   
-	function dragoOf(address _drago) constant returns (uint) {}
 	function dragoCount() constant returns (uint) {}
 	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner) {}
 	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner) {}
