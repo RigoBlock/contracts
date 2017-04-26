@@ -5,12 +5,24 @@
 pragma solidity ^0.4.10;
 
 contract Owned {
+    
+	modifier only_owner { if (msg.sender != owner) return; _; }
+
 	event NewOwner(address indexed old, address indexed current);
-	function setOwner(address _new) {}
-	function getOwner() constant returns (address owner) {}
+   
+	function setOwner(address _new) only_owner {
+		owner = _new;
+		NewOwner(owner, _new);
+	}
+	
+	function getOwner() constant returns (address) {
+	    return owner;
+	}
+
+	address public owner = msg.sender;
 }
 
-contract ERC20Face is Owned {
+contract ERC20 {
 
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -19,43 +31,35 @@ contract ERC20Face is Owned {
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 	function approve(address _spender, uint256 _value) returns (bool success) {}
 
-	function totalSupply() constant returns (uint256 total) {}
-	function balanceOf(address _who) constant returns (uint256 balance) {}
-	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
+	function totalSupply() constant returns (uint256) {}
+	function balanceOf(address _who) constant returns (uint256) {}
+	function allowance(address _owner, address _spender) constant returns (uint256) {}
 }
 
 contract Exchange {
 
 	event Deposit(address token, address user, uint amount, uint balance);
-    	event Withdraw(address token, address user, uint amount, uint balance);
-    	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
-    	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
-    	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
+	event Withdraw(address token, address user, uint amount, uint balance);
+	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
+	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
+	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 
 	// METHODS
 
 	function deposit(address token, uint256 amount) payable {}
 	function withdraw(address token, uint256 amount) {}
-	function orderCFD(bool is_stable, uint32 adjustment, uint128 stake) payable {}	//returns(uint id)
 	function order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce) {}
 	function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) {}
 	function cancelOrder(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
-	function cancel(uint32 id) {}	//function cancel(uint id) returns (bool) {}
-	function finalize(uint24 id) {}
-	function moveOrder(uint id, uint quantity) returns (bool) {}
 	
 	function balanceOf(address _who) constant returns (uint256) {}
 	function balanceOf(address token, address user) constant returns (uint256) {}
 	function availableVolume(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) constant returns(uint) {}
-    	function amountFilled(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) constant returns(uint) {}
-    	
+	function amountFilled(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) constant returns(uint) {}
 	function getLastOrderId() constant returns (uint) {}
-	function isActive(uint id) constant returns (bool active) {}
-	function getOwner(uint id) constant returns (address owner) {}
-	//function getOrder(uint id) constant returns (uint, ERC20, uint, ERC20) {}
-    	//mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
-    	//mapping (address => mapping (bytes32 => bool)) public orders; //mapping of user accounts to mapping of order hashes to booleans (true = submitted by user, equivalent to offchain signature)
-    	//mapping (address => mapping (bytes32 => uint)) public orderFills;
+	function isActive(uint id) constant returns (bool) {}
+	function getOwner(uint id) constant returns (address) {}
+	function getOrder(uint id) constant returns (uint, ERC20, uint, ERC20) {}
 }
 
 contract CFDExchange {
@@ -82,15 +86,15 @@ contract CFDExchange {
 	function marginOf(address _who) constant returns (uint) {}
 	function balanceOf(address token, address _who) constant returns (uint) {}
 	function getLastOrderId() constant returns (uint) {}
-	function isActive(uint id) constant returns (bool active) {}
-	function getOwner(uint id) constant returns (address owner) {}
+	function isActive(uint id) constant returns (bool) {}
+	function getOwner(uint id) constant returns (address) {}
 	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {}
 	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {}
 }
 
 contract DragoFace {
 
-    	event Transfer(address indexed _from, address indexed _to, uint256 _value);
+	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
@@ -116,7 +120,7 @@ contract DragoFace {
 	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 id) {}	
 	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 id) {}
 
-	function balanceOf(address _from) constant returns (uint256 balance) {}
+	function balanceOf(address _from) constant returns (uint256) {}
 	function getName() constant returns (string name) {}
 	function getSymbol() constant returns (string symbol) {}
 	function getPrice() constant returns (uint256 price) {}
@@ -124,7 +128,7 @@ contract DragoFace {
 	function getFeeCollector() constant returns (address feeCollector) {}
 }
 
-contract Drago is Owned, ERC20Face, DragoFace {
+contract Drago is Owned, ERC20, DragoFace {
     
 	struct Receipt {
 		uint units;
@@ -253,7 +257,7 @@ contract Drago is Owned, ERC20Face, DragoFace {
 		cfds.finalize(_cfd, id);
 	}
 
-	function balanceOf(address _who) constant returns (uint256 balance) {
+	function balanceOf(address _who) constant returns (uint256) {
 		return balances[_who];
 	}
 	
