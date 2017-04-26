@@ -77,10 +77,10 @@ contract CFDExchange {
 	function cancel(address _cfd, uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(address _cfd, uint24 id) {}
 	function moveOrder(address _cfd, uint24 id, bool is_stable, uint32 adjustment) returns (bool) {}
-	
-	function balanceOf() constant returns (uint256) {}
-	function balanceOf(address who) constant returns (uint256) {}
-	function balanceOf(address token, address user) constant returns (uint256) {}
+
+	function balanceOf(address _who) constant returns (uint) {}
+	function marginOf(address _who) constant returns (uint) {}
+	function balanceOf(address token, address _who) constant returns (uint) {}
 	function getLastOrderId() constant returns (uint) {}
 	function isActive(uint id) constant returns (bool active) {}
 	function getOwner(uint id) constant returns (address owner) {}
@@ -253,8 +253,8 @@ contract Drago is Owned, ERC20Face, DragoFace {
 		cfds.finalize(_cfd, id);
 	}
 
-	function balanceOf(address _from) constant returns (uint256 balance) {
-		return balances[_from];
+	function balanceOf(address _who) constant returns (uint256 balance) {
+		return balances[_who];
 	}
 	
 	Exchange exchange = Exchange(_exchange);
