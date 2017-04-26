@@ -23,8 +23,7 @@ contract CFDExchangeFace {
 	function cancel(address _cfd, uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(address _cfd, uint24 id) {}
 	function moveOrder(address _cfd, uint24 id, bool is_stable, uint32 adjustment) returns (bool) {}
-	
-	function balanceOf() constant returns (uint256) {}
+
 	function balanceOf(address who) constant returns (uint256) {}
 	function balanceOf(address token, address user) constant returns (uint256) {}
 	function getLastOrderId() constant returns (uint) {}
