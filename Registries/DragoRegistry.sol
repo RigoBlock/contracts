@@ -60,13 +60,12 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	modifier when_is_symbol(string _symbol) { if (bytes(_symbol).length != 3) return; _; }
 	modifier when_has_symbol(string _symbol) { if (mapFromSymbol[_symbol] == 0) return; _; }
 	modifier only_drago_owner(uint _id) { if (dragos[_id].owner != msg.sender) return; _; }
-	//modifier only_rigoblock_drago;
-	//modifier when_name_free(bytes32 _name) { if (mapFromName[_name] != 0) return; _; }
-	//modifier when_has_name(bytes32 _name) { if (mapFromName[_name] == 0) return; _; }
-	//modifier only_badge_owner(uint _id) { if (badges[_id].owner != msg.sender) return; _; 
-	
-	event Registered(string indexed tla, uint indexed id, address drago, string name);
-	event Unregistered(string indexed tla, uint indexed id);
+	//modifier only_rigoblock_drago
+	modifier when_name_free(string _name) { if (mapFromName[_name] != 0) return; _; }
+	modifier when_has_name(string _name) { if (mapFromName[_name] == 0) return; _; }
+
+	event Registered(string indexed symbol, uint indexed id, address drago, string name);
+	event Unregistered(string indexed symbol, uint indexed id);
 	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
     
 	function accountOf(uint _dragoID) constant returns (address) {
@@ -90,6 +89,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		dragos.push(Drago(_drago, _symbol, _base, _name, _owner));
 		mapFromAddress[_drago] = dragos.length;
 		mapFromSymbol[_symbol] = dragos.length;
+		mapFromName[_name] = dragos.length;
 		Registered(_symbol, dragos.length - 1, _drago, _name);
 		return true;
 	}
@@ -98,6 +98,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		Unregistered(dragos[_id].symbol, _id);
 		delete mapFromAddress[dragos[_id].drago];
 		delete mapFromSymbol[dragos[_id].symbol];
+		delete mapFromName[dragos[_id].name];
 		delete dragos[_id];
 	}
 	
@@ -135,6 +136,15 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		name = t.name;
 		owner = t.owner;
 	}
+	
+	function fromName(string _name) constant returns (uint id, string symbol, address drago, uint base, address owner) {
+		id = mapFromName[_name] - 1;
+		var t = dragos[id];
+		symbol = t.symbol;
+		drago = t.drago;
+		base = t.base;
+		owner = t.owner;
+	}
 
 	function meta(uint _id, bytes32 _key) constant returns (bytes32) {
 		return dragos[_id].meta[_key];
@@ -152,6 +162,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	
 	mapping (address => uint) mapFromAddress;
 	mapping (string => uint) mapFromSymbol;
+	mapping (string => uint) mapFromName;
 	mapping(address => uint) public toDrago;
 	mapping(uint => address) public odragos; //Drago[] dragos;
 	mapping(address => address[]) public created;
