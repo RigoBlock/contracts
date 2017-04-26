@@ -25,10 +25,14 @@ contract Owned {
 
 contract Drago {
 
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+	// EVENTS
+
+	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
+	
+	// METHODS
 	
  	function Drago(string _dragoName,  string _dragoSymbol) {}
 	function() payable {}
@@ -60,7 +64,12 @@ contract Drago {
 }
       
 contract DragoAdminFace {
-    function buyDrago(address targetDrago) payable {}
+
+	// EVENTS
+
+	// METHODS
+	
+	function buyDrago(address targetDrago) payable {}
 	function sellDrago(address targetDrago, uint256 amount) {}
 	function changeRatio(address _targetDrago, uint256 _ratio) {}
 	function setTransactionFee(address _targetDrago, uint _transactionFee) {}
@@ -79,7 +88,7 @@ contract DragoAdminFace {
       
 contract DragoAdmin is Owned, DragoAdminFace {
     
-    modifier only_owner { if (msg.sender != owner) return; _; }
+	modifier only_owner { if (msg.sender != owner) return; _; }
 	
 	function buyDrago(address _targetDrago) payable {
 		drago.buy.value(msg.value)();
