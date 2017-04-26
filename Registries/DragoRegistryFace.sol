@@ -24,9 +24,9 @@ contract DragoRegistryFace {
 	function accountOf(uint _dragoID) constant returns (address) {}   
 	function dragoOf(address _drago) constant returns (uint) {}
 	function dragoCount() constant returns (uint) {}
-	function drago(uint _id) constant returns (address drago, string symbol, uint base, string name, address owner) {}
-	function fromAddress(address _drago) constant returns (uint id, string symbol, uint base, string name, address owner) {}
-	function fromSymbol(string _symbol) constant returns (uint id, address drago, uint base, string name, address owner) {}
-	function fromName(string _name) constant returns (uint id, string symbol, address drago, uint base, address owner) {}
+	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner) {}
+	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner) {}
+	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner) {}
+	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner) {}
 	function meta(uint _id, bytes32 _key) constant returns (bytes32) {}
 }
