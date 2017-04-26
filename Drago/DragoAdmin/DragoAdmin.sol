@@ -60,7 +60,7 @@ contract Drago {
 }
 
 contract DragoAdminFace {
-    function buyDrago(address targetDrago) payable {}
+	function buyDrago(address targetDrago) payable {}
 	function sellDrago(address targetDrago, uint256 amount) {}
 	function changeRatio(address _targetDrago, uint256 _ratio) {}
 	function setTransactionFee(address _targetDrago, uint _transactionFee) {}
@@ -79,7 +79,7 @@ contract DragoAdminFace {
       
 contract DragoAdmin is Owned, DragoAdminFace {
     
-    modifier only_owner { if (msg.sender != owner) return; _; }
+	modifier only_owner { if (msg.sender != owner) return; _; }
 	
 	function buyDrago(address _targetDrago) payable {
 		drago.buy.value(msg.value)();
