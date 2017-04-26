@@ -6,7 +6,7 @@ pragma solidity ^0.4.10;
 
 contract DragoFace {
 
-    	event Transfer(address indexed _from, address indexed _to, uint256 _value);
+	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
@@ -32,7 +32,7 @@ contract DragoFace {
 	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 id) {}	
 	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 id) {}
 
-	function balanceOf(address _from) constant returns (uint256 balance) {}
+	function balanceOf(address _from) constant returns (uint256) {}
 	function getName() constant returns (string name) {}
 	function getSymbol() constant returns (string symbol) {}
 	function getPrice() constant returns (uint256 price) {}
