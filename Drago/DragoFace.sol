@@ -25,7 +25,7 @@ contract DragoFace {
 	function depositToExchange(address exchange, address token, uint256 value) payable returns(bool success) {}
 	function depositToCFDExchange(address _cfdExchange) payable returns(bool success) {}
 	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
-	function withdrawFromCFDExchange(address _cfdExchange, uint amount) payable returns(bool success) {}
+	function withdrawFromCFDExchange(address _cfdExchange, uint amount) returns(bool success) {}
 	function placeOrderExchange() {}
 	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}
 	function cancelOrderExchange() {}
