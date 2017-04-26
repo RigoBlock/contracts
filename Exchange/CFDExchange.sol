@@ -208,6 +208,7 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
   	mapping (address => mapping (bytes32 => bool)) public orders; //mapping of user accounts to mapping of order hashes to booleans (true = submitted by user, equivalent to offchain signature)
   	mapping (address => mapping (bytes32 => uint)) public orderFills;
   	mapping (address => Account) accounts;
+	mapping (address => uint256) public balanceOf;
   	uint public feeMake; //percentage times (1 ether)
   	uint public feeTake; //percentage times (1 ether)
   	uint public feeRebate;
