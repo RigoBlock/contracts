@@ -10,10 +10,7 @@ contract DragoFactoryFace {
 
 	event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
 	event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
-	event NewRegistry(address indexed dragoRegistry, address indexed _newRegistry);
-	event SetBeneficiary(address indexed dragoDAO, address indexed _dragoDAO);
-	event SetFee(uint fee, uint _fee);
-    
+
 	// METHODS
     
 	function createDrago(string _name, string _symbol) returns (address _drago, uint _dragoID) {}
