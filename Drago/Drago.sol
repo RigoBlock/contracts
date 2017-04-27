@@ -22,6 +22,34 @@ contract Owned {
 	address public owner = msg.sender;
 }
 
+contract SafeMath {
+
+    function safeMul(uint a, uint b) internal returns (uint) {
+        uint c = a * b;
+        assert(a == 0 || c / a == b);
+        return c;
+    }
+    
+    function safeDiv(uint a, uint b) internal returns (uint) {
+        assert(b > 0);
+        uint c = a / b;
+        assert(a == b * c + a % b);
+        return c;
+    }
+
+    function safeSub(uint a, uint b) internal returns (uint) {
+        assert(b <= a);
+        return a - b;
+    }
+
+    function safeAdd(uint a, uint b) internal returns (uint) {
+        uint c = a + b;
+        assert(c>=a && c>=b);
+        return c;
+    
+    }
+}    
+
 contract ERC20 {
 
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -98,7 +126,15 @@ contract DragoFace {
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
-	
+    event NAV(uint sellPrice, uint buyPrice);
+    event DepositExchange(uint value, uint256 indexed _amount, address indexed who, address token , address indexed _exchange);
+    event DepositCFDExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
+	event WithdrawExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
+	event WithdrawCFDExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
+	event OrderCFD(address indexed _cfdExchange, address indexed _cfd);
+	event CancelCFD(address indexed _cfdExchange, address indexed _cfd);
+	event FinalizeCFD(address indexed _cfdExchange, address indexed _cfd);
+
  	function Drago(string _dragoName,  string _dragoSymbol) {}
 	function() payable {}
 	function buy() payable returns (uint amount) {}
@@ -121,14 +157,16 @@ contract DragoFace {
 	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 id) {}
 
 	function balanceOf(address _from) constant returns (uint256) {}
-	function getName() constant returns (string name) {}
-	function getSymbol() constant returns (string symbol) {}
-	function getPrice() constant returns (uint256 price) {}
-	function getTransactionFee() constant returns (uint256 transactionFee) {}
-	function getFeeCollector() constant returns (address feeCollector) {}
+	function getName() constant returns (string) {}
+	function getSymbol() constant returns (string) {}
+	function getPrice() constant returns (uint256 sellPrice, uint256 buyPrice) {}
+	function getSupply() constant returns (uint256) {}
+	function getTransactionFee() constant returns (uint256) {}
+	function getFeeCollector() constant returns (address) {}
+	function getRefundActivationPeriod() constant returns (uint32) {}
 }
 
-contract Drago is Owned, ERC20, DragoFace {
+contract Drago is Owned, ERC20, SafeMath, DragoFace {
     
 	struct Receipt {
 		uint units;
@@ -150,43 +188,56 @@ contract Drago is Owned, ERC20, DragoFace {
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
-	
+    event NAV(uint sellPrice, uint buyPrice);
+    event DepositExchange(uint value, uint256 indexed _amount, address indexed who, address token , address indexed _exchange);
+    event DepositCFDExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
+	event WithdrawExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
+	event WithdrawCFDExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
+	event OrderCFD(address indexed _cfdExchange, address indexed _cfd);
+	event CancelCFD(address indexed _cfdExchange, address indexed _cfd);
+	event FinalizeCFD(address indexed _cfdExchange, address indexed _cfd);
+
  	function Drago(string _dragoName,  string _dragoSymbol) {
-        	name = _dragoName;  
-        	symbol = _dragoSymbol;
+        name = _dragoName;
+        symbol = _dragoSymbol;
 	}
     
 	function() payable {
 		buyDrago();
 	}
 	
-	//TODO: separate function and its specifics
 	function buyDrago() payable returns (uint amount) {
-	//TODO: introduce safemath
-		//if (!approvedAccount[msg.sender]) throw;
-		if (msg.value < min_order) throw;
-        	gross_amount = msg.value / buyPrice;
-        	fee = gross_amount * transactionFee / (100 ether);
-        	fee_dragoo = fee * 80 / 100;
-        	fee_dragator = fee - fee_dragoo;
-        	amount = gross_amount - fee;
-        	balances[msg.sender] += amount;
-        	balances[feeCollector] += fee_dragoo;
-        	balances[dragator] += fee_dragator;
-        	accounts[msg.sender].receipt[buyPrice].activation = uint32(now) + refundActivationPeriod;
-        	totalSupply += gross_amount;
-    		Buy(msg.sender, this, msg.value, amount);
-    		return amount;
+	    assert(buyDragoInternal());
+	    Buy(msg.sender, this, msg.value, amount);
 	}
-	
-	function sellDrago(uint256 amount) minimum_period_past(buyPrice, amount) returns (uint revenue, bool success) {
-		//TODO: execute redemption only 2 days after sell
-		//TODO: introduce safemath
+
+	function buyDragoInternal() internal returns (bool success) {
+		//if (!approvedAccount[msg.sender]) throw; //or separate whitelisted
+		if (msg.value < min_order) throw;
+        var gross_amount = safeDiv(msg.value, buyPrice);
+        var fee = safeMul(gross_amount, transactionFee) / (100 ether);
+        var fee_drago = safeMul(fee, ratio);
+        var fee_dragator = safeSub(fee, fee_drago);
+        var amount = safeSub(gross_amount, fee);
+        balances[msg.sender] = safeAdd(balances[msg.sender], amount);
+        balances[feeCollector] = safeAdd(balances[feeCollector], fee_drago);
+        balances[dragator] = safeAdd(balances[dragator], fee_dragator);
+        accounts[msg.sender].receipt[buyPrice].activation = uint32(now) + refundActivationPeriod;
+        totalSupply = safeAdd(totalSupply, gross_amount);
+    	return (true);
+	}
+
+    function sellDrago(uint256 amount) returns (uint revenue, bool success) {
+        sellDragoInternal(amount);
+        Sell(this, msg.sender, amount, revenue);
+    }
+
+	function sellDragoInternal(uint256 amount) minimum_period_past(buyPrice, amount) returns (uint revenue, bool success) {
 		//if (!approvedAccount[msg.sender]) throw;
-		revenue = /*safeMul(*/amount * sellPrice/*)*/;
+		revenue = safeMul(amount, sellPrice);
         	if (balances[msg.sender] >= amount && balances[msg.sender] + amount > balances[msg.sender] && revenue >= min_order) {
-            	balances[msg.sender] -= amount;
-            	totalSupply -= amount;
+            	balances[msg.sender] = safeSub(balances[msg.sender], amount);
+            	totalSupply = safeSub(totalSupply, amount);
 		if (!msg.sender.send(revenue)) {
 			throw;
 			} else { 
@@ -197,11 +248,11 @@ contract Drago is Owned, ERC20, DragoFace {
 	}
 	
 	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) only_dragator {
-	//	refundActivationPeriod = _refundActivationPeriod;
+		refundActivationPeriod = _refundActivationPeriod;
 	}
 	
 	function changeRatio(uint256 _ratio) only_dragator {
-		ratio = _ratio;
+		ratio = safeDiv(_ratio, 100);
 	}
 	
 	function setTransactionFee(uint _transactionFee) only_owner {   // 1 ==> 1 bps = 0.01%
@@ -209,78 +260,122 @@ contract Drago is Owned, ERC20, DragoFace {
 	}
 	
 	function changeFeeCollector(address _feeCollector) only_owner {	
-	        feeCollector = _feeCollector; 
+	    feeCollector = _feeCollector; 
 	}
 	
 	function changeDragator(address _dragator) only_dragator {
-        	dragator = _dragator;
+        dragator = _dragator;
 	}
     
 	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) /*only_owner*/ {  //proxy modifier
-        	sellPrice = newSellPrice*(10**(18 - 4));
-        	buyPrice = newBuyPrice*(10**(18 - 4));
+        sellPrice = newSellPrice*(10**(18 - 4)); //in wei ALT:newSellPrice*(10**(18 - 4))
+        buyPrice = newBuyPrice*(10**(18 - 4));
+        NAV(sellPrice, buyPrice);
 	}
 
 	function depositToExchange(address _exchange, address token, uint256 value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
 		//address who used to determine from which account _who is the drago contract
+		Exchange exchange = Exchange(_exchange);
 		//exchange.deposit.value(msg.value)(_who);
 		exchange.deposit.value(msg.value)(token, value);
+		DepositExchange(value, msg.value, msg.sender, token, _exchange);
 	}
-	
+
 	function depositToCFDExchange(address _cfdExchange) /*when_approved_exchange*/ /*only_drago_owner*/ payable returns(bool success) {
 	    CFDExchange cfds = CFDExchange(_cfdExchange);
 	    cfds.deposit.value(msg.value);
+	    DepositCFDExchange(0, msg.value, msg.sender, 0, _cfdExchange);
 	}
-	
+
 	function withdrawFromExchange(address _exchange, address token, uint256 value) only_owner returns (bool success) {
+		Exchange exchange = Exchange(_exchange);
 		//if(!exchange.withdraw(value)) throw;
 		exchange.withdraw(token, value); //for ETH token = 0
+		WithdrawExchange(value, value, msg.sender, token, _exchange);
 	}
-	
+
 	function withdrawFromCFDExchange(address _cfdExchange, uint amount) /*when_approved_exchange*/ /*only_drago_owner*/ returns(bool success) {
 	    CFDExchange cfds = CFDExchange(_cfdExchange);
 	    cfds.withdraw(amount);
+	    WithdrawCFDExchange(amount, amount, msg.sender, 0, _cfdExchange);
 	}
-	
+
 	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) /*only_owner*/ {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
 		cfds.orderCFD(_cfd, is_stable, adjustment, stake);
+		OrderCFD(_cfdExchange, _cfd);
 	}
-	
+
 	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 id) only_owner {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
 		cfds.cancel(_cfd, id);
-	}	
-	
+		CancelCFD(_cfdExchange, _cfd);
+	}
+
 	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 id) only_owner {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
 		cfds.finalize(_cfd, id);
+		FinalizeCFD(_cfdExchange, _cfd);
 	}
 
 	function balanceOf(address _who) constant returns (uint256) {
 		return balances[_who];
 	}
 	
-	Exchange exchange = Exchange(_exchange);
+	function getName() constant returns (string) {
+	    return name;
+	}
+	
+	function getSymbol() constant returns (string) {
+	    return symbol;
+	}
+	
+	function getPrice() constant returns (uint256 sellPrice, uint256 buyPrice) {
+	    return (sellPrice, buyPrice);
+	}
+	
+	function getSupply() constant returns (uint256) {
+	    return totalSupply;
+	}
+	
+	function getRatio() constant returns (uint256) {
+	    return ratio;
+	}
+	
+	function getTransactionFee() constant returns (uint256) {
+	    return transactionFee;   
+	}
+	
+	function getFeeCollector() constant returns (address) {
+	    return feeCollector;
+	}
+	
+	function getDragator() constant returns (address) {
+        return dragator;
+	}
+	
+	function getOwner() constant returns (address) {
+        return owner;
+	}
+	
+	function getRefundActivationPeriod() constant returns (uint32) {
+	    return refundActivationPeriod;
+    }
+	
 	string public name;
 	string public symbol;
 	string public version = 'H0.2';
 	uint256 public totalSupply = 0;
-	uint256 public sellPrice = 1 finney;
-	uint256 public buyPrice = 1 finney;
+	uint256 public sellPrice = 1 ether;
+	uint256 public buyPrice = 1 ether;
 	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
 	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
+	uint256 public ratio = safeDiv(80, 100) ; //ratio is 80%
+	uint32 public refundActivationPeriod = 0 days; //can be amended
 	address public feeCollector = msg.sender;
 	address public dragator = msg.sender;
 	address public owner = msg.sender;
-	address _exchange;
-	address[] _cfdExchange; //double check whether array or single one (array upgradeable)
-	uint gross_amount;
-	uint fee;
-	uint fee_dragoo;
-	uint fee_dragator;
-	uint256 public ratio = 80;
-	uint32 constant refundActivationPeriod = 2 days;
+	//address[] cfdExchange; //array of exchanges
 	mapping (address => uint256) public balances;
 	mapping(address => address[]) public approvedAccount;
 	mapping (address => Account) accounts;
