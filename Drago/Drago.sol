@@ -24,30 +24,29 @@ contract Owned {
 
 contract SafeMath {
 
-    function safeMul(uint a, uint b) internal returns (uint) {
-        uint c = a * b;
-        assert(a == 0 || c / a == b);
-        return c;
-    }
+	function safeMul(uint a, uint b) internal returns (uint) {
+		uint c = a * b;
+		assert(a == 0 || c / a == b);
+		return c;
+	}
     
-    function safeDiv(uint a, uint b) internal returns (uint) {
-        assert(b > 0);
-        uint c = a / b;
-        assert(a == b * c + a % b);
-        return c;
-    }
+	function safeDiv(uint a, uint b) internal returns (uint) {
+		assert(b > 0);
+		uint c = a / b;
+		assert(a == b * c + a % b);
+		return c;
+	}
 
-    function safeSub(uint a, uint b) internal returns (uint) {
-        assert(b <= a);
-        return a - b;
-    }
+	function safeSub(uint a, uint b) internal returns (uint) {
+		assert(b <= a);
+		return a - b;
+	}
 
-    function safeAdd(uint a, uint b) internal returns (uint) {
-        uint c = a + b;
-        assert(c>=a && c>=b);
-        return c;
-    
-    }
+	function safeAdd(uint a, uint b) internal returns (uint) {
+		uint c = a + b;
+		assert(c>=a && c>=b);
+		return c;
+	}
 }    
 
 contract ERC20 {
@@ -66,7 +65,7 @@ contract ERC20 {
 
 contract Exchange {
     
-    // EVENTS
+	// EVENTS
 
 	event Deposit(address token, address user, uint amount, uint balance);
 	event Withdraw(address token, address user, uint amount, uint balance);
@@ -124,7 +123,7 @@ contract CFDExchange {
 
 contract DragoFace {
     
-    // METHODS
+	// METHODS
 
  	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {}
 	function() payable {}
@@ -141,7 +140,7 @@ contract DragoFace {
 	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
 	function withdrawFromCFDExchange(address _cfdExchange, uint amount) returns(bool success) {}
 	function placeOrderExchange() {}
-    function placeTradeExchange() {}
+	function placeTradeExchange() {}
 	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}
 	function cancelOrderExchange() {}
 	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 id) {}	
@@ -181,9 +180,9 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
-    event NAV(uint sellPrice, uint buyPrice);
-    event DepositExchange(uint value, uint256 indexed _amount, address indexed who, address token , address indexed _exchange);
-    event DepositCFDExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
+	event NAV(uint sellPrice, uint buyPrice);
+	event DepositExchange(uint value, uint256 indexed _amount, address indexed who, address token , address indexed _exchange);
+	event DepositCFDExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
 	event WithdrawExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
 	event WithdrawCFDExchange(uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
 	event OrderCFD(address indexed _cfdExchange, address indexed _cfd);
@@ -191,9 +190,9 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	event FinalizeCFD(address indexed _cfdExchange, address indexed _cfd);
 
  	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {
-        name = _dragoName;
-        symbol = _dragoSymbol;
-        dragoID = _dragoID;
+		name = _dragoName;
+		symbol = _dragoSymbol;
+		dragoID = _dragoID;
 	}
     
 	function() payable {
@@ -203,18 +202,18 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	function buyDrago() payable returns (bool success) {
 		//if (!approvedAccount[msg.sender]) throw; //or separate whitelisted
 		if (msg.value < min_order) throw;
-        var gross_amount = safeDiv(msg.value, buyPrice);
-        var fee = safeMul(gross_amount, transactionFee) / (100 ether);
-        var fee_drago = safeMul(fee, ratio);
-        var fee_dragator = safeSub(fee, fee_drago);
-        var amount = safeSub(gross_amount, fee);
-        balances[msg.sender] = safeAdd(balances[msg.sender], amount);
-        balances[feeCollector] = safeAdd(balances[feeCollector], fee_drago);
-        balances[dragator] = safeAdd(balances[dragator], fee_dragator);
-        accounts[msg.sender].receipt[buyPrice].activation = uint32(now) + refundActivationPeriod;
-        totalSupply = safeAdd(totalSupply, gross_amount);
-        Buy(msg.sender, this, msg.value, amount);
-    	return (true);
+		var gross_amount = safeDiv(msg.value, buyPrice);
+        	var fee = safeMul(gross_amount, transactionFee) / (100 ether);
+        	var fee_drago = safeMul(fee, ratio);
+        	var fee_dragator = safeSub(fee, fee_drago);
+        	var amount = safeSub(gross_amount, fee);
+        	balances[msg.sender] = safeAdd(balances[msg.sender], amount);
+        	balances[feeCollector] = safeAdd(balances[feeCollector], fee_drago);
+        	balances[dragator] = safeAdd(balances[dragator], fee_dragator);
+        	accounts[msg.sender].receipt[buyPrice].activation = uint32(now) + refundActivationPeriod;
+        	totalSupply = safeAdd(totalSupply, gross_amount);
+        	Buy(msg.sender, this, msg.value, amount);
+    		return (true);
 	}
 
 	function sellDrago(uint256 amount) minimum_period_past(buyPrice, amount) returns (uint revenue, bool success) {
@@ -233,8 +232,8 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 	
 	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) /*only_owner*/ {  //proxy modifier
-        sellPrice = newSellPrice*(10**(18 - 4)); //in wei ALT:newSellPrice*(10**(18 - 4))
-        buyPrice = newBuyPrice*(10**(18 - 4));
+        	sellPrice = newSellPrice*(10**(18 - 4)); //in wei ALT:newSellPrice*(10**(18 - 4))
+        	buyPrice = newBuyPrice*(10**(18 - 4));
 	}
 	
 	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) only_dragator {
@@ -250,11 +249,11 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 	
 	function changeFeeCollector(address _feeCollector) only_owner {	
-	    feeCollector = _feeCollector; 
+		feeCollector = _feeCollector; 
 	}
 	
 	function changeDragator(address _dragator) only_dragator {
-        dragator = _dragator;
+        	dragator = _dragator;
 	}
 
 	function depositToExchange(address _exchange, address token, uint256 value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
@@ -264,8 +263,8 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function depositToCFDExchange(address _cfdExchange) /*when_approved_exchange*/ /*only_drago_owner*/ payable returns(bool success) {
-	    CFDExchange cfds = CFDExchange(_cfdExchange);
-	    cfds.deposit.value(msg.value);
+		CFDExchange cfds = CFDExchange(_cfdExchange);
+		cfds.deposit.value(msg.value);
 	}
 
 	function withdrawFromExchange(address _exchange, address token, uint256 value) only_owner returns (bool success) {
@@ -275,8 +274,8 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function withdrawFromCFDExchange(address _cfdExchange, uint amount) /*when_approved_exchange*/ /*only_drago_owner*/ returns(bool success) {
-	    CFDExchange cfds = CFDExchange(_cfdExchange);
-	    cfds.withdraw(amount);
+		CFDExchange cfds = CFDExchange(_cfdExchange);
+		cfds.withdraw(amount);
 	}
 
 	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) /*only_owner*/ {
@@ -299,44 +298,44 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 	
 	function getName() constant returns (string) {
-	    return name;
+		return name;
 	}
 	
 	function getSymbol() constant returns (string) {
-	    return symbol;
+		return symbol;
 	}
 	
 	function getPrice() constant returns (uint256 sellPrice, uint256 buyPrice) {
-	    return (sellPrice, buyPrice);
+		return (sellPrice, buyPrice);
 	}
 	
 	function getSupply() constant returns (uint256) {
-	    return totalSupply;
+		return totalSupply;
 	}
 	
 	function getRatio() constant returns (uint256) {
-	    return ratio;
+		return ratio;
 	}
 	
 	function getTransactionFee() constant returns (uint256) {
-	    return transactionFee;   
+		return transactionFee;   
 	}
 	
 	function getFeeCollector() constant returns (address) {
-	    return feeCollector;
+		return feeCollector;
 	}
 	
 	function getDragator() constant returns (address) {
-        return dragator;
+        	return dragator;
 	}
 	
 	function getOwner() constant returns (address) {
-        return owner;
+        	return owner;
 	}
 	
 	function getRefundActivationPeriod() constant returns (uint32) {
-	    return refundActivationPeriod;
-    }
+		return refundActivationPeriod;
+	}
 	
 	string public name;
 	string public symbol;
