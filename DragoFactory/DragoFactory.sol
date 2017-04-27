@@ -37,10 +37,7 @@ contract DragoFactoryFace {
 
 	event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
 	event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
-	event NewRegistry(address indexed dragoRegistry, address indexed _newRegistry);
-	event SetBeneficiary(address indexed dragoDAO, address indexed _dragoDAO);
-	event SetFee(uint fee, uint _fee);
-    
+
 	// METHODS
     
 	function createDrago(string _name, string _symbol) returns (address _drago, uint _dragoID) {}
@@ -61,9 +58,6 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	
 	event DragoCreated(string _name, string _symbol, address _drago, address _dragowner, uint _dragoID);
 	event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
-	event NewRegistry(address indexed dragoRegistry, address indexed _newRegistry);
-	event SetBeneficiary(address indexed dragoDAO, address indexed _dragoDAO);
-	event SetFee(uint fee, uint _fee);
     
 	// MODIFIERS
     
@@ -90,22 +84,18 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	function registerDrago(address _drago, string _name, string _symbol, uint _dragoID) internal {
 		DragoRegistry registry = DragoRegistry(dragoRegistry);
 		assert(registry.registerAs(_drago, _name, _symbol, _dragoID, msg.sender));
-		DragoRegistered(_drago, _name, _symbol, _dragoID, msg.sender);
 	}
 	
 	function setRegistry(address _newRegistry) only_owner {
 		dragoRegistry = _newRegistry;
-		NewRegistry(dragoRegistry, _newRegistry);
 	}
     
 	function setBeneficiary(address _dragoDAO) only_owner {
 		dragoDAO = _dragoDAO;
-		SetBeneficiary(dragoDAO, _dragoDAO);
 	}
 	
 	function setFee(uint _fee) only_owner {
 		fee = _fee;
-		SetFee(fee, _fee);
 	}
 
 	function drain() only_owner {
@@ -136,7 +126,6 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	
 	string public version = 'DF0.2';
 	uint public fee = 0;
-	//uint public dragoID;
 	uint public nextDragoID = 1;
 	address public dragoDAO = msg.sender;
 	address public dragoRegistry;
