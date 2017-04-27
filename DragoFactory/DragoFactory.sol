@@ -43,7 +43,7 @@ contract DragoFactoryFace {
     
 	// METHODS
     
-	function createDrago(string _name, string _symbol, address _dragowner) returns (address _drago, uint _dragoID) {}
+	function createDrago(string _name, string _symbol) returns (address _drago, uint _dragoID) {}
 	function setRegistry(address _newRegistry) {}
 	function setBeneficiary(address _dragoDAO) {}
 	function setFee(uint _fee) {}
@@ -76,12 +76,12 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	function DragoFactory () {}
 
 	function createDrago(string _name, string _symbol) when_fee_paid returns (address _drago, uint _dragoID) {
-		Drago newDrago = (new Drago(_name, _symbol)); //Drago newDrago = (new Drago(_name, _symbol, _dragowner));
+		var dragoID = nextDragoID;
+		++nextDragoID;
+		Drago newDrago = (new Drago(_name, _symbol, dragoID));
 		newDragos.push(address(newDrago));
 		created[msg.sender].push(address(newDrago));
 		newDrago.setOwner(msg.sender);  //owner is msg.sender
-		dragoID = nextDragoID;
-		++nextDragoID;
 		registerDrago(_drago, _name, _symbol, _dragoID);
 		DragoCreated(_name, _symbol, address(newDrago), msg.sender, uint(newDrago));
 		return (address(newDrago), uint(newDrago));
@@ -136,8 +136,8 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	
 	string public version = 'DF0.2';
 	uint public fee = 0;
-	uint public dragoID;
-	uint public nextDragoID = 0;
+	//uint public dragoID;
+	uint public nextDragoID = 1;
 	address public dragoDAO = msg.sender;
 	address public dragoRegistry;
 	address public owner = msg.sender;
