@@ -24,11 +24,13 @@ contract Owned {
 }
 
 contract Drago {
+    
+	// METHODS
 
- 	function Drago(string _dragoName,  string _dragoSymbol) {}
+ 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {}
 	function() payable {}
-	function buy() payable returns (uint amount) {}
-	function sell(uint256 amount) returns (uint revenue, bool success) {}
+	function buyDrago() payable returns (bool success) {}
+	function sellDrago(uint256 amount) returns (uint revenue, bool success) {}
 	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) {}
 	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) {}
 	function changeRatio(uint256 _ratio) {}
