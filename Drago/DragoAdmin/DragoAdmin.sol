@@ -60,7 +60,7 @@ contract DragoAdminFace {
 
 	// EVENTS
 
-    event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
+	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event NAV(uint sellPrice, uint buyPrice);
 	event DepositExchange(uint value, uint256 indexed _amount, address indexed who, address token , address indexed _exchange);
