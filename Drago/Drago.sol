@@ -104,7 +104,7 @@ contract CFDExchange {
 
 	// METHODS
 
-	function deposit() payable {}
+	function deposit() payable /*returns (bool success)*/ {}
 	function withdraw(uint256 amount) {}
 	function orderCFD(address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}	//returns(uint id)
 	function cancel(address _cfd, uint32 id) {}	//function cancel(uint id) returns (bool) {}
@@ -135,8 +135,8 @@ contract DragoFace {
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
 	function changeDragator(address _dragator) {}
-	function depositToExchange(address exchange, address token, uint256 value) payable returns(bool success) {}
-	function depositToCFDExchange(address _cfdExchange) payable returns(bool success) {}
+	function depositToExchange(address exchange, address _token, uint256 _value) payable returns(bool success) {}
+	function depositToCFDExchange(address _cfdExchange, uint256 _value) payable returns(bool success) {}
 	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
 	function withdrawFromCFDExchange(address _cfdExchange, uint amount) returns(bool success) {}
 	function placeOrderExchange() {}
@@ -232,8 +232,9 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 	
 	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) /*only_owner*/ {  //proxy modifier
-        	sellPrice = newSellPrice*(10**(18 - 4)); //in wei ALT:newSellPrice*(10**(18 - 4))
-        	buyPrice = newBuyPrice*(10**(18 - 4));
+        	sellPrice = newSellPrice*(10**(18)); //in wei ALT:newSellPrice*(10**(18 - 4))
+        	buyPrice = newBuyPrice*(10**(18));  //10**(18 - 4) if price = 1 finney
+        	//amend in order to do calculations in UI
 	}
 	
 	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) only_dragator {
@@ -256,15 +257,17 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
         	dragator = _dragator;
 	}
 
-	function depositToExchange(address _exchange, address token, uint256 value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
+	function depositToExchange(address _exchange, address _token, uint256 _value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
 		//address who used to determine from which account _who is the drago contract
 		Exchange exchange = Exchange(_exchange);
-		exchange.deposit.value(msg.value)(token, value); //exchange.deposit.value(msg.value)(token, value, _who);
+		exchange.deposit.value(_value)(_token, _value); //exchange.deposit.value(msg.value)(token, value, _who);
 	}
 
-	function depositToCFDExchange(address _cfdExchange) /*when_approved_exchange*/ /*only_drago_owner*/ payable returns(bool success) {
+	function depositToCFDExchange(address _cfdExchange, uint256 _value) /*when_approved_exchange*/ /*only_drago_owner*/ payable returns(bool success) {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
-		cfds.deposit.value(msg.value);
+		//msg.value = _value;
+		cfds.deposit.value(_value)(); //.gas(300000)
+		return true;
 	}
 
 	function withdrawFromExchange(address _exchange, address token, uint256 value) only_owner returns (bool success) {
