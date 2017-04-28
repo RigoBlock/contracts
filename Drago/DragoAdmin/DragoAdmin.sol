@@ -214,8 +214,7 @@ contract DragoAdmin is Owned, DragoAdminFace {
 	function() {
 		throw;
 	}
-	
-	
+
 	string public version = 'DA0.2';
 	address public owner = msg.sender;
 }
