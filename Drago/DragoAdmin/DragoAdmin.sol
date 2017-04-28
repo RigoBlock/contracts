@@ -114,14 +114,14 @@ contract DragoAdmin is Owned, DragoAdminFace {
 	function buyDrago(address _targetDrago) payable returns (uint amount) {
 		Drago drago = Drago(_targetDrago);
 		drago.buyDrago.value(msg.value)(); //assert
-		//return amount;  //double check it's the right way to call it
+		return amount;
 		Buy(_targetDrago, msg.sender, this, msg.value, amount);
 		//return true;
 	}
     
 	function sellDrago(address _targetDrago, uint256 amount) returns (uint revenue) {
 		Drago drago = Drago(_targetDrago);
-		drago.sellDrago(amount);
+		drago.sellDrago(amount);    //assert()
 		Sell(_targetDrago, this, msg.sender, amount, revenue);
 	}
 	
@@ -140,7 +140,7 @@ contract DragoAdmin is Owned, DragoAdminFace {
 	
 	function depositToCFDExchange(address _targetDrago, address _cfdExchange) /*when_approved_exchange*/ /*only_drago_owner*/ payable returns(bool) {
 	    Drago drago = Drago(_targetDrago);
-	    drago.depositToCFDExchange(_cfdExchange);
+	    drago.depositToCFDExchange.value(msg.value)(_cfdExchange);
 	    DepositCFDExchange(_targetDrago, 0, msg.value, msg.sender, 0, _cfdExchange);
 	}
 	
@@ -214,7 +214,8 @@ contract DragoAdmin is Owned, DragoAdminFace {
 	function() {
 		throw;
 	}
-
+	
+	
 	string public version = 'DA0.2';
 	address public owner = msg.sender;
 }
