@@ -18,8 +18,8 @@ contract DragoFace {
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
 	function changeDragator(address _dragator) {}
-	function depositToExchange(address exchange, address token, uint256 value) payable returns(bool success) {}
-	function depositToCFDExchange(address _cfdExchange) payable returns(bool success) {}
+	function depositToExchange(address exchange, address _token, uint256 _value) payable returns(bool success) {}
+	function depositToCFDExchange(address _cfdExchange, uint256 _value) payable returns(bool success) {}
 	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
 	function withdrawFromCFDExchange(address _cfdExchange, uint amount) returns(bool success) {}
 	function placeOrderExchange() {}
