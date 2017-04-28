@@ -112,14 +112,14 @@ contract DragoAdmin is Owned, DragoAdminFace {
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	
 	function buyDrago(address _targetDrago) payable returns (uint amount) {
-		drago.buy.value(msg.value)(); //assert
+		drago.buyDrago.value(msg.value)(); //assert
 		//return amount;  //double check it's the right way to call it
 		Buy(_targetDrago, msg.sender, this, msg.value, amount);
 		//return true;
 	}
     
 	function sellDrago(address _targetDrago, uint256 amount) returns (uint revenue) {
-		drago.sell(amount);
+		drago.sellDrago(amount);
 		Sell(_targetDrago, this, msg.sender, amount, revenue);
 	}
 	
