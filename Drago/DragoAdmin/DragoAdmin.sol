@@ -37,8 +37,8 @@ contract Drago {
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
 	function changeDragator(address _dragator) {}
-	function depositToExchange(address exchange, address token, uint256 value) payable returns(bool success) {}
-	function depositToCFDExchange(address _cfdExchange) payable returns(bool success) {}
+	function depositToExchange(address exchange, address _token, uint256 _value) payable returns(bool success) {}
+	function depositToCFDExchange(address _cfdExchange, uint256 _value) payable returns(bool success) {}
 	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
 	function withdrawFromCFDExchange(address _cfdExchange, uint amount) returns(bool success) {}
 	function placeOrderExchange() {}
@@ -57,6 +57,27 @@ contract Drago {
 	function getFeeCollector() constant returns (address) {}
 	function getRefundActivationPeriod() constant returns (uint32) {}
 }
+
+contract DragoFactory {
+    
+	// EVENTS
+
+	event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
+	event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
+
+	// METHODS
+    
+	function createDrago(string _name, string _symbol) returns (address _drago, uint _dragoID) {}
+	function setRegistry(address _newRegistry) {}
+	function setBeneficiary(address _dragoDAO) {}
+	function setFee(uint _fee) {}
+	function drain() {}
+    
+	function getRegistry() constant returns (address) {}
+	function getBeneficiary() constant returns (address) {}
+	function getVersion() constant returns (string) {}
+	function getLastId() constant returns (uint) {}
+}
       
 contract DragoAdminFace {
 
@@ -72,6 +93,8 @@ contract DragoAdminFace {
 	event OrderCFD(address indexed _cfdExchange, address indexed _cfd);
 	event CancelCFD(address indexed _cfdExchange, address indexed _cfd);
 	event FinalizeCFD(address indexed _cfdExchange, address indexed _cfd);
+	event DragoCreated(string _name, string _symbol, address _drago, address _dragowner, uint _dragoID);
+
 	
 	// METHODS
 	
@@ -92,9 +115,10 @@ contract DragoAdminFace {
 	function cancelOrderExchange() {}
 	function cancelOrderCFDExchange(address targetDrago, address _cfdExchange, address _cfd, uint32 id) {}
 	function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {}
+    function createDrago(address _dragoFactory, string _name, string _symbol) returns (address _drago, uint _dragoID) {}
 }  
       
-contract DragoAdmin is Owned, DragoAdminFace {
+library DragoAdmin {
 
 	event Buy(address _targetDrago, address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address _targetDrago, address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
@@ -108,10 +132,12 @@ contract DragoAdmin is Owned, DragoAdminFace {
 	event CancelExchange(address indexed _targetDrago, address indexed _exchange, address indexed token, uint id);
 	event CancelCFD(address indexed _targetDrago, address indexed _cfdExchange, address indexed _cfd, uint32 id);
 	event FinalizeCFD(address indexed _targetDrago, address indexed _cfdExchange, address indexed _cfd, uint32 id);
+	event DragoCreated(string _name, string _symbol, address _drago, address _dragowner, uint _dragoID);
+
 	
-	modifier only_owner { if (msg.sender != owner) return; _; }
+	//modifier only_owner { if (msg.sender != owner) return; _; }
 	
-	function buyDrago(address _targetDrago) payable returns (uint amount) {
+	function buyDrago(address _targetDrago) returns (uint amount) {
 		Drago drago = Drago(_targetDrago);
 		drago.buyDrago.value(msg.value)(); //assert
 		return amount;
@@ -131,20 +157,20 @@ contract DragoAdmin is Owned, DragoAdminFace {
 	    NAV(_targetDrago, _sellPrice, _buyPrice);
 	}
     
-	function depositToExchange(address _targetDrago, address _exchange, address _token, uint256 _value) /*when_approved_exchange*/ payable returns(bool) {
+	function depositToExchange(address _targetDrago, address _exchange, address _token, uint256 _value) /*when_approved_exchange*/ returns(bool) {
 		//address who used to determine from which account
 		Drago drago = Drago(_targetDrago);
-		assert(drago.depositToExchange.value(msg.value)(_exchange, _token, _value));
+		assert(drago.depositToExchange(_exchange, _token, _value));
 		DepositExchange(_targetDrago, _value, msg.value, msg.sender, _token, _exchange);
 	}
 	
-	function depositToCFDExchange(address _targetDrago, address _cfdExchange) /*when_approved_exchange*/ /*only_drago_owner*/ payable returns(bool) {
+	function depositToCFDExchange(address _targetDrago, address _cfdExchange, uint _value) /*when_approved_exchange*/ /*only_drago_owner*/ returns(bool) {
 	    Drago drago = Drago(_targetDrago);
-	    drago.depositToCFDExchange.value(msg.value)(_cfdExchange);
+	    drago.depositToCFDExchange(_cfdExchange, _value);
 	    DepositCFDExchange(_targetDrago, 0, msg.value, msg.sender, 0, _cfdExchange);
 	}
 	
-	function withdrawFromExchange(address _targetDrago, address _exchange, address token, uint256 value) only_owner returns (bool) {
+	function withdrawFromExchange(address _targetDrago, address _exchange, address token, uint256 value) /*only_owner*/ returns (bool) {
 		//remember to reinsert address _who
 		Drago drago = Drago(_targetDrago);
 		assert(drago.withdrawFromExchange(_exchange, token, value)); //for ETH token = 0
@@ -163,7 +189,7 @@ contract DragoAdmin is Owned, DragoAdminFace {
 		OrderExchange(_targetDrago, _exchange, _token);
 	}
 	
-	function placeOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) only_owner {
+	function placeOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) /*only_owner*/ {
 		Drago drago = Drago(_targetDrago);
 		drago.placeOrderCFDExchange(_cfdExchange, _cfd, is_stable, adjustment, stake);
 		OrderCFD(_targetDrago, _cfdExchange, _cfd);
@@ -177,13 +203,13 @@ contract DragoAdmin is Owned, DragoAdminFace {
 		CancelExchange(_targetDrago, exchange, token, id);
 	}
 	
-	function cancelOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint32 id) only_owner {
+	function cancelOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint32 id) {
 		Drago drago = Drago(_targetDrago);
 		drago.cancelOrderCFDExchange(_cfdExchange, _cfd, id);
 		CancelCFD(_targetDrago, _cfdExchange, _cfd, id);
 	}	
 	
-	function finalizeDealCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint24 id) /*only_drago_owner*/ {
+	function finalizeDealCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint24 id) {
 		Drago drago = Drago(_targetDrago);
 		drago.finalizeDealCFDExchange(_cfdExchange, _cfd, id);
 		FinalizeCFD(_targetDrago, _cfdExchange, _cfd, id);
@@ -196,7 +222,7 @@ contract DragoAdmin is Owned, DragoAdminFace {
     
 	function setTransactionFee(address _targetDrago, uint _transactionFee) {    //exmple, uint public fee = 100 finney;
 		Drago drago = Drago(_targetDrago);
-		drago.setTransactionFee(_transactionFee);       //fee is in basis points (1 bps = 0.01%)
+		drago.setTransactionFee(_transactionFee); //fee is in basis points (1 bps = 0.01%)
 	}
     
 	function changeFeeCollector(address _targetDrago, address _feeCollector) {
@@ -209,13 +235,15 @@ contract DragoAdmin is Owned, DragoAdminFace {
 		drago.changeDragator(_dragator);
 	}
 	
-	// CONSTANT METHODS
-	
-	function() {
-		throw;
+	function createDrago(address _dragoFactory, string _name, string _symbol) returns (address _drago, uint _dragoID) {
+	    DragoFactory factory = DragoFactory(_dragoFactory);
+	    factory.createDrago(_name, _symbol);
+	    DragoCreated(_name, _symbol, _drago, msg.sender, _dragoID);
 	}
 	
+	// CONSTANT METHODS
 	
-	string public version = 'DA0.2';
-	address public owner = msg.sender;
+	string constant public version = 'DA0.2';
+	//address constant public owner = msg.sender;
+	// add all assertive to prevent event if non executed;
 }
