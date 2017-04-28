@@ -38,4 +38,4 @@ contract DragoAdminFace {
 	function cancelOrderExchange() {}
 	function cancelOrderCFDExchange(address targetDrago, address _cfdExchange, address _cfd, uint32 id) {}
 	function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {}
-} 
+}
