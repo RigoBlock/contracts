@@ -39,7 +39,7 @@ contract DragoFactoryFace {
 
 	// METHODS
     
-	function createDrago(string _name, string _symbol) returns (address _drago, uint _dragoID) {}
+	function createDrago(string _name, string _symbol) returns (bool) {}
 	function setRegistry(address _newRegistry) {}
 	function setBeneficiary(address _dragoDAO) {}
 	function setFee(uint _fee) {}
@@ -57,6 +57,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	    uint fee;
 	    address dragoRegistry;
 	    address[] newDragos;
+	    uint nextDragoID;
 	    mapping(address => address[]) created;
 	}
 
@@ -65,18 +66,19 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	modifier when_fee_paid { if (msg.value < data.fee) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
     
-	function DragoFactory () {}
+	//function DragoFactory () {}
 
-	function createDrago(string _name, string _symbol) when_fee_paid returns (address _drago, uint _dragoID) {
-		var dragoID = nextDragoID;
-		++nextDragoID;
+	function createDrago(string _name, string _symbol) when_fee_paid returns (bool success) {
+		++data.nextDragoID;
+		uint dragoID = data.nextDragoID;
 		Drago newDrago = (new Drago(_name, _symbol, dragoID));
 		data.newDragos.push(address(newDrago));
 		data.created[msg.sender].push(address(newDrago));
 		newDrago.setOwner(msg.sender);  //owner is msg.sender
-		registerDrago(address(newDrago), _name, _symbol, dragoID);
-		DragoCreated(_name, _symbol, address(newDrago), msg.sender, uint(newDrago));
-		return (address(newDrago), uint(newDrago));
+		address drago = address(newDrago);
+		registerDrago(drago, _name, _symbol, dragoID);
+		DragoCreated(_name, _symbol, drago, msg.sender, dragoID);
+		return true;
 	}
 	
 	function registerDrago(address _drago, string _name, string _symbol, uint _dragoID) internal {
@@ -111,7 +113,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	Data data;
 	
 	string public version = 'DF0.3';
-	uint public nextDragoID = 1;
+	//uint public nextDragoID = 1;
 	address public dragoDAO = msg.sender;
 	address public owner = msg.sender;
 }
