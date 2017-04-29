@@ -28,7 +28,7 @@ library DragoAdminFace {
 	function changeRatio(address _targetDrago, uint256 _ratio) {}
 	function setTransactionFee(address _targetDrago, uint _transactionFee) {}
 	function changeFeeCollector(address _targetDrago, address _feeCollector) {}
-	function changeDragator(address _targetDrago, address _dragator) {}
+	function changeDragoDAO(address _targetDrago, address _dragoDAO) {}
 	function depositToExchange(address targetDrago, address exchange, address token, uint256 value) returns(bool) {}
 	function depositToCFDExchange(address _targetDrago, address _cfdExchange) returns(bool) {}
 	function withdrawFromExchange(address targetDrago, address exchange, address token, uint256 value) returns (bool) {}
@@ -40,4 +40,4 @@ library DragoAdminFace {
 	function cancelOrderCFDExchange(address targetDrago, address _cfdExchange, address _cfd, uint32 id) {}
 	function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {}
 	function createDrago(address _dragoFactory, string _name, string _symbol) returns (address _drago, uint _dragoID) {}
-}
+} 
