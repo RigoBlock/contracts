@@ -6,15 +6,13 @@ pragma solidity ^0.4.10;
 
 contract Upgrade {
 
-  modifier restricted() {
-    if (msg.sender == owner) _;
-  }
+  modifier only_owner() { if (msg.sender != owner) return; _; }
 
-  function setUpgraded(uint confirmed) restricted {
+  function setUpgraded(uint confirmed) only_owner {
     lastCompletedUpgrade = confirmed;
   }
 
-  function upgrade(address newAddress) restricted {
+  function upgrade(address newAddress) only_owner {
     Upgrade upgraded = Upgrade(newAddress);
     upgraded.setUpgraded(lasConfirmedUpgrade);
   }
