@@ -17,8 +17,8 @@ contract CFDExchangeFace {
 
 	// METHODS
 
-	function deposit() payable {}
-	function withdraw(uint256 amount) {}
+	function deposit() payable returns (bool success) {}
+	function withdraw(uint256 amount) returns (bool success) {}
 	function orderCFD(address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}	//returns(uint id)
 	function cancel(address _cfd, uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(address _cfd, uint24 id) {}
@@ -28,8 +28,8 @@ contract CFDExchangeFace {
 	function marginOf(address _who) constant returns (uint) {}
 	function balanceOf(address token, address _who) constant returns (uint) {}
 	function getLastOrderId() constant returns (uint) {}
-	function isActive(uint id) constant returns (bool active) {}
-	function getOwner(uint id) constant returns (address owner) {}
+	function isActive(uint id) constant returns (bool) {}
+	function getOwner(uint id) constant returns (address) {}
 	function getBestAdjustment(address _cfd, bool _is_stable) constant returns (uint32) {}
 	function getBestAdjustmentFor(address _cfd, bool _is_stable, uint128 _stake) constant returns (uint32) {}
 }
