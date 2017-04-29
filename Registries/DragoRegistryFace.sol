@@ -19,7 +19,10 @@ contract DragoRegistryFace {
 	function unregister(uint _id) {}
 	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
 	function setFee(uint _fee) {}
+	function upgrade(address _newAddress) payable {}
+	function setUpgraded(uint _version) {}
 	function drain() {}
+	function kill() {}
 	
 	function dragoCount() constant returns (uint) {}
 	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner) {}
