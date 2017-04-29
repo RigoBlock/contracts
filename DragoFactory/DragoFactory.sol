@@ -16,8 +16,8 @@ contract DragoRegistry {
 	
 	// METHODS
         
-	function register(address _drago, string _name, string _symbol, uint _dragoID, address _group) payable returns (bool) {}
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _group, address _owner) payable returns (bool) {}
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {}
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) payable returns (bool) {}
 	function unregister(uint _id) {}
 	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
 	function setFee(uint _fee) {}
