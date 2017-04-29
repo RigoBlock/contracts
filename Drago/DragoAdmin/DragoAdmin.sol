@@ -5,24 +5,6 @@
 
 pragma solidity ^0.4.10;
 
-contract Owned {
-    
-	modifier only_owner { if (msg.sender != owner) return; _; }
-
-	event NewOwner(address indexed old, address indexed current);
-   
-	function setOwner(address _new) only_owner {
-		owner = _new;
-		NewOwner(owner, _new);
-	}
-	
-	function getOwner() constant returns (address) {
-	    return owner;
-	}
-
-	address public owner = msg.sender;
-}
-
 contract Drago {
     
 	// METHODS
@@ -128,9 +110,6 @@ library DragoAdmin {
 	event CancelCFD(address indexed _targetDrago, address indexed _cfdExchange, address indexed _cfd, uint32 id);
 	event FinalizeCFD(address indexed _targetDrago, address indexed _cfdExchange, address indexed _cfd, uint32 id);
 	event DragoCreated(string _name, string _symbol, address _drago, address _dragowner, uint _dragoID);
-
-	
-	//modifier only_owner { if (msg.sender != owner) return; _; }
 	
 	function buyDrago(address _targetDrago) returns (uint amount) {
 		Drago drago = Drago(_targetDrago);
@@ -191,9 +170,9 @@ library DragoAdmin {
 	}
 	
 	function placeTradeExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint8 _v, bytes32 _r, bytes32 _s, uint _amount) {
-	    Drago drago = Drago(_targetDrago);
-	    drago.placeTradeExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce, _user, _v, _r, _s, _amount);
-	    Trade(_tokenGet, _amountGet, _tokenGive, _amountGive, _user, msg.sender);
+		Drago drago = Drago(_targetDrago);
+		drago.placeTradeExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce, _user, _v, _r, _s, _amount);
+		Trade(_tokenGet, _amountGet, _tokenGive, _amountGive, _user, msg.sender);
 	}
 	
 	function cancelOrderExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {
@@ -235,14 +214,13 @@ library DragoAdmin {
 	}
 	
 	function createDrago(address _dragoFactory, string _name, string _symbol) returns (address _drago, uint _dragoID) {
-	    DragoFactory factory = DragoFactory(_dragoFactory);
-	    factory.createDrago(_name, _symbol);
-	    DragoCreated(_name, _symbol, _drago, msg.sender, _dragoID);
+		DragoFactory factory = DragoFactory(_dragoFactory);
+		factory.createDrago(_name, _symbol);
+		DragoCreated(_name, _symbol, _drago, msg.sender, _dragoID);
 	}
 	
 	// CONSTANT METHODS
 	
 	string constant public version = 'DA0.2';
-	//address constant public owner = msg.sender;
 	// add all assertive to prevent event if non executed;
 }
