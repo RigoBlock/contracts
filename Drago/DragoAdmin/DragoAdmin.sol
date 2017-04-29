@@ -62,7 +62,6 @@ contract DragoFactory {
 
 	// METHODS
     
-	//function createDrago(string _name, string _symbol) returns (address _drago, uint _dragoID) {}
 	function createDrago(string _name, string _symbol) returns (bool success);
 	function setRegistry(address _newRegistry) {}
 	function setBeneficiary(address _dragoDAO) {}
@@ -214,7 +213,6 @@ library DragoAdmin {
 	function depositToExchange(address _targetDrago, address _exchange, address _token, uint256 _value) returns(bool) {
 		Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
 		assert(drago.depositToExchange(_exchange, _token, _value));
@@ -224,7 +222,6 @@ library DragoAdmin {
 	function depositToCFDExchange(address _targetDrago, address _cfdExchange, uint _value) returns(bool) {
 	    Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 	    Drago drago = Drago(_targetDrago);
 	    drago.depositToCFDExchange(_cfdExchange, _value);
@@ -234,7 +231,6 @@ library DragoAdmin {
 	function withdrawFromExchange(address _targetDrago, address _exchange, address token, uint256 value) returns (bool) {
 		Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
 		assert(drago.withdrawFromExchange(_exchange, token, value)); //for ETH token = 0
@@ -244,7 +240,6 @@ library DragoAdmin {
 	function withdrawFromCFDExchange(address _targetDrago, address _cfdExchange, uint amount) /*when_approved_exchange*/ /*only_drago_owner*/ returns(bool) {
 	    Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 	    Drago drago = Drago(_targetDrago);
 	    assert(drago.withdrawFromCFDExchange(_cfdExchange, amount));
@@ -254,7 +249,6 @@ library DragoAdmin {
 	function placeOrderExchange(address _exchange, address _targetDrago, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {
 		Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
 		drago.placeOrderExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce);
@@ -264,7 +258,6 @@ library DragoAdmin {
 	function placeOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) /*only_owner*/ {
 		Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 		Drago drago = Drago(_targetDrago);
 		drago.placeOrderCFDExchange(_cfdExchange, _cfd, is_stable, adjustment, stake);
@@ -274,7 +267,6 @@ library DragoAdmin {
 	function placeTradeExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint8 _v, bytes32 _r, bytes32 _s, uint _amount) {
 	    Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    //if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 	    Drago drago = Drago(_targetDrago);
 	    drago.placeTradeExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce, _user, _v, _r, _s, _amount);
@@ -284,7 +276,6 @@ library DragoAdmin {
 	function cancelOrderExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {
 		Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
 		drago.cancelOrderExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, nonce, v, r, s);
@@ -294,7 +285,6 @@ library DragoAdmin {
 	function cancelOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint32 id) {
 		Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 		Drago drago = Drago(_targetDrago);
 		drago.cancelOrderCFDExchange(_cfdExchange, _cfd, id);
@@ -304,7 +294,6 @@ library DragoAdmin {
 	function finalizeDealCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint24 id) {
 		Authority auth = Authority(0xF4D8e706CfB25c0DECBbDd4D2E2Cc10C66376a3F);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 		Drago drago = Drago(_targetDrago);
 		drago.finalizeDealCFDExchange(_cfdExchange, _cfd, id);
@@ -347,8 +336,6 @@ library DragoAdmin {
 	    if (!factory.createDrago(_name, _symbol)) throw;
 	    DragoCreated(_name, _symbol, _drago, msg.sender, _dragoID);
 	}
-	
-	// CONSTANT METHODS
 	
 	string constant public version = 'DA0.2';
 }
