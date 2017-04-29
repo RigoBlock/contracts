@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-contract AuthFace {
+contract Auth {
   
   event SetAuthority (address indexed authority);
   event SetWhitelister (address indexed whitelister);
@@ -14,8 +14,8 @@ contract AuthFace {
   function setWhitelister(address _whitelister) {}
   function whitelistUser(address _target, bool _isWhitelisted) {}
   
-  function isWhitelistedUser(address _target) constant returns (bool) {}
-  function getOwner() constant returns (address owner) {}
-  function getAuth() contant returns (address auth) {}
-  function getWhitelisters() constant returns (address[] whitelister) {}
+  function isWhitelistedUser(address _target) constant returns (bool) {}
+  function getOwner() constant returns (address) {}
+  function getAuth() constant returns (address) {}
+  function getWhitelisters() constant returns (address[]) {}
 }
