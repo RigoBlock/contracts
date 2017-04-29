@@ -133,7 +133,7 @@ contract DragoFace {
 	function changeRatio(uint256 _ratio) {}
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
-	function changeDragator(address _dragoDAO) {}
+	function changeDragoDAO(address _dragoDAO) {}
 	function depositToExchange(address _exchange, address _token, uint256 _value) payable returns(bool success) {}
 	function depositToCFDExchange(address _cfdExchange, uint256 _value) payable returns(bool success) {}
 	function withdrawFromExchange(address _exchange, address _token, uint256 _value) returns (bool success) {}
