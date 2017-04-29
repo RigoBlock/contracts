@@ -126,7 +126,6 @@ contract DragoFace {
 	// METHODS
 
  	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {}
-	function() payable {}
 	function buyDrago() payable returns (bool success) {}
 	function sellDrago(uint256 _amount) returns (uint revenue, bool success) {}
 	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) {}
@@ -145,6 +144,7 @@ contract DragoFace {
 	function cancelOrderExchange() {}
 	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 _id) {}	
 	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 _id) {}
+	function setOwner(address _new) {}
 
 	function balanceOf(address _who) constant returns (uint256) {}
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
@@ -163,6 +163,9 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		uint balance;
 		mapping (uint => Receipt) receipt;
 		mapping (address => uint) allowanceOf;
+		mapping(address => address[]) approvedAccount;
+		//mapping (address => uint256) balances;
+		//address[] cfdExchange; //array of exchanges
 	}
 	
 	struct DragoData {
@@ -174,10 +177,13 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		uint totalSupply;
 		uint sellPrice;
 		uint buyPrice;
-		//mapping (bytes32 => bytes32) meta;
+		uint transactionFee;
+		uint32 minPeriod;
+		address dragoDAO;
+		mapping (address => uint256) balances;
 	}
 	
-	modifier only_dragoDAO { if (msg.sender != dragoDAO) return; _; }
+	modifier only_dragoDAO { if (msg.sender != data.dragoDAO) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	//modifier when_approved_exchange { if (exchange != approved) return; _; }
 	modifier minimum_period_past(uint buyPrice, uint amount) { if (now < accounts[msg.sender].receipt[buyPrice].activation) return; _; }
@@ -203,40 +209,36 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		data.sellPrice = 1 ether;
 		data.buyPrice = 1 ether;
 	}
-    
-	function() payable {
-		buyDrago();
-	}
 
 	function buyDrago() payable minimum_stake(msg.value) returns (bool success) {
 		//if (!approvedAccount[msg.sender]) throw; //or separate whitelisted
 		uint gross_amount = safeDiv(msg.value, data.buyPrice) * base;
-        	uint fee = safeMul(gross_amount, transactionFee);
-        	uint fee_drago = safeMul(fee, ratio);
-        	uint fee_dragoDAO = safeSub(fee, fee_drago);
-        	uint amount = safeSub(gross_amount, fee);
-        	balances[msg.sender] = safeAdd(balances[msg.sender], amount);
-        	balances[feeCollector] = safeAdd(balances[feeCollector], fee_drago);
-        	balances[dragoDAO] = safeAdd(balances[dragoDAO], fee_dragoDAO);
-        	accounts[msg.sender].receipt[data.buyPrice].activation = uint32(now) + minPeriod;
-        	data.totalSupply = safeAdd(data.totalSupply, gross_amount);
-        	Buy(msg.sender, this, msg.value, amount);
-    		return (true);
+        uint fee = safeMul(gross_amount, data.transactionFee);
+        uint fee_drago = safeMul(fee, ratio);
+        uint fee_dragoDAO = safeSub(fee, fee_drago);
+        uint amount = safeSub(gross_amount, fee);
+        data.balances[msg.sender] = safeAdd(data.balances[msg.sender], amount);
+        data.balances[feeCollector] = safeAdd(data.balances[feeCollector], fee_drago);
+        data.balances[data.dragoDAO] = safeAdd(data.balances[data.dragoDAO], fee_dragoDAO);
+        accounts[msg.sender].receipt[data.buyPrice].activation = uint32(now) + data.minPeriod;
+        data.totalSupply = safeAdd(data.totalSupply, gross_amount);
+        Buy(msg.sender, this, msg.value, amount);
+    	return (true);
 	}
 
 	function sellDrago(uint256 _amount) minimum_period_past(data.buyPrice, _amount) minimum_stake(net_revenue) returns (uint net_revenue, bool success) {
 		//if (!approvedAccount[msg.sender]) throw;
-		if (balances[msg.sender] < _amount && balances[msg.sender] + _amount <= balances[msg.sender]) throw;
+		if (data.balances[msg.sender] < _amount && data.balances[msg.sender] + _amount <= data.balances[msg.sender]) throw;
 		uint gross_amount = _amount;
-		uint fee = safeMul (gross_amount, transactionFee);
+		uint fee = safeMul (gross_amount, data.transactionFee);
 		uint fee_drago = safeMul(fee, ratio);
-        	uint fee_dragoDAO = safeSub(fee, fee_drago);
+        uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint net_amount = safeSub(gross_amount, fee);
 		net_revenue = safeMul(net_amount, data.sellPrice) / base;
-        	balances[msg.sender] = safeSub(balances[msg.sender], _amount);
-        	balances[feeCollector] = safeAdd(balances[feeCollector], fee_drago);
-        	balances[dragoDAO] = safeAdd(balances[dragoDAO], fee_dragoDAO);
-        	data.totalSupply = safeSub(data.totalSupply, _amount);
+        data.balances[msg.sender] = safeSub(data.balances[msg.sender], _amount);
+        data.balances[feeCollector] = safeAdd(data.balances[feeCollector], fee_drago);
+        data.balances[data.dragoDAO] = safeAdd(data.balances[data.dragoDAO], fee_dragoDAO);
+        data.totalSupply = safeSub(data.totalSupply, _amount);
 		if (!msg.sender.send(net_revenue)) throw;
 		Sell(this, msg.sender, _amount, net_revenue);
 		return (net_revenue, true);
@@ -244,11 +246,11 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	
 	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) only_owner {
         	data.sellPrice = _newSellPrice;
-            	data.buyPrice = _newBuyPrice;
+            data.buyPrice = _newBuyPrice;
 	}
 	
 	function changeMinPeriod(uint32 _minPeriod) only_dragoDAO {
-		minPeriod = _minPeriod;
+		data.minPeriod = _minPeriod;
 	}
 	
 	function changeRatio(uint256 _ratio) only_dragoDAO {
@@ -256,7 +258,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 	
 	function setTransactionFee(uint _transactionFee) only_owner {
-		transactionFee = safeDiv(_transactionFee, 10000); //fee is in basis points
+		data.transactionFee = safeDiv(_transactionFee, 10000); //fee is in basis points (1bps=0.01%)
 	}
 	
 	function changeFeeCollector(address _feeCollector) only_owner {	
@@ -264,7 +266,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 	
 	function changeDragoDAO(address _dragoDAO) only_dragoDAO {
-    		dragoDAO = _dragoDAO;
+    	data.dragoDAO = _dragoDAO;
 	}
 
 	function depositToExchange(address _exchange, address _token, uint256 _value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
@@ -305,7 +307,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function balanceOf(address _who) constant returns (uint256) {
-		return balances[_who];
+		return data.balances[_who];
 	}
 	
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {
@@ -317,27 +319,19 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 	
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {
-	    	return (feeCollector, dragoDAO, ratio, transactionFee, minPeriod);
+	    return (feeCollector, data.dragoDAO, ratio, transactionFee, minPeriod);
 	}
-	
+	/*
 	function getOwner() constant returns (address) {
-        	return owner;
-	}
+        return owner;
+	}*/
 	
 	DragoData data;
 	
-	string public version = 'H0.2';
-	
-	uint public base = 1000000;    // tokens are divisible
-	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
+	string public version = 'H0.3';
+	uint public base = 1000000;    // tokens are divisible by 1 million
 	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
 	uint256 public ratio = safeDiv(80, 100) ; //ratio is 80%
-	uint32 public minPeriod = 0 days; //can be amended
 	address public feeCollector = msg.sender;
-	address public dragoDAO;
-	address public owner = msg.sender;
-	//address[] cfdExchange; //array of exchanges
-	mapping (address => uint256) public balances;
-	mapping(address => address[]) public approvedAccount;
 	mapping (address => Account) accounts;
 }
