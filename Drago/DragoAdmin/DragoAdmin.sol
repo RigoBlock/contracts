@@ -10,7 +10,7 @@ contract Owned {
 	modifier only_owner { if (msg.sender != owner) return; _; }
 
 	event NewOwner(address indexed old, address indexed current);
-   
+ 
 	function setOwner(address _new) only_owner {
 		owner = _new;
 		NewOwner(owner, _new);
@@ -62,7 +62,7 @@ contract DragoFactory {
 
 	// METHODS
     
-	function createDrago(string _name, string _symbol) returns (bool success);
+	function createDrago(string _name, string _symbol) returns (bool) {}
 	function setRegistry(address _newRegistry) {}
 	function setBeneficiary(address _dragoDAO) {}
 	function setFee(uint _fee) {}
@@ -71,10 +71,12 @@ contract DragoFactory {
     
 	function getRegistry() constant returns (address) {}
 	function getStorage() constant returns (address dragoDAO, string version, uint nextDragoID) {}
-    function getOwner() constant returns (address) {}
+	function getOwner() constant returns (address) {}
 }
 
 contract Authority {
+
+    // EVENTS
   
     event SetAuthority (address indexed authority);
     event SetWhitelister (address indexed whitelister);
@@ -82,22 +84,25 @@ contract Authority {
     event WhitelistedAsset(address indexed asset, bool approved);
     event WhitelistedExchange(address indexed exchange, bool approved);
     event WhitelistedRegistry(address indexed registry, bool approved);
+    
+    // METHODS
   
-    function setAuthority(address _authority) {}
-    function setWhitelister(address _whitelister) {}
+    function setAuthority(address _authority, bool _isWhitelisted) {}
+    function setWhitelister(address _whitelister, bool _isWhitelisted) {}
     function whitelistUser(address _target, bool _isWhitelisted) {}
     function whitelistAsset(address _asset, bool _isWhitelisted) {}
     function whitelistExchange(address _exchange, bool _isWhitelisted) {}
+    function whitelistDrago(address _drago, bool _isWhitelisted) {}
     function whitelistRegistry(address _registry, bool _isWhitelisted) {}
   
     function isWhitelistedUser(address _target) constant returns (bool) {}
+    function isWhitelister(address _whitelister) constant returns (bool) {}
+    function isAuthority(address _authority) constant returns (bool) {}
     function isWhitelistedAsset(address _asset) constant returns (bool) {}
     function isWhitelistedExchange(address _exchange) constant returns (bool) {}
     function isWhitelistedRegistry(address _registry) constant returns (bool) {}
     function isWhitelistedDrago(address _drago) constant returns (bool) {}
     function getOwner() constant returns (address) {}
-    function getAuth() constant returns (address) {}
-    function getWhitelisters() constant returns (address[]) {}
 }
 
 contract DragoRegistry {
@@ -110,20 +115,23 @@ contract DragoRegistry {
 	
 	// METHODS
         
-	function register(address _drago, string _name, string _symbol, uint _dragoID) payable returns (bool) {}
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {}
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {}
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) payable returns (bool) {}
 	function unregister(uint _id) {}
 	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
 	function setFee(uint _fee) {}
+	function upgrade(address _newAddress) payable {}
+	function setUpgraded(uint _version) {}
 	function drain() {}
+	function kill() {}
 	
 	function dragoCount() constant returns (uint) {}
-	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner) {}
-	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner) {}
-	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner) {}
-	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner) {}
+	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
+	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
 	function meta(uint _id, bytes32 _key) constant returns (bytes32) {}
-	function isDrago(address _drago) constant returns (bool) {}
+	function getGroups(address _group) constant returns (address[]) {}
 }
       
 library DragoAdminFace {
