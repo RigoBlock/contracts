@@ -79,7 +79,7 @@ contract Exchange {
 	function withdraw(address token, uint256 amount) {}
 	function order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce) {}
 	function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) {}
-	function cancelOrder(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
+	function cancelOrder(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
 	
 	function balanceOf(address _who) constant returns (uint256) {}
 	function balanceOf(address token, address user) constant returns (uint256) {}
@@ -138,10 +138,10 @@ contract DragoFace {
 	function depositToCFDExchange(address _cfdExchange, uint256 _value) payable returns(bool success) {}
 	function withdrawFromExchange(address _exchange, address _token, uint256 _value) returns (bool success) {}
 	function withdrawFromCFDExchange(address _cfdExchange, uint _amount) returns(bool success) {}
-	function placeOrderExchange() {}
-	function placeTradeExchange() {}
+	function placeOrderExchange(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {}
+	function placeTradeExchange(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint8 _v, bytes32 _r, bytes32 _s, uint _amount) {}
 	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
-	function cancelOrderExchange() {}
+	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
 	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 _id) {}	
 	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 _id) {}
 	function setOwner(address _new) {}
@@ -290,10 +290,25 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
 		cfds.withdraw(_amount);
 	}
+	
+	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {
+	    Exchange exchange = Exchange(_exchange);
+	    exchange.order(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce);
+	}
 
 	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) only_owner {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
 		cfds.orderCFD(_cfd, _is_stable, _adjustment, _stake);
+	}
+	
+	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint8 _v, bytes32 _r, bytes32 _s, uint _amount) {
+	    Exchange exchange = Exchange(_exchange);
+	    exchange.trade(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce, _user, _v, _r, _s, _amount);
+	}
+	
+	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {
+	    Exchange exchange = Exchange(_exchange);
+	    exchange.cancelOrder(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, nonce, v, r, s);
 	}
 
 	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 _id) only_owner {
@@ -321,11 +336,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {
 	    return (feeCollector, data.dragoDAO, ratio, transactionFee, minPeriod);
 	}
-	/*
-	function getOwner() constant returns (address) {
-        return owner;
-	}*/
-	
+
 	DragoData data;
 	
 	string public version = 'H0.3';
