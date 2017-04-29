@@ -52,7 +52,7 @@ contract DragoFactoryFace {
     
 	function getRegistry() constant returns (address) {}
 	function getStorage() constant returns (address dragoDAO, string version, uint nextDragoID) {}
-    function getOwner() constant returns (address) {}
+	function getOwner() constant returns (address) {}
 }
 
 contract DragoFactory is Owned, DragoFactoryFace {
