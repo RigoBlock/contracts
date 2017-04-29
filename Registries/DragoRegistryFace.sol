@@ -14,8 +14,8 @@ contract DragoRegistryFace {
 	
 	// METHODS
         
-	function register(address _drago, string _name, string _symbol, uint _dragoID) payable returns (bool) {}
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {}
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _group) payable returns (bool) {}
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _group, address _owner) payable returns (bool) {}
 	function unregister(uint _id) {}
 	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
 	function setFee(uint _fee) {}
@@ -25,9 +25,10 @@ contract DragoRegistryFace {
 	function kill() {}
 	
 	function dragoCount() constant returns (uint) {}
-	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner) {}
-	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner) {}
-	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner) {}
-	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner) {}
+	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
+	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
 	function meta(uint _id, bytes32 _key) constant returns (bytes32) {}
+	function getGroups(address _group) constant returns (address[]) {}
 }
