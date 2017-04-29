@@ -12,7 +12,7 @@ contract DragoFactoryFace {
 
 	// METHODS
     
-	function createDrago(string _name, string _symbol) returns (address _drago, uint _dragoID) {}
+	function createDrago(string _name, string _symbol) returns (bool) {}
 	function setRegistry(address _newRegistry) {}
 	function setBeneficiary(address _dragoDAO) {}
 	function setFee(uint _fee) {}
