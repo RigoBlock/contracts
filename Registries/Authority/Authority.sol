@@ -52,8 +52,6 @@ contract AuthorityFace {
     function isWhitelistedRegistry(address _registry) constant returns (bool) {}
     function isWhitelistedDrago(address _drago) constant returns (bool) {}
     function getOwner() constant returns (address) {}
-    function getAuth() constant returns (address) {}
-    function getWhitelisters() constant returns (address[]) {}
 }
 
 contract Authority is Owned, AuthorityFace {
