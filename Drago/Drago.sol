@@ -75,8 +75,8 @@ contract Exchange {
 
 	// METHODS
 
-	function deposit(address token, uint256 amount) payable {}
-	function withdraw(address token, uint256 amount) {}
+	function deposit(address token, uint256 amount) payable returns (bool success) {}
+	function withdraw(address token, uint256 amount) returns (bool success) {}
 	function order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce) {}
 	function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) {}
 	function cancelOrder(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
@@ -104,8 +104,8 @@ contract CFDExchange {
 
 	// METHODS
 
-	function deposit() payable /*returns (bool success)*/ {}
-	function withdraw(uint256 amount) {}
+	function deposit() payable returns (bool success) {}
+	function withdraw(uint256 amount) returns (bool success) {}
 	function orderCFD(address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}	//returns(uint id)
 	function cancel(address _cfd, uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(address _cfd, uint24 id) {}
@@ -133,7 +133,7 @@ contract DragoFace {
 	function changeRatio(uint256 _ratio) {}
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
-	function changeDragoDAO(address _dragoDAO) {}
+	function changeDragator(address _dragoDAO) {}
 	function depositToExchange(address _exchange, address _token, uint256 _value) payable returns(bool success) {}
 	function depositToCFDExchange(address _cfdExchange, uint256 _value) payable returns(bool success) {}
 	function withdrawFromExchange(address _exchange, address _token, uint256 _value) returns (bool success) {}
@@ -271,24 +271,24 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 
 	function depositToExchange(address _exchange, address _token, uint256 _value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
 		Exchange exchange = Exchange(_exchange);
-		exchange.deposit.value(_value)(_token, _value);
+		assert(exchange.deposit.value(_value)(_token, _value));
 	}
 
 	function depositToCFDExchange(address _cfdExchange, uint256 _value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
-		cfds.deposit.value(_value)();
+		assert(cfds.deposit.value(_value)());
 		return true;
 	}
 
 	function withdrawFromExchange(address _exchange, address _token, uint256 _value) only_owner returns (bool success) {
 		Exchange exchange = Exchange(_exchange);
 		//if(!exchange.withdraw(value)) throw;
-		exchange.withdraw(_token, _value); //for ETH token = 0
+		assert(exchange.withdraw(_token, _value)); //for ETH token = 0
 	}
 
 	function withdrawFromCFDExchange(address _cfdExchange, uint _amount) /*when_approved_exchange*/ only_owner returns(bool success) {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
-		cfds.withdraw(_amount);
+		assert(cfds.withdraw(_amount));
 	}
 	
 	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {
