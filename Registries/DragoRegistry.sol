@@ -59,7 +59,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		mapping (bytes32 => bytes32) meta;
 	}
     
-    // EVENTS
+	// EVENTS
 
 	event Registered(string indexed name, string indexed symbol, uint indexed id, address drago, uint dragoID);
 	event Unregistered(string indexed name, string indexed symbol, uint indexed id);
@@ -104,14 +104,29 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		dragos[_id].meta[_key] = _value;
 		MetaChanged(_id, _key, _value);
 	}
-	
+
 	function setFee(uint _fee) only_owner {
 		fee = _fee;
 	}
-	
+
+	function upgrade(address _newAddress) payable only_owner {
+		DragoRegistry registry = DragoRegistry(_newAddress);
+		++version;
+		registry.setUpgraded(version);
+	    	if (!address(registry).call.value(msg.value)(msg.data)) throw;	//copy old data to new externally and then upgrade
+	}
+
+	function setUpgraded(uint _version) only_owner {
+    		version = _version;
+  	}
+
 	function drain() only_owner {
 		if (!msg.sender.send(this.balance))
 			throw;
+	}
+
+	function kill() only_owner {
+	    suicide(msg.sender);
 	}
 	
 	// CONSTANT METHODS
@@ -165,5 +180,6 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	mapping (string => uint) mapFromSymbol;
 	address public _drago;
 	uint public fee = 0;
+	uint public version;
 	Drago[] dragos;
 }
