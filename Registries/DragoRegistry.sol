@@ -33,8 +33,8 @@ contract DragoRegistryFace {
 	
 	// METHODS
         
-	function register(address _drago, string _name, string _symbol, uint _dragoID) payable returns (bool) {}
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {}
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _group) payable returns (bool) {}
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _group, address _owner) payable returns (bool) {}
 	function unregister(uint _id) {}
 	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
 	function setFee(uint _fee) {}
@@ -44,11 +44,12 @@ contract DragoRegistryFace {
 	function kill() {}
 	
 	function dragoCount() constant returns (uint) {}
-	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner) {}
-	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner) {}
-	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner) {}
-	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner) {}
+	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
+	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
 	function meta(uint _id, bytes32 _key) constant returns (bytes32) {}
+	function getGroups(address _group) constant returns (address[]) {}
 }
 
 contract DragoRegistry is DragoRegistryFace, Owned {
@@ -59,6 +60,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		string symbol;
 		uint dragoID;
 		address owner;
+		address group;
 		mapping (bytes32 => bytes32) meta;
 	}
     
@@ -81,12 +83,12 @@ contract DragoRegistry is DragoRegistryFace, Owned {
     
 	// METHODS
 	
-	function register(address _drago, string _name, string _symbol, uint _dragoID) payable returns (bool) {
-		return registerAs(_drago, _name, _symbol, _dragoID, msg.sender);
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {
+		return registerAs(_drago, _name, _symbol, _dragoID, _owner, msg.sender);
 	}
 
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable when_fee_paid when_address_free(_drago) when_name_free(_name) when_is_symbol(_symbol) when_symbol_free(_symbol) returns (bool) {
-		dragos.push(Drago(_drago, _name, _symbol, _dragoID, _owner));
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) payable when_fee_paid when_address_free(_drago) when_name_free(_name) when_is_symbol(_symbol) when_symbol_free(_symbol) returns (bool) {
+		dragos.push(Drago(_drago, _name, _symbol, _dragoID, _owner, _group));
 		mapFromAddress[_drago] = dragos.length;
 		mapFromName[_name] = dragos.length;
 		mapFromSymbol[_symbol] = dragos.length;
@@ -115,7 +117,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		DragoRegistry registry = DragoRegistry(_newAddress);
 		++version;
 		registry.setUpgraded(version);
-	    if (!address(registry).call.value(msg.value)(msg.data)) throw;	//copy old data to new externally and then upgrade
+	    if (!address(registry).call.value(msg.value)(msg.data)) throw;
 	}
 
 	function setUpgraded(uint _version) only_owner {
@@ -137,49 +139,59 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	    return dragos.length; 
 	}
 	
-	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner) {
+	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {
 		var t = dragos[_id];
 		drago = t.drago;
 		name = t.name;
 		symbol = t.symbol;
 		dragoID = t.dragoID;
 		owner = t.owner;
+		group = t.group;
 	}
 
-	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner) {
+	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {
 		id = mapFromAddress[_drago] - 1;
 		var t = dragos[id];
 		name = t.name;
 		symbol = t.symbol;
 		dragoID = t.dragoID;
 		owner = t.owner;
+		group = t.group;
 	}
 
-	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner) {
+	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {
 		id = mapFromSymbol[_symbol] - 1;
 		var t = dragos[id];
 		drago = t.drago;
 		name = t.name;
 		dragoID = t.dragoID;
 		owner = t.owner;
+		group = t.group;
 	}
 	
-	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner) {
+	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {
 		id = mapFromName[_name] - 1;
 		var t = dragos[id];
 		symbol = t.symbol;
 		drago = t.drago;
 		dragoID = t.dragoID;
 		owner = t.owner;
+		group = t.group;
 	}
 
 	function meta(uint _id, bytes32 _key) constant returns (bytes32) {
 		return dragos[_id].meta[_key];
 	}
 	
+	function getGroups(address _group) constant returns (address[]) {
+	    return mapFromGroup[_group];
+	}
+	
+	mapping (bytes32 => address) mapFromKey;
 	mapping (address => uint) mapFromAddress;
 	mapping (string => uint) mapFromName;
 	mapping (string => uint) mapFromSymbol;
+	mapping (address=> address[]) mapFromGroup;
 	uint public fee = 0;
 	uint public version;
 	Drago[] dragos;
