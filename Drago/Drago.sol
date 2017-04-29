@@ -128,32 +128,28 @@ contract DragoFace {
  	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {}
 	function() payable {}
 	function buyDrago() payable returns (bool success) {}
-	function sellDrago(uint256 amount) returns (uint revenue, bool success) {}
-	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) {}
-	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) {}
+	function sellDrago(uint256 _amount) returns (uint revenue, bool success) {}
+	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) {}
+	function changeMinPeriod(uint32 _minPeriod) {}
 	function changeRatio(uint256 _ratio) {}
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
-	function changeDragator(address _dragator) {}
-	function depositToExchange(address exchange, address _token, uint256 _value) payable returns(bool success) {}
+	function changeDragator(address _dragoDAO) {}
+	function depositToExchange(address _exchange, address _token, uint256 _value) payable returns(bool success) {}
 	function depositToCFDExchange(address _cfdExchange, uint256 _value) payable returns(bool success) {}
-	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
-	function withdrawFromCFDExchange(address _cfdExchange, uint amount) returns(bool success) {}
+	function withdrawFromExchange(address _exchange, address _token, uint256 _value) returns (bool success) {}
+	function withdrawFromCFDExchange(address _cfdExchange, uint _amount) returns(bool success) {}
 	function placeOrderExchange() {}
 	function placeTradeExchange() {}
-	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}
+	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
 	function cancelOrderExchange() {}
-	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 id) {}	
-	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 id) {}
+	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 _id) {}	
+	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 _id) {}
 
-	function balanceOf(address _from) constant returns (uint256) {}
-	function getName() constant returns (string) {}
-	function getSymbol() constant returns (string) {}
-	function getPrice() constant returns (uint256 sellPrice, uint256 buyPrice) {}
-	function getSupply() constant returns (uint256) {}
-	function getTransactionFee() constant returns (uint256) {}
-	function getFeeCollector() constant returns (address) {}
-	function getRefundActivationPeriod() constant returns (uint32) {}
+	function balanceOf(address _who) constant returns (uint256) {}
+	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
+	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
+	function getOwner() constant returns (address) {}
 }
 
 contract Drago is Owned, ERC20, SafeMath, DragoFace {
@@ -169,12 +165,23 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		mapping (address => uint) allowanceOf;
 	}
 	
-	//struct Drago (to save gas)
+	struct DragoData {
+		address drago;
+		address owner;
+		string name;
+		string symbol;
+		uint dragoID;
+		uint totalSupply;
+		uint sellPrice;
+		uint buyPrice;
+		//mapping (bytes32 => bytes32) meta;
+	}
 	
-	modifier only_dragator { if (msg.sender != dragator) return; _; }
+	modifier only_dragoDAO { if (msg.sender != dragoDAO) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	//modifier when_approved_exchange { if (exchange != approved) return; _; }
 	modifier minimum_period_past(uint buyPrice, uint amount) { if (now < accounts[msg.sender].receipt[buyPrice].activation) return; _; }
+	modifier minimum_stake(uint amount) { if (amount < min_order) throw; _; }
 
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -190,172 +197,172 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	event FinalizeCFD(address indexed _cfdExchange, address indexed _cfd);
 
  	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {
-		name = _dragoName;
-		symbol = _dragoSymbol;
-		dragoID = _dragoID;
+		data.name = _dragoName;
+		data.symbol = _dragoSymbol;
+		data.dragoID = _dragoID;
+		data.sellPrice = 1 ether;
+		data.buyPrice = 1 ether;
 	}
     
 	function() payable {
 		buyDrago();
 	}
 
-	function buyDrago() payable returns (bool success) {
+	function buyDrago() payable minimum_stake(msg.value) returns (bool success) {
 		//if (!approvedAccount[msg.sender]) throw; //or separate whitelisted
-		if (msg.value < min_order) throw;
-		var gross_amount = safeDiv(msg.value, buyPrice);
-        	var fee = safeMul(gross_amount, transactionFee) / (100 ether);
-        	var fee_drago = safeMul(fee, ratio);
-        	var fee_dragator = safeSub(fee, fee_drago);
-        	var amount = safeSub(gross_amount, fee);
-        	balances[msg.sender] = safeAdd(balances[msg.sender], amount);
-        	balances[feeCollector] = safeAdd(balances[feeCollector], fee_drago);
-        	balances[dragator] = safeAdd(balances[dragator], fee_dragator);
-        	accounts[msg.sender].receipt[buyPrice].activation = uint32(now) + refundActivationPeriod;
-        	totalSupply = safeAdd(totalSupply, gross_amount);
-        	Buy(msg.sender, this, msg.value, amount);
-    		return (true);
+		uint gross_amount = safeDiv(msg.value, data.buyPrice) * base;
+        uint fee = safeMul(gross_amount, transactionFee);
+        uint fee_drago = safeMul(fee, ratio);
+        uint fee_dragoDAO = safeSub(fee, fee_drago);
+        uint amount = safeSub(gross_amount, fee);
+        balances[msg.sender] = safeAdd(balances[msg.sender], amount);
+        balances[feeCollector] = safeAdd(balances[feeCollector], fee_drago);
+        balances[dragoDAO] = safeAdd(balances[dragoDAO], fee_dragoDAO);
+        accounts[msg.sender].receipt[data.buyPrice].activation = uint32(now) + minPeriod;
+        data.totalSupply = safeAdd(data.totalSupply, gross_amount);
+        Buy(msg.sender, this, msg.value, amount);
+    	return (true);
 	}
 
-	function sellDrago(uint256 amount) minimum_period_past(buyPrice, amount) returns (uint revenue, bool success) {
+	function sellDrago(uint256 _amount) minimum_period_past(data.buyPrice, _amount) minimum_stake(net_revenue) returns (uint net_revenue, bool success) {
 		//if (!approvedAccount[msg.sender]) throw;
-		revenue = safeMul(amount, sellPrice);
-        	if (balances[msg.sender] >= amount && balances[msg.sender] + amount > balances[msg.sender] && revenue >= min_order) {
-            	balances[msg.sender] = safeSub(balances[msg.sender], amount);
-            	totalSupply = safeSub(totalSupply, amount);
-		if (!msg.sender.send(revenue)) {
-			throw;
-			} else { 
-				Sell(this, msg.sender, amount, revenue);
-			}
-			return (revenue, true);
-		} else { return (revenue, false); }
+		if (balances[msg.sender] < _amount && balances[msg.sender] + _amount <= balances[msg.sender]) throw;
+		uint gross_amount = _amount;
+		uint fee = safeMul (gross_amount, transactionFee);
+		uint fee_drago = safeMul(fee, ratio);
+        uint fee_dragoDAO = safeSub(fee, fee_drago);
+		uint net_amount = safeSub(gross_amount, fee);
+		net_revenue = safeMul(net_amount, data.sellPrice) / base;
+        balances[msg.sender] = safeSub(balances[msg.sender], _amount);
+        balances[feeCollector] = safeAdd(balances[feeCollector], fee_drago);
+        balances[dragoDAO] = safeAdd(balances[dragoDAO], fee_dragoDAO);
+        data.totalSupply = safeSub(data.totalSupply, _amount);
+		if (!msg.sender.send(net_revenue)) throw;
+		Sell(this, msg.sender, _amount, net_revenue);
+		return (net_revenue, true);
 	}
 	
-	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) /*only_owner*/ {  //proxy modifier
-        	sellPrice = newSellPrice*(10**(18)); //in wei ALT:newSellPrice*(10**(18 - 4))
-        	buyPrice = newBuyPrice*(10**(18));  //10**(18 - 4) if price = 1 finney
-        	//amend in order to do calculations in UI
+	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) only_owner {
+        	data.sellPrice = _newSellPrice;
+            data.buyPrice = _newBuyPrice;
 	}
 	
-	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) only_dragator {
-		refundActivationPeriod = _refundActivationPeriod;
+	function changeMinPeriod(uint32 _minPeriod) only_dragoDAO {
+		minPeriod = _minPeriod;
 	}
 	
-	function changeRatio(uint256 _ratio) only_dragator {
+	function changeRatio(uint256 _ratio) only_dragoDAO {
 		ratio = safeDiv(_ratio, 100);
 	}
 	
-	function setTransactionFee(uint _transactionFee) only_owner {   // 1 ==> 1 bps = 0.01%
-		transactionFee = _transactionFee * (10 ** 18) / (1 ether);	//fee in basis points
+	function setTransactionFee(uint _transactionFee) only_owner {
+		transactionFee = safeDiv(_transactionFee, 10000); //fee is in basis points
 	}
 	
 	function changeFeeCollector(address _feeCollector) only_owner {	
 		feeCollector = _feeCollector; 
 	}
 	
-	function changeDragator(address _dragator) only_dragator {
-        	dragator = _dragator;
+	function changeDragoDAO(address _dragoDAO) only_dragoDAO {
+    	dragoDAO = _dragoDAO;
 	}
 
 	function depositToExchange(address _exchange, address _token, uint256 _value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
-		//address who used to determine from which account _who is the drago contract
 		Exchange exchange = Exchange(_exchange);
-		exchange.deposit.value(_value)(_token, _value); //exchange.deposit.value(msg.value)(token, value, _who);
+		exchange.deposit.value(_value)(_token, _value);
 	}
 
-	function depositToCFDExchange(address _cfdExchange, uint256 _value) /*when_approved_exchange*/ /*only_drago_owner*/ payable returns(bool success) {
+	function depositToCFDExchange(address _cfdExchange, uint256 _value) /*when_approved_exchange*/ only_owner payable returns(bool success) {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
-		//msg.value = _value;
-		cfds.deposit.value(_value)(); //.gas(300000)
+		cfds.deposit.value(_value)();
 		return true;
 	}
 
-	function withdrawFromExchange(address _exchange, address token, uint256 value) only_owner returns (bool success) {
+	function withdrawFromExchange(address _exchange, address _token, uint256 _value) only_owner returns (bool success) {
 		Exchange exchange = Exchange(_exchange);
 		//if(!exchange.withdraw(value)) throw;
-		exchange.withdraw(token, value); //for ETH token = 0
+		exchange.withdraw(_token, _value); //for ETH token = 0
 	}
 
-	function withdrawFromCFDExchange(address _cfdExchange, uint amount) /*when_approved_exchange*/ /*only_drago_owner*/ returns(bool success) {
+	function withdrawFromCFDExchange(address _cfdExchange, uint _amount) /*when_approved_exchange*/ only_owner returns(bool success) {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
-		cfds.withdraw(amount);
+		cfds.withdraw(_amount);
 	}
 
-	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) /*only_owner*/ {
+	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) only_owner {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
-		cfds.orderCFD(_cfd, is_stable, adjustment, stake);
+		cfds.orderCFD(_cfd, _is_stable, _adjustment, _stake);
 	}
 
-	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 id) only_owner {
+	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 _id) only_owner {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
-		cfds.cancel(_cfd, id);
+		cfds.cancel(_cfd, _id);
 	}
 
-	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 id) only_owner {
+	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 _id) only_owner {
 		CFDExchange cfds = CFDExchange(_cfdExchange);
-		cfds.finalize(_cfd, id);
+		cfds.finalize(_cfd, _id);
 	}
 
 	function balanceOf(address _who) constant returns (uint256) {
 		return balances[_who];
 	}
 	
-	function getName() constant returns (string) {
-		return name;
+	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {
+		name = data.name;
+		symbol = data.symbol;
+		sellPrice = sellPrice;
+		buyPrice = buyPrice;
+		totalSupply = totalSupply;
 	}
 	
-	function getSymbol() constant returns (string) {
-		return symbol;
-	}
-	
-	function getPrice() constant returns (uint256 sellPrice, uint256 buyPrice) {
-		return (sellPrice, buyPrice);
-	}
-	
-	function getSupply() constant returns (uint256) {
-		return totalSupply;
-	}
-	
-	function getRatio() constant returns (uint256) {
-		return ratio;
-	}
-	
-	function getTransactionFee() constant returns (uint256) {
-		return transactionFee;   
-	}
-	
-	function getFeeCollector() constant returns (address) {
-		return feeCollector;
-	}
-	
-	function getDragator() constant returns (address) {
-        	return dragator;
+	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {
+	    return (feeCollector, dragoDAO, ratio, transactionFee, minPeriod);
 	}
 	
 	function getOwner() constant returns (address) {
-        	return owner;
+        return owner;
 	}
 	
-	function getRefundActivationPeriod() constant returns (uint32) {
-		return refundActivationPeriod;
-	}
+	DragoData data;
 	
-	string public name;
-	string public symbol;
-	uint public dragoID;
 	string public version = 'H0.2';
-	uint256 public totalSupply = 0;
-	uint256 public sellPrice = 1 ether;
-	uint256 public buyPrice = 1 ether;
+	
+	uint public base = 1000000;    // tokens are divisible
 	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
 	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
 	uint256 public ratio = safeDiv(80, 100) ; //ratio is 80%
-	uint32 public refundActivationPeriod = 0 days; //can be amended
+	uint32 public minPeriod = 0 days; //can be amended
 	address public feeCollector = msg.sender;
-	address public dragator = msg.sender;
+	address public dragoDAO;
 	address public owner = msg.sender;
 	//address[] cfdExchange; //array of exchanges
 	mapping (address => uint256) public balances;
 	mapping(address => address[]) public approvedAccount;
 	mapping (address => Account) accounts;
+}
+
+contract DragoRegistry {
+
+	//EVENTS
+
+	event Registered(string indexed symbol, uint indexed id, address drago, string name);
+	event Unregistered(string indexed symbol, uint indexed id);
+	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
+	
+	// METHODS
+        
+	function register(address _drago, string _name, string _symbol, uint _dragoID) payable returns (bool) {}
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {}
+	function unregister(uint _id) {}
+	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
+	function setFee(uint _fee) {}
+	function drain() {}
+	
+	function dragoCount() constant returns (uint) {}
+	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner) {}
+	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner) {}
+	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner) {}
+	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner) {}
+	function meta(uint _id, bytes32 _key) constant returns (bytes32) {}
 }
