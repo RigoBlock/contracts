@@ -40,10 +40,10 @@ contract Drago {
 	function depositToCFDExchange(address _cfdExchange, uint256 _value) payable returns(bool success) {}
 	function withdrawFromExchange(address _exchange, address _token, uint256 _value) returns (bool success) {}
 	function withdrawFromCFDExchange(address _cfdExchange, uint _amount) returns(bool success) {}
-	function placeOrderExchange() {}
-	function placeTradeExchange() {}
+	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {}
+	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint8 _v, bytes32 _r, bytes32 _s, uint _amount) {}
 	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
-	function cancelOrderExchange() {}
+	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
 	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 _id) {}	
 	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 _id) {}
 	function setOwner(address _new) {}
@@ -71,7 +71,7 @@ contract DragoFactory {
     
 	function getRegistry() constant returns (address) {}
 	function getStorage() constant returns (address dragoDAO, string version, uint nextDragoID) {}
-    function getOwner() constant returns (address) {}
+	function getOwner() constant returns (address) {}
 }
       
 library DragoAdminFace {
@@ -89,7 +89,6 @@ library DragoAdminFace {
 	event CancelCFD(address indexed _cfdExchange, address indexed _cfd);
 	event FinalizeCFD(address indexed _cfdExchange, address indexed _cfd);
 	event DragoCreated(string _name, string _symbol, address _drago, address _dragowner, uint _dragoID);
-
 	
 	// METHODS
 	
@@ -104,10 +103,10 @@ library DragoAdminFace {
 	function depositToCFDExchange(address _targetDrago, address _cfdExchange) returns(bool) {}
 	function withdrawFromExchange(address targetDrago, address exchange, address token, uint256 value) returns (bool) {}
 	function withdrawFromCFDExchange(address _targetDrago, address _cfdExchange, uint amount) returns(bool) {}
-	function placeOrderExchange() {}
-	function placeTradeExchange() {}
+	function placeOrderExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {}
+	function placeTradeExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint8 _v, bytes32 _r, bytes32 _s, uint _amount) {}
 	function placeOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}
-	function cancelOrderExchange() {}
+	function cancelOrderExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
 	function cancelOrderCFDExchange(address targetDrago, address _cfdExchange, address _cfd, uint32 id) {}
 	function finalizedDealExchange(address targetDrago, address exchange, uint24 id) {}
 	function createDrago(address _dragoFactory, string _name, string _symbol) returns (address _drago, uint _dragoID) {}
@@ -124,6 +123,7 @@ library DragoAdmin {
 	event WithdrawCFDExchange(address _targetDrago, uint , uint256 indexed _amount, address indexed who, address , address indexed _cfdExchange);
 	event OrderExchange(address _targetDrago, address indexed _exchange, address indexed _token);
 	event OrderCFD(address _targetDrago, address indexed _cfdExchange, address indexed _cfd);
+	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 	event CancelExchange(address indexed _targetDrago, address indexed _exchange, address indexed token, uint id);
 	event CancelCFD(address indexed _targetDrago, address indexed _cfdExchange, address indexed _cfd, uint32 id);
 	event FinalizeCFD(address indexed _targetDrago, address indexed _cfdExchange, address indexed _cfd, uint32 id);
@@ -178,10 +178,10 @@ library DragoAdmin {
 	    WithdrawCFDExchange(_targetDrago, amount, amount, msg.sender, 0, _cfdExchange);
 	}
 	
-	function placeOrderExchange(address _targetDrago, address _exchange, address _token) {
+	function placeOrderExchange(address _exchange, address _targetDrago, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {
 		Drago drago = Drago(_targetDrago);
-		drago.placeOrderExchange();
-		OrderExchange(_targetDrago, _exchange, _token);
+		drago.placeOrderExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce);
+		OrderExchange(_targetDrago, _exchange, _tokenGet);
 	}
 	
 	function placeOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) /*only_owner*/ {
@@ -190,12 +190,16 @@ library DragoAdmin {
 		OrderCFD(_targetDrago, _cfdExchange, _cfd);
 	}
 	
-	function placeTradeExchange() {}
+	function placeTradeExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint8 _v, bytes32 _r, bytes32 _s, uint _amount) {
+	    Drago drago = Drago(_targetDrago);
+	    drago.placeTradeExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce, _user, _v, _r, _s, _amount);
+	    Trade(_tokenGet, _amountGet, _tokenGive, _amountGive, _user, msg.sender);
+	}
 	
-	function cancelOrderExchange(address _targetDrago, address exchange, address token, uint32 id) {
+	function cancelOrderExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {
 		Drago drago = Drago(_targetDrago);
-		drago.cancelOrderExchange();
-		CancelExchange(_targetDrago, exchange, token, id);
+		drago.cancelOrderExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, nonce, v, r, s);
+		CancelExchange(_targetDrago, _exchange, _tokenGet, nonce);
 	}
 	
 	function cancelOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint32 id) {
