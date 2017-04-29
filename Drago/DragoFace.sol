@@ -11,30 +11,26 @@ contract DragoFace {
  	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {}
 	function() payable {}
 	function buyDrago() payable returns (bool success) {}
-	function sellDrago(uint256 amount) returns (uint revenue, bool success) {}
-	function setPrices(uint256 newSellPrice, uint256 newBuyPrice) {}
-	function changeRefundActivationPeriod(uint32 _refundActivationPeriod) {}
+	function sellDrago(uint256 _amount) returns (uint revenue, bool success) {}
+	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) {}
+	function changeMinPeriod(uint32 _minPeriod) {}
 	function changeRatio(uint256 _ratio) {}
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
-	function changeDragator(address _dragator) {}
-	function depositToExchange(address exchange, address _token, uint256 _value) payable returns(bool success) {}
+	function changeDragator(address _dragoDAO) {}
+	function depositToExchange(address _exchange, address _token, uint256 _value) payable returns(bool success) {}
 	function depositToCFDExchange(address _cfdExchange, uint256 _value) payable returns(bool success) {}
-	function withdrawFromExchange(address exchange, address token, uint256 value) returns (bool success) {}
-	function withdrawFromCFDExchange(address _cfdExchange, uint amount) returns(bool success) {}
+	function withdrawFromExchange(address _exchange, address _token, uint256 _value) returns (bool success) {}
+	function withdrawFromCFDExchange(address _cfdExchange, uint _amount) returns(bool success) {}
 	function placeOrderExchange() {}
 	function placeTradeExchange() {}
-	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}
+	function placeOrderCFDExchange(address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
 	function cancelOrderExchange() {}
-	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 id) {}	
-	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 id) {}
+	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 _id) {}	
+	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 _id) {}
 
-	function balanceOf(address _from) constant returns (uint256) {}
-	function getName() constant returns (string) {}
-	function getSymbol() constant returns (string) {}
-	function getPrice() constant returns (uint256 sellPrice, uint256 buyPrice) {}
-	function getSupply() constant returns (uint256) {}
-	function getTransactionFee() constant returns (uint256) {}
-	function getFeeCollector() constant returns (address) {}
-	function getRefundActivationPeriod() constant returns (uint32) {}
+	function balanceOf(address _who) constant returns (uint256) {}
+	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
+	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
+	function getOwner() constant returns (address) {}
 }
