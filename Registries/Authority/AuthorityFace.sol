@@ -18,19 +18,20 @@ contract AuthorityFace {
     
     // METHODS
   
-    function setAuthority(address _authority) {}
-    function setWhitelister(address _whitelister) {}
+    function setAuthority(address _authority, bool _isWhitelisted) {}
+    function setWhitelister(address _whitelister, bool _isWhitelisted) {}
     function whitelistUser(address _target, bool _isWhitelisted) {}
     function whitelistAsset(address _asset, bool _isWhitelisted) {}
     function whitelistExchange(address _exchange, bool _isWhitelisted) {}
+    function whitelistDrago(address _drago, bool _isWhitelisted) {}
     function whitelistRegistry(address _registry, bool _isWhitelisted) {}
   
     function isWhitelistedUser(address _target) constant returns (bool) {}
+    function isWhitelister(address _whitelister) constant returns (bool) {}
+    function isAuthority(address _authority) constant returns (bool) {}
     function isWhitelistedAsset(address _asset) constant returns (bool) {}
     function isWhitelistedExchange(address _exchange) constant returns (bool) {}
     function isWhitelistedRegistry(address _registry) constant returns (bool) {}
     function isWhitelistedDrago(address _drago) constant returns (bool) {}
     function getOwner() constant returns (address) {}
-    function getAuth() constant returns (address) {}
-    function getWhitelisters() constant returns (address[]) {}
 }
