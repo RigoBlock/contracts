@@ -8,8 +8,7 @@ contract DragoFactoryFace {
     
 	// EVENTS
 
-	event DragoCreated(string _name, address _drago, address _dragowner, uint _dragoID);
-	event DragoRegistered(address indexed _drago, string _name, string _symbol, uint _dragoID, address indexed owner);
+	event DragoCreated(string _name, address _drago, address _owner, uint _dragoID);
 
 	// METHODS
     
@@ -18,9 +17,9 @@ contract DragoFactoryFace {
 	function setBeneficiary(address _dragoDAO) {}
 	function setFee(uint _fee) {}
 	function drain() {}
+	function setOwner(address _new) {}
     
 	function getRegistry() constant returns (address) {}
-	function getBeneficiary() constant returns (address) {}
-	function getVersion() constant returns (string) {}
-	function getLastId() constant returns (uint) {}
+	function getStorage() constant returns (address dragoDAO, string version, uint nextDragoID) {}
+	function getOwner() constant returns (address) {}
 }
