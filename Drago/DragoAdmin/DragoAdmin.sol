@@ -333,7 +333,7 @@ library DragoAdmin {
 	
 	function createDrago(address _dragoFactory, string _name, string _symbol) returns (address _drago, uint _dragoID) {
 	    DragoFactory factory = DragoFactory(_dragoFactory);
-	    if (!factory.createDrago(_name, _symbol)) throw;
+	    assert(factory.createDrago(_name, _symbol));
 	    DragoCreated(_name, _symbol, _drago, msg.sender, _dragoID);
 	}
 	
