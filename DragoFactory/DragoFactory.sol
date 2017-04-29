@@ -44,11 +44,11 @@ contract DragoFactoryFace {
 	function setBeneficiary(address _dragoDAO) {}
 	function setFee(uint _fee) {}
 	function drain() {}
+	function setOwner(address _new) {}
     
 	function getRegistry() constant returns (address) {}
-	function getBeneficiary() constant returns (address) {}
-	function getVersion() constant returns (string) {}
-	function getLastId() constant returns (uint) {}
+	function getStorage() constant returns (address dragoDAO, string version, uint nextDragoID) {}
+    function getOwner() constant returns (address) {}
 }
 
 contract DragoFactory is Owned, DragoFactoryFace {
@@ -99,30 +99,18 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	function drain() only_owner {
 		if (!dragoDAO.send(this.balance)) throw;
 	}
-    
-	function() {
-		throw;
-	}
-	
+
 	function getRegistry() constant returns (address) {
-	    return data.dragoRegistry;
+	    return (data.dragoRegistry);
 	}
 	
-	function getBeneficiary() constant returns (address) {
-	    return dragoDAO;
-	}
-	
-	function getVersion() constant returns (string) {
-	    return version;
-	}
-	
-	function getLastId() constant returns (uint) {
-	    return nextDragoID;
+	function getStorage() constant returns (address dragoDAO, string version, uint nextDragoID) {
+	    return (dragoDAO, version, nextDragoID);
 	}
 	
 	Data data;
 	
-	string public version = 'DF0.2';
+	string public version = 'DF0.3';
 	uint public nextDragoID = 1;
 	address public dragoDAO = msg.sender;
 	address public owner = msg.sender;
