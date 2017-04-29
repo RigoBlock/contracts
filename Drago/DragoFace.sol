@@ -9,7 +9,6 @@ contract DragoFace {
 	// METHODS
 
  	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {}
-	function() payable {}
 	function buyDrago() payable returns (bool success) {}
 	function sellDrago(uint256 _amount) returns (uint revenue, bool success) {}
 	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) {}
@@ -28,6 +27,7 @@ contract DragoFace {
 	function cancelOrderExchange() {}
 	function cancelOrderCFDExchange(address _cfdExchange, address _cfd, uint32 _id) {}	
 	function finalizeDealCFDExchange(address _cfdExchange, address _cfd, uint24 _id) {}
+	function setOwner(address _new) {}
 
 	function balanceOf(address _who) constant returns (uint256) {}
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
