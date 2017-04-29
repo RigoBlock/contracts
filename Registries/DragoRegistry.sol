@@ -64,7 +64,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		mapping (bytes32 => bytes32) meta;
 	}
     
-    // EVENTS
+	// EVENTS
 
 	event Registered(string indexed name, string indexed symbol, uint indexed id, address drago, uint dragoID);
 	event Unregistered(string indexed name, string indexed symbol, uint indexed id);
