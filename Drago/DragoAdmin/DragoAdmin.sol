@@ -38,7 +38,7 @@ contract DragoFactory {
     
 	// EVENTS
 
-	event DragoCreated(string _name, address _drago, address _owner, uint _dragoID);
+	event DragoCreated(string _name, string _symbol, address indexed _drago, address indexed _owner, uint _dragoID);
 
 	// METHODS
     
