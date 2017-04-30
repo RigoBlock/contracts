@@ -4,12 +4,12 @@
 Exchange and CFDExchange.
 
 
-## Exchange contract version 0.0.1
+## Exchange contract version 0.1.1
 ```
 0x49EFFC67063eF7fB6356a8a679cA1508bbF3e495
 ```
 
-## CfdExchange contract version 0.1.1
+## CfdExchange contract version 0.2.1
 ```
 0xa1577D9a823D858A9d53478f2Ef413832E934cFD
 ```
