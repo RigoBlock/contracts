@@ -17,8 +17,8 @@ contract CFDExchangeFace {
 
 	// METHODS
 
-	function deposit() payable returns (bool success) {}
-	function withdraw(uint256 amount) returns (bool success) {}
+	function deposit(address token, uint256 amount) payable returns (bool success) {}
+	function withdraw(address token, uint256 amount) returns (bool success) {}
 	function orderCFD(address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}	//returns(uint id)
 	function cancel(address _cfd, uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(address _cfd, uint24 id) {}
