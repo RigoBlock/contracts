@@ -61,6 +61,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	    uint fee;
 	    address dragoRegistry;
 	    uint nextDragoID;
+	    address dragoDAO;
 	    mapping(address => address[]) dragos;
 	}
 
@@ -76,8 +77,9 @@ contract DragoFactory is Owned, DragoFactoryFace {
 		uint dragoID = data.nextDragoID;
 		Drago drago = new Drago(_name, _symbol, dragoID, msg.sender);
 		address newDrago = address(drago);
+		registerDrago(newDrago, _name, _symbol, dragoID);
 		data.dragos[msg.sender].push(newDrago);
-		DragoCreated(_name, _symbol, drago, msg.sender, dragoID);
+		DragoCreated(_name, _symbol, newDrago, msg.sender, dragoID);
 		return true;
 	}
 	
@@ -91,7 +93,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	}
     
 	function setBeneficiary(address _dragoDAO) only_owner {
-		dragoDAO = _dragoDAO;
+		data.dragoDAO = _dragoDAO;
 	}
 	
 	function setFee(uint _fee) only_owner {
@@ -99,7 +101,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	}
 
 	function drain() only_owner {
-		if (!dragoDAO.send(this.balance)) throw;
+		if (!data.dragoDAO.send(this.balance)) throw;
 	}
 
 	function getRegistry() constant returns (address) {
@@ -113,6 +115,4 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	Data data;
 	
 	string public version = 'DF0.3';
-	address public dragoDAO = msg.sender;
-	address public owner = msg.sender;
 }
