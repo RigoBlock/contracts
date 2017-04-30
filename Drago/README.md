@@ -1,1 +1,2 @@
-Drago is a library contract for deploying dragos
+# Drago Contract
+Drago is our library contract for deploying dragos
