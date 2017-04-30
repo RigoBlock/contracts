@@ -1,5 +1,5 @@
 # Drago Factory Contracts
-Deploy dragos like a master.
+Deploy dragos like a master. Set registry when deploy new one!
 
 ## Drago Factory contract version 0.2.1
 ```
