@@ -61,7 +61,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	    uint fee;
 	    address dragoRegistry;
 	    uint nextDragoID;
-	    mapping(address => address[]) newDragos;
+	    mapping(address => address[]) dragos;
 	}
 
 	event DragoCreated(string indexed _name, string _symbol, address indexed _drago, address indexed _owner, uint _dragoID);
@@ -74,11 +74,9 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	function createDrago(string _name, string _symbol) when_fee_paid returns (bool success) {
 		++data.nextDragoID;
 		uint dragoID = data.nextDragoID;
-		Drago newDrago = new Drago(_name, _symbol, dragoID);
-		address drago = address(newDrago);
-		data.newDragos[msg.sender].push(drago);
-		newDrago.setOwner(msg.sender);  //owner is msg.sender
-		registerDrago(drago, _name, _symbol, dragoID);
+		Drago drago = new Drago(_name, _symbol, dragoID, msg.sender);
+		address newDrago = address(drago);
+		data.dragos[msg.sender].push(newDrago);
 		DragoCreated(_name, _symbol, drago, msg.sender, dragoID);
 		return true;
 	}
