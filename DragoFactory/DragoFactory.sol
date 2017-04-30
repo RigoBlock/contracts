@@ -39,7 +39,7 @@ contract DragoFactoryFace {
     
 	// EVENTS
 
-	event DragoCreated(string _name, address _drago, address _owner, uint _dragoID);
+	event DragoCreated(string _name, string _symbol, address indexed _drago, address indexed _owner, uint _dragoID);
 
 	// METHODS
     
@@ -57,7 +57,7 @@ contract DragoFactoryFace {
 
 contract DragoFactory is Owned, DragoFactoryFace {
     
-    struct Data {
+	struct Data {
 	    uint fee;
 	    address dragoRegistry;
 	    uint nextDragoID;
@@ -65,7 +65,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	    mapping(address => address[]) dragos;
 	}
 
-	event DragoCreated(string indexed _name, string _symbol, address indexed _drago, address indexed _owner, uint _dragoID);
+	event DragoCreated(string _name, string _symbol, address indexed _drago, address indexed _owner, uint _dragoID);
 
 	modifier when_fee_paid { if (msg.value < data.fee) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
