@@ -79,7 +79,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 		Drago drago = new Drago(_name, _symbol, dragoID, msg.sender);
 		address newDrago = address(drago);
 		registerDrago(newDrago, _name, _symbol, dragoID);
-		drago.setOwner(msg.sender);
+		drago.setOwner(tx.origin);
 		data.dragos[msg.sender].push(newDrago);
 		DragoCreated(_name, _symbol, newDrago, msg.sender, dragoID);
 		return true;
