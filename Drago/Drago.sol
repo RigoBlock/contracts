@@ -102,37 +102,37 @@ contract Exchange {
 
 contract Authority {
 
-    	// EVENTS
-  
-    	event SetAuthority (address indexed authority);
-    	event SetWhitelister (address indexed whitelister);
-    	event WhitelistedUser(address indexed target, bool approved);
-    	event WhitelistedAsset(address indexed asset, bool approved);
-	event WhitelistedExchange(address indexed exchange, bool approved);
-    	event WhitelistedRegistry(address indexed registry, bool approved);
-    
-    	// METHODS
-  
-    	function setAuthority(address _authority, bool _isWhitelisted) {}
-    	function setWhitelister(address _whitelister, bool _isWhitelisted) {}
-    	function whitelistUser(address _target, bool _isWhitelisted) {}
-    	function whitelistAsset(address _asset, bool _isWhitelisted) {}
-    	function whitelistExchange(address _exchange, bool _isWhitelisted) {}
-    	function whitelistDrago(address _drago, bool _isWhitelisted) {}
-    	function whitelistRegistry(address _registry, bool _isWhitelisted) {}
-  
-    	function isWhitelistedUser(address _target) constant returns (bool) {}
-    	function isWhitelister(address _whitelister) constant returns (bool) {}
-    	function isAuthority(address _authority) constant returns (bool) {}
-    	function isWhitelistedAsset(address _asset) constant returns (bool) {}
-    	function isWhitelistedExchange(address _exchange) constant returns (bool) {}
-    	function isWhitelistedRegistry(address _registry) constant returns (bool) {}
-    	function isWhitelistedDrago(address _drago) constant returns (bool) {}
-    	function getOwner() constant returns (address) {}
+    // EVENTS
+
+    event SetAuthority (address indexed authority);
+    event SetWhitelister (address indexed whitelister);
+    event WhitelistedUser(address indexed target, bool approved);
+    event WhitelistedAsset(address indexed asset, bool approved);
+    event WhitelistedExchange(address indexed exchange, bool approved);
+    event WhitelistedRegistry(address indexed registry, bool approved);
+
+    // METHODS
+
+    function setAuthority(address _authority, bool _isWhitelisted) {}
+    function setWhitelister(address _whitelister, bool _isWhitelisted) {}
+    function whitelistUser(address _target, bool _isWhitelisted) {}
+    function whitelistAsset(address _asset, bool _isWhitelisted) {}
+    function whitelistExchange(address _exchange, bool _isWhitelisted) {}
+    function whitelistDrago(address _drago, bool _isWhitelisted) {}
+    function whitelistRegistry(address _registry, bool _isWhitelisted) {}
+
+    function isWhitelistedUser(address _target) constant returns (bool) {}
+    function isWhitelister(address _whitelister) constant returns (bool) {}
+    function isAuthority(address _authority) constant returns (bool) {}
+    function isWhitelistedAsset(address _asset) constant returns (bool) {}
+    function isWhitelistedExchange(address _exchange) constant returns (bool) {}
+    function isWhitelistedRegistry(address _registry) constant returns (bool) {}
+    function isWhitelistedDrago(address _drago) constant returns (bool) {}
+    function getOwner() constant returns (address) {}
 }
 
 contract DragoFace {
-    
+
 	// METHODS
 
  	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {}
@@ -170,11 +170,10 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	struct Account {
 		uint balance;
 		mapping (uint => Receipt) receipt;
-		mapping (address => uint) allowanceOf;
+		//mapping (address => uint) allowanceOf;
 		mapping(address => address[]) approvedAccount;
-		//mapping (address => uint256) balances;
 	}
-	
+
 	struct DragoData {
 		address drago;
 		address owner;
@@ -187,7 +186,6 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		uint transactionFee;
 		uint32 minPeriod;
 		address dragoDAO;
-		mapping (address => uint256) balances;
 	}
 	
 	modifier only_dragoDAO { if (msg.sender != data.dragoDAO) return; _; }
@@ -225,9 +223,9 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		uint fee_drago = safeMul(fee, ratio);
  		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint amount = safeSub(gross_amount, fee);
-		data.balances[msg.sender] = safeAdd(data.balances[msg.sender], amount);
-		data.balances[feeCollector] = safeAdd(data.balances[feeCollector], fee_drago);
-		data.balances[data.dragoDAO] = safeAdd(data.balances[data.dragoDAO], fee_dragoDAO);
+		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, amount);
+		accounts[feeCollector].balance = safeAdd(accounts[feeCollector].balance, fee_drago);
+		accounts[data.dragoDAO].balance = safeAdd(accounts[data.dragoDAO].balance, fee_dragoDAO);
  		accounts[msg.sender].receipt[data.buyPrice].activation = uint32(now) + data.minPeriod;
 		data.totalSupply = safeAdd(data.totalSupply, gross_amount);
 		Buy(msg.sender, this, msg.value, amount);
@@ -236,15 +234,15 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 
 	function sellDrago(uint256 _amount) minimum_period_past(data.buyPrice, _amount) returns (uint net_revenue, bool success) {
 		//if (!approvedAccount[msg.sender]) throw;
-		if (data.balances[msg.sender] < _amount && data.balances[msg.sender] + _amount <= data.balances[msg.sender]) throw;
+		if (accounts[msg.sender].balance < _amount && accounts[msg.sender].balance + _amount <= accounts[msg.sender].balance) throw;
 		uint fee = safeMul (_amount, data.transactionFee);
 		uint fee_drago = safeMul(fee, ratio);
 		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint net_amount = safeSub(_amount, fee);
 		net_revenue = safeMul(net_amount, data.sellPrice) / base;
-		data.balances[msg.sender] = safeSub(data.balances[msg.sender], _amount);
-		data.balances[feeCollector] = safeAdd(data.balances[feeCollector], fee_drago);
-		data.balances[data.dragoDAO] = safeAdd(data.balances[data.dragoDAO], fee_dragoDAO);
+		accounts[msg.sender].balance = safeSub(accounts[msg.sender].balance, _amount);
+		accounts[feeCollector].balance = safeAdd(accounts[feeCollector].balance, fee_drago);
+		accounts[data.dragoDAO].balance = safeAdd(accounts[data.dragoDAO].balance, fee_dragoDAO);
 		data.totalSupply = safeSub(data.totalSupply, _amount);
 		if (!msg.sender.send(net_revenue)) throw;
 		Sell(this, msg.sender, _amount, net_revenue);
@@ -317,7 +315,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function balanceOf(address _who) constant returns (uint256) {
-		return data.balances[_who];
+		return accounts[_who].balance;
 	}
 	
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {
