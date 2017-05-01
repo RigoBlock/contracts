@@ -80,8 +80,8 @@ contract CFDExchangeFace {
 
 	// METHODS
 
-	function deposit(address token, uint256 amount) payable returns (bool success) {}
-	function withdraw(address token, uint256 amount) returns (bool success) {}
+	function deposit(address _token, uint256 _amount) payable returns (bool success) {}
+	function withdraw(address _token, uint256 _amount) returns (bool success) {}
 	function orderCFD(address _cfd, bool is_stable, uint32 adjustment, uint128 stake) {}	//returns(uint id)
 	function cancel(address _cfd, uint32 id) {}	//function cancel(uint id) returns (bool) {}
 	function finalize(address _cfd, uint24 id) {}
@@ -131,16 +131,19 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
 	modifier only_owner { if (msg.sender != owner) return; _; } 
 	modifier margin_ok(uint margin) { if (accounts[msg.sender].balance < margin) return; _; }
 	modifier ether_only(address token) { if (token != 0) throw; _; }
+	modifier minimum_stake(uint amount) { if (amount < min_order) throw; _; }
+
 
     	// METHODS
 
-	function deposit(address token, uint256 amount) payable ether_only(token) returns (bool success) {
+	function deposit(address _token, uint256 _amount) payable ether_only(token) minimum_stake(amount) returns (bool success) {
 		tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
 		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, msg.value);
 		Deposit(0, msg.sender, msg.value, tokens[address(0)][msg.sender]);
+		return true;
 	}
 
-	function withdraw(address token, uint256 amount) ether_only(token) returns (bool success) {
+	function withdraw(address _token, uint256 _amount) ether_only(token) minimum_stake(_amount) returns (bool success) {
 		if (tokens[address(0)][msg.sender] < amount) throw;
 		tokens[0][msg.sender] = safeSub(tokens[0][msg.sender], amount);
 		accounts[msg.sender].balance = safeSub(accounts[msg.sender].balance, amount);
@@ -148,7 +151,7 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
 		Withdraw(0, msg.sender, amount, tokens[address(0)][msg.sender]);
 	}
 	
-	function orderCFD(address _cfd, bool is_stable, uint32 adjustment, uint128 stake) margin_ok(stake) {    //in CFD is payable
+	function orderCFD(address _cfd, bool is_stable, uint32 adjustment, uint128 stake) margin_ok(stake) minimum_stake(stake) {
 		CFD cfd = CFD(_cfd);
 		cfd.orderExchange(is_stable, adjustment, stake);    //assert!
 		accounts[msg.sender].balance = safeSub(accounts[msg.sender].balance, stake);
@@ -209,6 +212,7 @@ contract CFDExchange is CFDExchangeFace, SafeMath, Owned {
   	uint public feeMake; //percentage times (1 ether)
   	uint public feeTake; //percentage times (1 ether)
   	uint public feeRebate;
+	uint min_order = 100 finney;
   	address public feeAccount; //the account that will receive fees
   	address public accountLevelsAddr;
 	address public signer = msg.sender;
