@@ -165,124 +165,134 @@ library DragoAdmin {
 
 	function buyDrago(address _targetDrago) returns (uint amount) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
+		if(msg.value <= 100 finney) throw;
+	    //if (!auth.isWhitelistedUser(msg.sender)) return;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 		Drago drago = Drago(_targetDrago);
-		drago.buyDrago.value(msg.value)(); //assert
+		assert(drago.buyDrago.value(msg.value)());
 		return amount;
 		BuyDrago(_targetDrago, msg.sender, this, msg.value, amount);
 	}
     
 	function sellDrago(address _targetDrago, uint256 _amount) returns (uint revenue) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
+		if(_amount <= 0) throw;
+	    //if (!auth.isWhitelistedUser(msg.sender)) return;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 		Drago drago = Drago(_targetDrago);
-		drago.sellDrago(_amount);    //assert()
+		if (drago.balanceOf(msg.sender) < _amount) return;
+		drago.sellDrago(_amount);
 		SellDrago(_targetDrago, msg.sender, this, _amount, revenue);
 	}
 	
 	function setDragoPrice(address _targetDrago, uint _sellPrice, uint _buyPrice) {
 	    Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
+	    if(_sellPrice <= 10 finney) return;
+	    if(_buyPrice <= 10 finney) return;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    Drago drago = Drago(_targetDrago);
+	    if( msg.sender != drago.getOwner()) return;
 	    drago.setPrices(_sellPrice, _buyPrice);
 	    NewNAV(_targetDrago, msg.sender, this, _sellPrice, _buyPrice);
 	}
     
 	function depositToExchange(address _targetDrago, address _exchange, address _token, uint256 _value) returns(bool) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
+	    if (!auth.isWhitelistedUser(msg.sender)) throw;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
+		if( msg.sender != drago.getOwner()) return;
 		assert(drago.depositToExchange(_exchange, _token, _value));
 		DepositExchange(_targetDrago, _exchange, msg.sender, _value, msg.value);
 	}
 	
 	function withdrawFromExchange(address _targetDrago, address _exchange, address _token, uint256 _value) returns (bool) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
+		if(_targetDrago == 0) throw;
+	    //if (!auth.isWhitelistedUser(msg.sender)) throw;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
+		if( msg.sender != drago.getOwner()) return;
 		assert(drago.withdrawFromExchange(_exchange, _token, _value)); //for ETH token = 0
 		WithdrawExchange(_targetDrago, _exchange, msg.sender, _value, 0);
 	}
 
 	function placeOrderExchange(address _exchange, address _targetDrago, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
+		if(_targetDrago == 0) throw;
+	    //if (!auth.isWhitelistedUser(msg.sender)) throw;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
+		if( msg.sender != drago.getOwner()) return;
 		drago.placeOrderExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce);
 		OrderExchange(_targetDrago, _exchange, _tokenGet, _amountGet, _nonce);
 	}
 
 	function placeOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
+	    //if (!auth.isWhitelistedUser(msg.sender)) throw;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 		Drago drago = Drago(_targetDrago);
+		if( msg.sender != drago.getOwner()) return;
 		drago.placeOrderCFDExchange(_cfdExchange, _cfd, _is_stable, _adjustment, _stake);
 		OrderExchange(_targetDrago, _cfdExchange, _cfd, _stake, _adjustment);
 	}
 	
 	function placeTradeExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint _amount) {
         Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-        if (!auth.isWhitelistedUser(msg.sender)) return;
-        //if (!auth.isWhitelistedDrago(_targetDrago)) return;
+        if(_targetDrago == 0) throw;
+        //if (!auth.isWhitelistedUser(msg.sender)) return;
+        if (!auth.isWhitelistedDrago(_targetDrago)) return;
         if (!auth.isWhitelistedExchange(_exchange)) return;
         Drago drago = Drago(_targetDrago);
+        if( msg.sender != drago.getOwner()) return;
         drago.placeTradeExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce, _user, _amount);
         TradeExchange(_targetDrago, _exchange, _tokenGet, _tokenGive, _amountGet, _amountGive, _user, msg.sender);
 	}
 	
 	function cancelOrderExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    	if (!auth.isWhitelistedUser(msg.sender)) return;
-	    	if (!auth.isWhitelistedDrago(_targetDrago)) return;
-	    	if (!auth.isWhitelistedExchange(_exchange)) return;
+		if(_targetDrago == 0) throw;
+	    //if (!auth.isWhitelistedUser(msg.sender)) return;
+	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
+	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
+		if( msg.sender != drago.getOwner()) return;
 		drago.cancelOrderExchange(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce);
 		CancelOrder(_targetDrago, _exchange, _tokenGet, _amountGet, _nonce);
 	}
 	
 	function cancelOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint32 _id) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    	if (!auth.isWhitelistedUser(msg.sender)) return;
-	    	if (!auth.isWhitelistedDrago(_targetDrago)) return;
-	    	if (!auth.isWhitelistedExchange(_cfdExchange)) return;
+	    //if (!auth.isWhitelistedUser(msg.sender)) return;
+	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
+	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 		Drago drago = Drago(_targetDrago);
+		if( msg.sender != drago.getOwner()) return;
 		drago.cancelOrderCFDExchange(_cfdExchange, _cfd, _id);
 		CancelOrder(_targetDrago, _cfdExchange, _cfd, 0,_id);
 	}
 	
 	function finalizeDealCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint24 _id) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
+	    //if (!auth.isWhitelistedUser(msg.sender)) return;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 		Drago drago = Drago(_targetDrago);
+		if( msg.sender != drago.getOwner()) return;
 		drago.finalizeDealCFDExchange(_cfdExchange, _cfd, _id);
 		DealFinalized(_targetDrago, _cfdExchange, _cfd, 0, _id);
-	}
-	
-	function changeRatio(address _targetDrago, uint256 _ratio) {
-		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
-		Drago drago = Drago(_targetDrago);
-		drago.changeRatio(_ratio);
 	}
     
 	function setTransactionFee(address _targetDrago, uint _transactionFee) {
 		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
 		Drago drago = Drago(_targetDrago);
+		if( msg.sender != drago.getOwner()) return;
 		drago.setTransactionFee(_transactionFee); //fee is in basis points (1 bps = 0.01%)
 	}
     
@@ -291,15 +301,8 @@ library DragoAdmin {
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 		Drago drago = Drago(_targetDrago);
+		if( msg.sender != drago.getOwner()) return;
 		drago.changeFeeCollector(_feeCollector);
-	}
-    
-	function changeDragoDAO(address _targetDrago, address _dragoDAO) {
-		Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
-	    if (!auth.isWhitelistedUser(msg.sender)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
-		Drago drago = Drago(_targetDrago);
-		drago.changeDragoDAO(_dragoDAO);
 	}
 	
 	function createDrago(address _dragoFactory, string _name, string _symbol) returns (address drago, uint dragoID) {
