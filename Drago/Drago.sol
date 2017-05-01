@@ -71,7 +71,7 @@ contract Exchange {
 	event Withdraw(address token, address user, uint amount, uint balance);
 	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
 	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
-    	event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
+    event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
 	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
 	event OrderCancelled(address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
 	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
@@ -108,7 +108,7 @@ contract Authority {
     	event SetWhitelister (address indexed whitelister);
     	event WhitelistedUser(address indexed target, bool approved);
     	event WhitelistedAsset(address indexed asset, bool approved);
-   	event WhitelistedExchange(address indexed exchange, bool approved);
+	event WhitelistedExchange(address indexed exchange, bool approved);
     	event WhitelistedRegistry(address indexed registry, bool approved);
     
     	// METHODS
@@ -150,7 +150,7 @@ contract DragoFace {
 	function placeTradeExchange(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint8 _v, bytes32 _r, bytes32 _s, uint _amount) {}
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
 	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce, uint8 v, bytes32 r, bytes32 s) {}
-	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) {}	
+	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) {}
 	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) {}
 	function setOwner(address _new) {}
 
@@ -234,7 +234,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		return (true);
 	}
 
-	function sellDrago(uint256 _amount) minimum_period_past(data.buyPrice, _amount) minimum_stake(net_revenue) returns (uint net_revenue, bool success) {
+	function sellDrago(uint256 _amount) minimum_period_past(data.buyPrice, _amount) returns (uint net_revenue, bool success) {
 		//if (!approvedAccount[msg.sender]) throw;
 		if (data.balances[msg.sender] < _amount && data.balances[msg.sender] + _amount <= data.balances[msg.sender]) throw;
 		uint fee = safeMul (_amount, data.transactionFee);
