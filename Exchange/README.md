@@ -4,11 +4,6 @@
 Exchange and CFDExchange.
 
 
-## Exchange contract version 0.1.1
-```
-0x49EFFC67063eF7fB6356a8a679cA1508bbF3e495
-```
-
 ## CfdExchange contract version 0.2.2
 ```
 0x0Ec293E28f95007C879Fa1D338aB9D6B98c53b78
