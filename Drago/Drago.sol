@@ -19,7 +19,7 @@ contract Owned {
 	    return owner;
 	}
 
-	address public owner = msg.sender;
+	address public owner; // = msg.sender; //amended owner to fix ownership from factory
 }
 
 contract SafeMath {
@@ -135,7 +135,7 @@ contract DragoFace {
 
 	// METHODS
 
- 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {}
+ 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID, address _owner) {}
 	function buyDrago() payable returns (bool success) {}
 	function sellDrago(uint256 _amount) returns (uint revenue, bool success) {}
 	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) {}
@@ -176,7 +176,6 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 
 	struct DragoData {
 		address drago;
-		address owner;
 		string name;
 		string symbol;
 		uint dragoID;
@@ -203,7 +202,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		data.dragoID = _dragoID;
 		data.sellPrice = 1 ether;
 		data.buyPrice = 1 ether;
-		data.owner = _owner;
+		owner = _owner;
 	}
 
 	function buyDrago() payable minimum_stake(msg.value) returns (bool success) {
