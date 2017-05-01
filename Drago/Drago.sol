@@ -187,7 +187,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		uint32 minPeriod;
 		address dragoDAO;
 	}
-	
+
 	modifier only_dragoDAO { if (msg.sender != data.dragoDAO) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	modifier when_approved_exchange(address exchange) { if (!auth.isWhitelistedExchange(exchange)) return; _; }
@@ -220,7 +220,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		//if (!approvedAccount[msg.sender]) throw;
 		uint gross_amount = safeDiv(msg.value, data.buyPrice) * base;
 		uint fee = safeMul(gross_amount, data.transactionFee);
-		uint fee_drago = safeMul(fee, ratio);
+		uint fee_drago = safeMul(fee, ratio) / 100;
  		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint amount = safeSub(gross_amount, fee);
 		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, amount);
@@ -236,7 +236,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		//if (!approvedAccount[msg.sender]) throw;
 		if (accounts[msg.sender].balance < _amount && accounts[msg.sender].balance + _amount <= accounts[msg.sender].balance) throw;
 		uint fee = safeMul (_amount, data.transactionFee);
-		uint fee_drago = safeMul(fee, ratio);
+		uint fee_drago = safeMul(fee, ratio) / 100;
 		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint net_amount = safeSub(_amount, fee);
 		net_revenue = safeMul(net_amount, data.sellPrice) / base;
@@ -333,10 +333,10 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	Authority auth = Authority(0x23A013E7A236DE234437c1E1342022727823e800);
 	DragoData data;
 	
-	string public version = 'H0.3';
-	uint public base = 1000000;    // tokens are divisible by 1 million
+	string constant version = 'HF 0.2.3';
+	uint constant base = 1000000; // tokens are divisible by 1 million
 	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
-	uint256 public ratio = safeDiv(80, 100) ; //ratio is 80%
+	uint256 public ratio = 80 ; //ratio is 80%
 	address public feeCollector = msg.sender;
 	mapping (address => Account) accounts;
 }
