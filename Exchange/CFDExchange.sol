@@ -151,7 +151,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
  
 	modifier only_owner { if (msg.sender != owner) return; _; } 
 	modifier margin_ok(uint margin) { if (accounts[msg.sender].balance < margin) return; _; }
-	modifier ether_only(address token) { if (token != 0) throw; _; }
+	modifier ether_only(address token) { if (token != address(0)) throw; _; }
 	modifier minimum_stake(uint amount) { if (amount < min_order) throw; _; }
 
 
