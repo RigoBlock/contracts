@@ -36,5 +36,5 @@ library DragoAdminFace {
     function cancelOrderExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {}
     function cancelOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint32 _id) {}
     function finalizedDealExchange(address _targetDrago, address _exchange, uint24 _id) {}
-    function createDrago(address _dragoFactory, string _name, string _symbol) returns (address _drago, uint _dragoID) {}
-}
+    function createDrago(address _dragoFactory, string _name, string _symbol, address _owner) returns (address _drago, uint _dragoID) {}
+} 
