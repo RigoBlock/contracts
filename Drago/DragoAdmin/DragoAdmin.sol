@@ -42,7 +42,7 @@ contract DragoFactory {
 
 	// METHODS
     
-	function createDrago(string _name, string _symbol) returns (bool) {}
+	function createDrago(string _name, string _symbol, address _owner) returns (bool) {}
 	function setRegistry(address _newRegistry) {}
 	function setBeneficiary(address _dragoDAO) {}
 	function setFee(uint _fee) {}
@@ -147,7 +147,7 @@ library DragoAdminFace {
     function cancelOrderExchange(address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {}
     function cancelOrderCFDExchange(address _targetDrago, address _cfdExchange, address _cfd, uint32 _id) {}
     function finalizedDealExchange(address _targetDrago, address _exchange, uint24 _id) {}
-    function createDrago(address _dragoFactory, string _name, string _symbol) returns (address _drago, uint _dragoID) {}
+    function createDrago(address _dragoFactory, string _name, string _symbol, address _owner) returns (address _drago, uint _dragoID) {}
 } 
       
 library DragoAdmin {
@@ -305,12 +305,16 @@ library DragoAdmin {
 		drago.changeFeeCollector(_feeCollector);
 	}
 	
-	function createDrago(address _dragoFactory, string _name, string _symbol) returns (address drago, uint dragoID) {
+	function createDrago(address _dragoFactory, string _name, string _symbol, address _owner) returns (address drago, uint dragoID) {
 	    DragoFactory factory = DragoFactory(_dragoFactory);
-	    assert(factory.createDrago(_name, _symbol));
+	    assert(factory.createDrago(_name, _symbol, _owner));
 	    dragoID;
 	    drago;
 	    DragoCreated(drago, _dragoFactory, msg.sender, dragoID, _name, _symbol);
+	}
+	
+	function delegatecall() { //first check whether delegatecall works from interface
+		// 
 	}
 	
 	string constant public version = 'DH0.2';
