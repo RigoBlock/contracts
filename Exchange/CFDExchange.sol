@@ -126,7 +126,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 	}
 
 	struct Account {
-		uint balance;
+		uint256 balance;
 		mapping (uint => Receipt) receipt;
 		mapping (address => uint) allowanceOf;
 	}
@@ -168,7 +168,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		if (tokens[address(0)][msg.sender] < _amount) throw;
 		tokens[address(0)][msg.sender] = safeSub(tokens[address(0)][msg.sender], _amount);
 		accounts[msg.sender].balance = safeSub(accounts[msg.sender].balance, _amount);
-		if (!msg.sender.send(_amount)) throw; //if (!msg.sender.call.value(_amount)()) throw;
+		if (!msg.sender.call.value(_amount)()) throw; //if (!msg.sender.call.value(_amount)()) throw;
 		Withdraw(0, msg.sender, _amount, tokens[address(0)][msg.sender]);
 	}
 	
@@ -182,14 +182,14 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 	function moveOrder(address _cfd, uint24 _id, bool _is_stable, uint32 _adjustment) returns (bool) {
 		CFD cfd = CFD(_cfd);
 		cancel(_cfd, _id);
-		uint128 stake = cfd.orderDetails(_id);
+		var stake = cfd.orderDetails(_id);
 		orderCFD(_cfd, _is_stable, _adjustment, stake);
 	}
   
 	function cancel(address _cfd, uint32 _id) {
 		CFD cfd = CFD(_cfd);
-		uint128 stake = cfd.orderDetails(_id);
-		accounts[msg.sender].balance += cfd.orderDetails(_id);
+		var stake = cfd.orderDetails(_id);
+		accounts[msg.sender].balance += stake;
 		cfd.cancel(_id);
 		OrderCancelled(_cfd, _id, msg.sender, stake);
 	}
