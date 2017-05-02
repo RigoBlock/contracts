@@ -314,7 +314,7 @@ library DragoAdmin {
 	}
 	
 	function delegatecall() { //first check whether delegatecall works from interface
-		// 
+		// TODO: fix event return values, otherwise cannot see event
 	}
 	
 	string constant public version = 'DH0.2';
