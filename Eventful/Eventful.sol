@@ -87,7 +87,7 @@ contract EventfulFace {
 	event DragoCreated(address indexed drago, address indexed group, address indexed owner, uint dragoID, string name, string symbol);
 	
     // METHODS
-    function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) payable returns (bool success) {}
+    function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) returns (bool success) {}
     function sellDrago(address _who, address _targetDrago, uint _amount, uint _revenue) returns (bool success) {}
     function setDragoPrice(address _who, address _targetDrago, uint _sellPrice, uint _buyPrice) returns (bool success) {}
     function changeRatio(address _who, address _targetDrago, uint256 _ratio) returns (bool success) {}
@@ -135,11 +135,11 @@ contract Eventful is EventfulFace {
     modifier approved_factory_only { if (!auth.isWhitelistedFactory(msg.sender)) return; _; }
     modifier approved_drago_only { if (!auth.isWhitelistedDrago(msg.sender)) return; _; }
 
-	function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) payable approved_drago_only returns (bool success) {
-		if(msg.value <= 100 finney) throw;
+	function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) approved_drago_only returns (bool success) {
+		if(_value <= 100 finney) throw;
 	    //if (!auth.isWhitelistedUser(_who)) return;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
-		BuyDrago(_targetDrago, _who, msg.sender, msg.value, _amount);
+		BuyDrago(_targetDrago, _who, msg.sender, _value, _amount);
 	}
     
 	function sellDrago(address _who, address _targetDrago, uint _amount, uint _revenue) approved_drago_only returns (bool success) {
