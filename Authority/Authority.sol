@@ -114,7 +114,7 @@ contract Authority is Owned, AuthorityFace {
         accounts[_asset].account = _asset;
         accounts[_asset].authorized = _isWhitelisted;
         accounts[_asset].groups[_asset].asset = _isWhitelisted;
-        WhitelistedUser(_asset, _isWhitelisted);
+        WhitelistedAsset(_asset, _isWhitelisted);
     }
     
     function whitelistExchange(address _exchange, bool _isWhitelisted) only_whitelister {
