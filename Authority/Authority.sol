@@ -29,6 +29,7 @@ contract AuthorityFace {
 
     event SetAuthority (address indexed authority);
     event SetWhitelister (address indexed whitelister);
+    event SetEventful(address indexed eventful);
     event WhitelistedUser(address indexed target, bool approved);
     event WhitelistedAsset(address indexed asset, bool approved);
     event WhitelistedExchange(address indexed exchange, bool approved);
@@ -76,6 +77,10 @@ contract Authority is Owned, AuthorityFace {
 		bool authorized;
 		mapping (address => Group) groups;
 	}
+	
+	struct Eventful {
+	    address eventful;
+	}
 
     event SetAuthority (address indexed authority);
     event SetWhitelister (address indexed whitelister);
@@ -84,6 +89,7 @@ contract Authority is Owned, AuthorityFace {
     event WhitelistedExchange(address indexed exchange, bool approved);
     event WhitelistedDrago(address indexed drago, bool isWhitelisted);
     event WhitelistedRegistry(address indexed registry, bool approved);
+    event NewEventful(address indexed old, address indexed eventful);
    		
     modifier only_whitelister { if (!accounts[msg.sender].groups[msg.sender].whitelister) return; _; }
     modifier only_authority { if (!accounts[msg.sender].groups[msg.sender].authority) return; _; }
@@ -137,6 +143,11 @@ contract Authority is Owned, AuthorityFace {
         accounts[_registry].groups[_registry].registry = _isWhitelisted;		
         WhitelistedRegistry(_registry, _isWhitelisted);
     }
+    
+    function setEventful(address _eventful) only_owner {
+		events.eventful = _eventful;
+		NewEventful(events.eventful, _eventful);
+	}
 
     function isWhitelistedUser(address _target) constant returns (bool) {
         return accounts[_target].groups[_target].user;
@@ -165,6 +176,12 @@ contract Authority is Owned, AuthorityFace {
     function isWhitelistedRegistry(address _registry) constant returns (bool) {
         return accounts[_registry].groups[_registry].registry;
     }
+    
+    function getEventful() constant returns (address) {
+	    return events.eventful;
+	}
+    
+    Eventful events;
     
     mapping (address => Account) accounts;
 }
