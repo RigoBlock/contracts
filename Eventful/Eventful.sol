@@ -135,8 +135,12 @@ contract Eventful is EventfulFace {
     modifier approved_factory_only { if (!auth.isWhitelistedFactory(msg.sender)) return; _; }
     modifier approved_drago_only { if (!auth.isWhitelistedDrago(msg.sender)) return; _; }
 
+    function Eventful(address _authority) {
+	    authority = _authority;
+	}
+
 	function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) approved_drago_only returns (bool success) {
-		if(_value <= 100 finney) throw;
+		//if(_value <= 100 finney) throw; //for testint is covered
 	    //if (!auth.isWhitelistedUser(_who)) return;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 		BuyDrago(_targetDrago, _who, msg.sender, _value, _amount);
@@ -254,7 +258,8 @@ contract Eventful is EventfulFace {
 	    DragoCreated(_newDrago, _dragoFactory, _owner, _dragoID, _name, _symbol);
 	}
 
-	Authority auth = Authority(0xfea837fA39b547589fB96edE3e498A299e2a9c10);
+	Authority auth = Authority(authority);
 	
+	address public authority;
 	string constant public version = 'DH0.2';
 }
