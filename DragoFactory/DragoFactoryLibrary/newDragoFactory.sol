@@ -1,3 +1,10 @@
+//! Drago Factory contract.
+//! By Gabriele Rigo (Rigo Investment Sagl), 2017.
+//! Released under the Apache Licence 2.
+//! This contract uses library and has more room for storage.
+
+pragma solidity ^0.4.10;
+
 contract DragoFactory is Owned, DragoFactoryFace {
  
 	struct Data {
