@@ -8,7 +8,7 @@ contract DragoFace {
 
 	// METHODS
 
- 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID) {}
+ 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID, address _owner) {}
 	function buyDrago() payable returns (bool success) {}
 	function sellDrago(uint256 _amount) returns (uint revenue, bool success) {}
 	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) {}
