@@ -3,6 +3,8 @@
 //! Released under the Apache Licence 2.
 //! This contract uses one library and has more room for storage.
 
+pragma solidity ^0.4.10;
+
 contract DragoFactoryFace {
     
 	// EVENTS
