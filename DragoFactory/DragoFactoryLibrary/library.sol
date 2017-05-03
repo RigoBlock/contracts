@@ -12,9 +12,9 @@ library DragoFactoryLibrary {
     struct NewDrago {
 	    string name;
 	    string symbol;
-	    uint dragoID;
-	    address newAddress;
+	    uint256 dragoID;
 	    address owner;
+	    address newAddress;
 	    address authority;
 	}
 	
