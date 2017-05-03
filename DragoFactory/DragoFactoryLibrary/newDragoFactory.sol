@@ -96,8 +96,9 @@ library DragoFactoryLibrary {
 	}
 }
 
+
 contract DragoFactory is Owned, DragoFactoryFace {
- 
+
 	struct Data {
 	    uint fee;
 	    address dragoRegistry;
@@ -110,7 +111,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	modifier when_fee_paid { if (msg.value < data.fee) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
     
-	function DragoFactory(address _registry, address _dragoDAO) {
+	function DragoFactory(address _registry, address _dragoDAO, address _authority) {
 	    setRegistry(_registry);
 	    data.dragoDAO = _dragoDAO;
 	}
@@ -125,6 +126,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	function createDragoInternal(string _name, string _symbol, address _owner, uint _dragoID) internal when_fee_paid returns (bool success) {
 		require(myNewDrago.createDrago(_name, _symbol, _owner, _dragoID));
 		data.dragos[msg.sender].push(myNewDrago.newAddress);
+		events.createDrago(msg.sender, this, myNewDrago.newAddress, myNewDrago.name, myNewDrago.symbol, myNewDrago.dragoID, myNewDrago.owner);
 		DragoCreated(myNewDrago.name, myNewDrago.symbol, myNewDrago.newAddress, myNewDrago.owner, myNewDrago.dragoID);
 	}
 	
@@ -173,6 +175,9 @@ contract DragoFactory is Owned, DragoFactoryFace {
 
     Data data;
     DragoRegistry registry = DragoRegistry(data.dragoRegistry);
-	
+    Authority auth = Authority(0xfea837fA39b547589fB96edE3e498A299e2a9c10);
+    Eventful events = Eventful(auth.getEventful());
+
 	string public version = 'DF0.3';
+	//address public authority = 0x23A013E7A236DE234437c1E1342022727823e800;
 }
