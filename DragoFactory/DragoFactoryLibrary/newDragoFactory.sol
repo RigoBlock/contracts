@@ -5,6 +5,97 @@
 
 pragma solidity ^0.4.10;
 
+import "github.com/RigoBlock/contracts/Drago/Drago.sol";
+
+contract DragoRegistry {
+
+	//EVENTS
+
+	event Registered(string indexed symbol, uint indexed id, address drago, string name);
+	event Unregistered(string indexed symbol, uint indexed id);
+	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
+	
+	// METHODS
+        
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _group) payable returns (bool) {}
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _group, address _owner) payable returns (bool) {}
+	function unregister(uint _id) {}
+	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
+	function setFee(uint _fee) {}
+	function upgrade(address _newAddress) payable {}
+	function setUpgraded(uint _version) {}
+	function drain() {}
+	function kill() {}
+	
+	function dragoCount() constant returns (uint) {}
+	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
+	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
+	function meta(uint _id, bytes32 _key) constant returns (bytes32) {}
+	function getGroups(address _group) constant returns (address[]) {}
+}
+
+contract DragoFactoryFace {
+    
+	// EVENTS
+
+	event DragoCreated(string name, string symbol, address indexed drago, address indexed owner, uint dragoID);
+
+	// METHODS
+    
+	function createDrago(string _name, string _symbol) returns (bool) {}
+	function setRegistry(address _newRegistry) {}
+	function setBeneficiary(address _dragoDAO) {}
+	function setFee(uint _fee) {}
+	function drain() {}
+	function setOwner(address _new) {}
+    
+	function getRegistry() constant returns (address) {}
+	function getStorage() constant returns (address dragoDAO, string version, uint nextDragoID) {}
+	function getNextID() constant returns (uint nextDragoID) {}
+	function getDragoDAO() constant returns (address dragoDAO) {}
+	function getVersion() constant returns (string version) {}
+	function getDragosByAddress(address _owner) constant returns (address[]) {}
+	function getOwner() constant returns (address) {}
+}
+
+library DragoFactoryLibrary {
+    
+    struct NewDrago {
+	    string name;
+	    string symbol;
+	    uint256 dragoID;
+	    address owner;
+	    address newAddress;
+	    address authority;
+	}
+	
+	function DragoFactoryLibrary(NewDrago storage newDrago, address _authority) {
+	    newDrago.authority = _authority;
+	}
+	
+	event DragoCreated(string name, string symbol, address indexed drago, address indexed owner, uint dragoID);
+ 	
+	function createDrago(NewDrago storage newDrago, string _name, string _symbol, address _owner, uint _dragoID) returns (bool) {
+	    Authority auth = Authority(newDrago.authority);
+	    if (!auth.isWhitelistedFactory(msg.sender)) return;
+	    createDragoInternal(newDrago, _name, _symbol, _owner, _dragoID);
+	}
+	
+	function createDragoInternal(NewDrago storage newDrago, string _name, string _symbol, address _owner, uint _dragoID) internal returns (bool success) {
+	    Drago drago = new Drago(_name, _symbol, _dragoID, _owner);
+	    drago.setOwner(_owner);
+	    newDrago.name = _name;
+	    newDrago.symbol = _symbol;
+	    newDrago.dragoID = _dragoID;
+	    newDrago.newAddress = address(drago);
+	    newDrago.owner = _owner;
+	    DragoCreated(_name, _symbol, newDrago.newAddress, _owner, newDrago.dragoID);
+		return true;
+	}
+}
+
 contract DragoFactory is Owned, DragoFactoryFace {
  
 	struct Data {
