@@ -11,6 +11,7 @@ contract AuthorityFace {
 
     event SetAuthority (address indexed authority);
     event SetWhitelister (address indexed whitelister);
+    event SetEventful(address indexed eventful);
     event WhitelistedUser(address indexed target, bool approved);
     event WhitelistedAsset(address indexed asset, bool approved);
     event WhitelistedExchange(address indexed exchange, bool approved);
