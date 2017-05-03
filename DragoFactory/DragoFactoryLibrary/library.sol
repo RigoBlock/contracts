@@ -3,6 +3,7 @@
 //! Released under the Apache Licence 2.
 //! Library performs computation, Factory is split and library is 20% smaller,
 //! allowing for more information stored in Factory.
+//! Only approved factories can access this library.
 
 pragma solidity ^0.4.10;
 
