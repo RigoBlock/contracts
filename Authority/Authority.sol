@@ -91,10 +91,10 @@ contract Authority is Owned, AuthorityFace {
     event WhitelistedDrago(address indexed drago, bool isWhitelisted);
     event WhitelistedRegistry(address indexed registry, bool approved);
     event NewEventful(address indexed eventful);
-   		
-    modifier only_whitelister { if (!accounts[msg.sender].groups[true].whitelister) return; _; }
-    modifier only_authority { if (!accounts[msg.sender].groups[true].authority) return; _; }
-    modifier only_admin { if (msg.sender != owner || !accounts[msg.sender].groups[true].whitelister) return; _; }
+		
+    modifier only_whitelister { if  (isWhitelister(msg.sender)) _; }
+    modifier only_authority { if (isAuthority(msg.sender)) _; }
+    modifier only_admin { if (msg.sender == owner || isWhitelister(msg.sender)) _; }
 	
     function setAuthority(address _authority, bool _isWhitelisted) only_owner {		
         accounts[_authority].account = _authority;
