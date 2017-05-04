@@ -131,6 +131,11 @@ contract DragoFactory is Owned, DragoFactoryFace {
 		DragoCreated(myNewDrago.name, myNewDrago.symbol, myNewDrago.newAddress, myNewDrago.owner, myNewDrago.dragoID);
 	}
 	
+	function setDragoDAO(address _targetDrago, address _dragoDAO) only_owner {
+		Drago drago = Drago(_targetDrago);
+		drago.changeDragoDAO(_dragoDAO);
+	}
+	
 	function setRegistry(address _newRegistry) only_owner {
 		data.dragoRegistry = _newRegistry;
 	}
