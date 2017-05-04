@@ -177,7 +177,6 @@ contract DragoFace {
 
 	// METHODS
 
- 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID, address _owner) {}
 	function buyDrago() payable returns (bool success) {}
 	function sellDrago(uint256 _amount) returns (uint revenue, bool success) {}
 	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) {}
@@ -226,37 +225,50 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		uint buyPrice;
 		uint transactionFee;
 		uint32 minPeriod;
+		address authority;
+	}
+	
+	struct Admin {
 		address dragoDAO;
+		address feeCollector;
+		uint min_order; // minimum stake to avoid dust clogging things up
+		uint ratio; //ratio is 80%
+		
 	}
 
-	modifier only_dragoDAO { if (msg.sender != data.dragoDAO) return; _; }
+	modifier only_dragoDAO { if (msg.sender != admin.dragoDAO) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	modifier when_approved_exchange(address exchange) { if (!auth.isWhitelistedExchange(exchange)) return; _; }
 	modifier minimum_period_past(uint buyPrice, uint amount) { if (now < accounts[msg.sender].receipt[buyPrice].activation) return; _; }
-	modifier minimum_stake(uint amount) { if (amount < min_order) throw; _; }
+	modifier minimum_stake(uint amount) { if (amount < admin.min_order) throw; _; }
 
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 
- 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID, address _owner) {
+ 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID, address _owner, address _authority) {
 		data.name = _dragoName;
 		data.symbol = _dragoSymbol;
 		data.dragoID = _dragoID;
 		data.sellPrice = 1 ether;
 		data.buyPrice = 1 ether;
 		owner = _owner;
+		data.authority = _authority;
+		admin.dragoDAO = msg.sender;
+		admin.min_order = 100 finney;
+		admin.feeCollector = _owner;
+		admin.ratio = 80;
 	}
 
 	function buyDrago() payable minimum_stake(msg.value) returns (bool success) {
 		//if (!approvedAccount[msg.sender]) throw;
 		uint gross_amount = safeDiv(msg.value, data.buyPrice) * base;
 		uint fee = safeMul(gross_amount, data.transactionFee);
-		uint fee_drago = safeMul(fee, ratio) / 100;
+		uint fee_drago = safeMul(fee, admin.ratio) / 100;
  		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint amount = safeSub(gross_amount, fee);
 		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, amount);
-		accounts[feeCollector].balance = safeAdd(accounts[feeCollector].balance, fee_drago);
-		accounts[data.dragoDAO].balance = safeAdd(accounts[data.dragoDAO].balance, fee_dragoDAO);
+		accounts[admin.feeCollector].balance = safeAdd(accounts[admin.feeCollector].balance, fee_drago);
+		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
  		accounts[msg.sender].receipt[data.buyPrice].activation = uint32(now) + data.minPeriod;
 		data.totalSupply = safeAdd(data.totalSupply, gross_amount);
 		events.buyDrago(msg.sender, this, msg.value, amount);
@@ -267,13 +279,13 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		//if (!approvedAccount[msg.sender]) throw;
 		if (accounts[msg.sender].balance < _amount && accounts[msg.sender].balance + _amount <= accounts[msg.sender].balance) throw;
 		uint fee = safeMul (_amount, data.transactionFee);
-		uint fee_drago = safeMul(fee, ratio) / 100;
+		uint fee_drago = safeMul(fee, admin.ratio) / 100;
 		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint net_amount = safeSub(_amount, fee);
 		net_revenue = safeMul(net_amount, data.sellPrice) / base;
 		accounts[msg.sender].balance = safeSub(accounts[msg.sender].balance, _amount);
-		accounts[feeCollector].balance = safeAdd(accounts[feeCollector].balance, fee_drago);
-		accounts[data.dragoDAO].balance = safeAdd(accounts[data.dragoDAO].balance, fee_dragoDAO);
+		accounts[admin.feeCollector].balance = safeAdd(accounts[admin.feeCollector].balance, fee_drago);
+		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
 		data.totalSupply = safeSub(data.totalSupply, _amount);
 		if (!msg.sender.send(net_revenue)) throw;
 		events.sellDrago(msg.sender, this, _amount, net_revenue);
@@ -291,7 +303,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 	
 	function changeRatio(uint256 _ratio) only_dragoDAO {
-		ratio = safeDiv(_ratio, 100);
+		admin.ratio = safeDiv(_ratio, 100);
 	}
 
 	function setTransactionFee(uint _transactionFee) only_owner {
@@ -300,12 +312,12 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function changeFeeCollector(address _feeCollector) only_owner {	
-		feeCollector = _feeCollector;
+		admin.feeCollector = _feeCollector;
 		//events.changeFeeCollector(msg.sender, this, _feeCollector);
 	}
 
 	function changeDragoDAO(address _dragoDAO) only_dragoDAO {
-		data.dragoDAO = _dragoDAO;
+		admin.dragoDAO = _dragoDAO;
 	}
 
 	function depositToExchange(address _exchange, address _token, uint256 _value) only_owner when_approved_exchange(_exchange) returns(bool success) {
@@ -368,17 +380,16 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 	
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {
-		return (feeCollector, data.dragoDAO, ratio, transactionFee, minPeriod);
+		return (feeCollector, admin.dragoDAO, ratio, transactionFee, minPeriod);
 	}
 
-	Authority auth = Authority(0xfea837fA39b547589fB96edE3e498A299e2a9c10);
+	Authority auth = Authority(data.authority);
 	Eventful events = Eventful(auth.getEventful()); //this is new
 	DragoData data;
 	
+	Admin admin;
+	mapping (address => Account) accounts;
+	
 	string constant version = 'HF 0.2.3';
 	uint constant base = 1000000; // tokens are divisible by 1 million
-	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
-	uint256 public ratio = 80 ; //ratio is 80%
-	address public feeCollector = msg.sender;
-	mapping (address => Account) accounts;
 }
