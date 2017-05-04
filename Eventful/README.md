@@ -1,4 +1,4 @@
-# Eventful coolects all events from dragos
+# Eventful collects all events from dragos
 You have all the events here
 
 ## Drago events contract version 0.2.2
