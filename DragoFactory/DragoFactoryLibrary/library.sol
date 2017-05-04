@@ -8,7 +8,7 @@
 pragma solidity ^0.4.10;
 
 library DragoFactoryLibrary {
-    
+
     struct NewDrago {
 	    string name;
 	    string symbol;
@@ -24,14 +24,14 @@ library DragoFactoryLibrary {
 	
 	event DragoCreated(string name, string symbol, address indexed drago, address indexed owner, uint dragoID);
  	
-	function createDrago(NewDrago storage newDrago, string _name, string _symbol, address _owner, uint _dragoID) returns (bool) {
-	    Authority auth = Authority(newDrago.authority);
+	function createDrago(NewDrago storage newDrago, string _name, string _symbol, address _owner, uint _dragoID, address _authority) returns (bool) {
+	    Authority auth = Authority(_authority);
 	    if (!auth.isWhitelistedFactory(msg.sender)) return;
-	    createDragoInternal(newDrago, _name, _symbol, _owner, _dragoID);
+	    createDragoInternal(newDrago, _name, _symbol, _owner, _dragoID, _authority);
 	}
 	
-	function createDragoInternal(NewDrago storage newDrago, string _name, string _symbol, address _owner, uint _dragoID) internal returns (bool success) {
-	    Drago drago = new Drago(_name, _symbol, _dragoID, _owner);
+	function createDragoInternal(NewDrago storage newDrago, string _name, string _symbol, address _owner, uint _dragoID, address _authority) internal returns (bool success) {
+	    Drago drago = new Drago(_name, _symbol, _dragoID, _owner, _authority);
 	    drago.setOwner(_owner);
 	    newDrago.name = _name;
 	    newDrago.symbol = _symbol;
