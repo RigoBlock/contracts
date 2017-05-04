@@ -76,7 +76,7 @@ contract Authority is Owned, AuthorityFace {
 	struct Account {
 	    address account;
 		bool authorized;
-		mapping (address => Group) groups;
+		mapping (bool => Group) groups; //mapping account to bool authorized to bool group
 	}
 	
 	struct Eventful {
@@ -92,56 +92,56 @@ contract Authority is Owned, AuthorityFace {
     event WhitelistedRegistry(address indexed registry, bool approved);
     event NewEventful(address indexed eventful);
    		
-    modifier only_whitelister { if (!accounts[msg.sender].groups[msg.sender].whitelister) return; _; }
-    modifier only_authority { if (!accounts[msg.sender].groups[msg.sender].authority) return; _; }
-    modifier only_admin { if (msg.sender != owner || !accounts[msg.sender].groups[msg.sender].whitelister) return; _; }
+    modifier only_whitelister { if (!accounts[msg.sender].groups[true].whitelister) return; _; }
+    modifier only_authority { if (!accounts[msg.sender].groups[true].authority) return; _; }
+    modifier only_admin { if (msg.sender != owner || !accounts[msg.sender].groups[true].whitelister) return; _; }
 	
     function setAuthority(address _authority, bool _isWhitelisted) only_owner {		
         accounts[_authority].account = _authority;
         accounts[_authority].authorized = _isWhitelisted;
-        accounts[_authority].groups[_authority].authority = _isWhitelisted;
+        accounts[_authority].groups[true].authority = _isWhitelisted;
         SetAuthority(_authority);
     }
 
     function setWhitelister(address _whitelister, bool _isWhitelisted) only_owner {
         accounts[_whitelister].account = _whitelister;
         accounts[_whitelister].authorized = _isWhitelisted;
-        accounts[_whitelister].groups[_whitelister].whitelister = _isWhitelisted;
+        accounts[_whitelister].groups[true].whitelister = _isWhitelisted;
         SetWhitelister(_whitelister);
     }
 	
     function whitelistUser(address _target, bool _isWhitelisted) only_whitelister {
         accounts[_target].account = _target;
         accounts[_target].authorized = _isWhitelisted;
-        accounts[_target].groups[_target].user = _isWhitelisted;
+        accounts[_target].groups[true].user = _isWhitelisted;
         WhitelistedUser(_target, _isWhitelisted);
     }
     
     function whitelistAsset(address _asset, bool _isWhitelisted) only_whitelister {
         accounts[_asset].account = _asset;
         accounts[_asset].authorized = _isWhitelisted;
-        accounts[_asset].groups[_asset].asset = _isWhitelisted;
+        accounts[_asset].groups[true].asset = _isWhitelisted;
         WhitelistedAsset(_asset, _isWhitelisted);
     }
     
     function whitelistExchange(address _exchange, bool _isWhitelisted) only_whitelister {
         accounts[_exchange].account = _exchange;
         accounts[_exchange].authorized = _isWhitelisted;
-        accounts[_exchange].groups[_exchange].exchange = _isWhitelisted;
+        accounts[_exchange].groups[true].exchange = _isWhitelisted;
         WhitelistedExchange(_exchange, _isWhitelisted);
     }
     
     function whitelistDrago(address _drago, bool _isWhitelisted) only_admin {
         accounts[_drago].account = _drago;
         accounts[_drago].authorized = _isWhitelisted;
-        accounts[_drago].groups[_drago].drago = _isWhitelisted;
+        accounts[_drago].groups[true].drago = _isWhitelisted;
         WhitelistedDrago(_drago, _isWhitelisted);
     }
     
     function whitelistRegistry(address _registry, bool _isWhitelisted) only_admin {
         accounts[_registry].account = _registry;
         accounts[_registry].authorized = _isWhitelisted;
-        accounts[_registry].groups[_registry].registry = _isWhitelisted;		
+        accounts[_registry].groups[true].registry = _isWhitelisted;		
         WhitelistedRegistry(_registry, _isWhitelisted);
     }
     
@@ -151,31 +151,31 @@ contract Authority is Owned, AuthorityFace {
 	}
 
     function isWhitelistedUser(address _target) constant returns (bool) {
-        return accounts[_target].groups[_target].user;
+        return accounts[_target].groups[true].user;
     }
     
     function isWhitelister(address _whitelister) constant returns (bool) {
-        return accounts[_whitelister].groups[_whitelister].whitelister;
+        return accounts[_whitelister].groups[true].whitelister;
     }
     
     function isAuthority(address _authority) constant returns (bool) {
-        return accounts[_authority].groups[_authority].authority;
+        return accounts[_authority].groups[true].authority;
     }
     
     function isWhitelistedAsset(address _asset) constant returns (bool) {
-        return accounts[_asset].groups[_asset].asset;
+        return accounts[_asset].groups[true].asset;
     }	
     
     function isWhitelistedExchange(address _exchange) constant returns (bool) {
-        return accounts[_exchange].groups[_exchange].exchange;
+        return accounts[_exchange].groups[true].exchange;
     }	
     
     function isWhitelistedDrago(address _drago) constant returns (bool) {
-        return accounts[_drago].groups[_drago].drago;
+        return accounts[_drago].groups[true].drago;
     }	
     
     function isWhitelistedRegistry(address _registry) constant returns (bool) {
-        return accounts[_registry].groups[_registry].registry;
+        return accounts[_registry].groups[true].registry;
     }
     
     function getEventful() constant returns (address) {
