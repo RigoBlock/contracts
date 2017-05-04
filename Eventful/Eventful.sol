@@ -132,33 +132,34 @@ contract Eventful is EventfulFace {
     event NewFee(address indexed targetDrago, address indexed group, address indexed who, uint transactionFee);
     event NewCollector(address indexed targetDrago, address indexed group, address indexed who, address feeCollector);
 
-    modifier approved_factory_only { if (!auth.isWhitelistedFactory(msg.sender)) return; _; }
-    modifier approved_drago_only { if (!auth.isWhitelistedDrago(msg.sender)) return; _; }
+    modifier approved_factory_only { if (auth.isWhitelistedFactory(msg.sender)) _; }
+    modifier approved_drago_only { if (auth.isWhitelistedDrago(msg.sender)) _; }
+    
 
     function Eventful(address _authority) {
 	    authority = _authority;
 	}
 
 	function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) approved_drago_only returns (bool success) {
-		//if(_value <= 100 finney) throw; //for testint is covered
+		if (_value <= 100 finney) throw;
 	    //if (!auth.isWhitelistedUser(_who)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
+		if (msg.sender != _targetDrago) return;
 		BuyDrago(_targetDrago, _who, msg.sender, _value, _amount);
 	}
     
 	function sellDrago(address _who, address _targetDrago, uint _amount, uint _revenue) approved_drago_only returns (bool success) {
 		if(_amount <= 0) throw;
 	    //if (!auth.isWhitelistedUser(_who)) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 		Drago drago = Drago(_targetDrago);
+		if (msg.sender != _targetDrago) return;
 		if (drago.balanceOf(_who) < _amount) return;
 		SellDrago(_targetDrago, msg.sender, this, _amount, _revenue);
 	}
 	
 	function setDragoPrice(address _who, address _targetDrago, uint _sellPrice, uint _buyPrice) approved_drago_only returns (bool success) {
 	    if(_sellPrice <= 10 finney || _buyPrice <= 10 finney) return;
-	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    Drago drago = Drago(_targetDrago);
+		if (msg.sender != _targetDrago) return;
 	    if( _who != drago.getOwner()) return;
 	    NewNAV(_targetDrago, msg.sender, this, _sellPrice, _buyPrice);
 	}
@@ -168,7 +169,8 @@ contract Eventful is EventfulFace {
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
-		if( _who != drago.getOwner()) return;
+		if (msg.sender != _targetDrago) return;
+		if (_who != drago.getOwner()) return;
 		DepositExchange(_targetDrago, _exchange, _token, _value, 0);
 	}
 	
@@ -178,7 +180,8 @@ contract Eventful is EventfulFace {
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
-		if( _who != drago.getOwner()) return;
+		if (msg.sender != _targetDrago) return;
+		if (_who != drago.getOwner()) return;
 		WithdrawExchange(_targetDrago, _exchange, _token, _value, 0);
 	}
 
@@ -188,7 +191,8 @@ contract Eventful is EventfulFace {
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
-		if( _who != drago.getOwner()) return;
+		if (msg.sender != _targetDrago) return;
+		if (_who != drago.getOwner()) return;
 		OrderExchange(_targetDrago, _exchange, _tokenGet, _amountGet, _nonce);
 	}
 
@@ -197,7 +201,8 @@ contract Eventful is EventfulFace {
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 		Drago drago = Drago(_targetDrago);
-		if( _who != drago.getOwner()) return;
+		if (msg.sender != _targetDrago) return;
+		if (_who != drago.getOwner()) return;
 		OrderExchange(_targetDrago, _cfdExchange, _cfd, _stake, _adjustment);
 	}
 	
@@ -207,7 +212,8 @@ contract Eventful is EventfulFace {
         if (!auth.isWhitelistedDrago(_targetDrago)) return;
         if (!auth.isWhitelistedExchange(_exchange)) return;
         Drago drago = Drago(_targetDrago);
-        if( _who != drago.getOwner()) return;
+		if (msg.sender != _targetDrago) return;
+        if (_who != drago.getOwner()) return;
         TradeExchange(_targetDrago, _exchange, _tokenGet, _tokenGive, _amountGet, _amountGive, _user, msg.sender);
 	}
 
@@ -217,7 +223,8 @@ contract Eventful is EventfulFace {
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_exchange)) return;
 		Drago drago = Drago(_targetDrago);
-		if( _who != drago.getOwner()) return;
+		if (msg.sender != _targetDrago) return;
+		if (_who != drago.getOwner()) return;
 		CancelOrder(_targetDrago, _exchange, _tokenGet, _amountGet, _nonce);
 	}
 
@@ -226,7 +233,8 @@ contract Eventful is EventfulFace {
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 		Drago drago = Drago(_targetDrago);
-		if( _who != drago.getOwner()) return;
+		if (msg.sender != _targetDrago) return;
+		if (_who != drago.getOwner()) return;
 		CancelOrder(_targetDrago, _cfdExchange, _cfd, 0,_id);
 	}
 	
@@ -235,14 +243,16 @@ contract Eventful is EventfulFace {
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 	    if (!auth.isWhitelistedExchange(_cfdExchange)) return;
 		Drago drago = Drago(_targetDrago);
-		if( _who != drago.getOwner()) return;
+		if (msg.sender != _targetDrago) return;
+		if (_who != drago.getOwner()) return;
 		DealFinalized(_targetDrago, _cfdExchange, _cfd, 0, _id);
 	}
     
 	function setTransactionFee(address _who, address _targetDrago, uint _transactionFee) approved_drago_only returns (bool success) {
 	    if (!auth.isWhitelistedUser(_who)) return;
 		Drago drago = Drago(_targetDrago);
-		if( _who != drago.getOwner()) return;
+		if (msg.sender != _targetDrago) return;
+		if (_who != drago.getOwner()) return;
 		NewFee(_targetDrago, msg.sender, _who, _transactionFee);
 	}
     
@@ -250,11 +260,13 @@ contract Eventful is EventfulFace {
 	    if (!auth.isWhitelistedUser(msg.sender)) return;
 	    if (!auth.isWhitelistedDrago(_targetDrago)) return;
 		Drago drago = Drago(_targetDrago);
+		if (msg.sender != _targetDrago) return;
 		if (_who != drago.getOwner()) return;
 		NewCollector(_targetDrago, msg.sender, _who, _feeCollector);
 	}
 	
 	function createDrago(address _who, address _dragoFactory, address _newDrago, string _name, string _symbol, uint _dragoID, address _owner) approved_factory_only returns (bool success) {
+	    if (msg.sender != _dragoFactory) return;
 	    DragoCreated(_newDrago, _dragoFactory, _owner, _dragoID, _name, _symbol);
 	}
 
