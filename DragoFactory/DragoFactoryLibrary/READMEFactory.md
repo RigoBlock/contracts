@@ -5,9 +5,9 @@ Hex of address is address withour 0x.
 Whitelist new factory in registry + add new Factory to whitelister list
 Library at 0xee72d340bddae5421e130b678439d7fab57c4aff
 
-## Drago Factory contract version 0.2.2 
+## Drago Factory contract version 0.3.2 
 ```
-0x01271815f67193F083779d28D7bF17c185F93CE4
+0xad645A7D42760d726f904d0f2bD924a6087Db4A7
 
 ```
 ```
