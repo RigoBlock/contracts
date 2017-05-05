@@ -7,7 +7,7 @@ This factory makes use of library, each deploy has to manually input Hex of libr
 
 ```
 
-0x0470bea08f2f030e0c2b169b0a59427ae64ba9bf
+0xee72d340bddae5421e130b678439d7fab57c4aff
 
 ```
 
