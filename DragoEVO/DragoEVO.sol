@@ -3,7 +3,7 @@
 //! Released under the Apache Licence 2.
 //! These dragos make use of eventful contract.
 
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.11;
 
 contract Owned {
     
@@ -70,12 +70,12 @@ contract Exchange {
 
 	event Deposit(address token, address user, uint amount, uint balance);
 	event Withdraw(address token, address user, uint amount, uint balance);
-	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
+	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
     event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
 	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
 	event OrderCancelled(address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
-	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user);
+	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 	event DealFinalized(address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
 
@@ -83,18 +83,18 @@ contract Exchange {
 
 	function deposit(address _token, uint256 _amount) payable returns (bool success) {}
 	function withdraw(address _token, uint256 _amount) returns (bool success) {}
-	function order(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {}
-	function orderCFD(address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {} //returns(bool success, uint id)
-	function trade(address _tokenGet, uint _amountGet, address _tokenGive, uint amountGive, uint expires, uint nonce, address user, uint amount) {}
-	function cancelOrder(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce) {}
-	function cancel(address _cfd, uint32 _id) {} // returns (bool success) {}
-	function finalize(address _cfd, uint24 _id) {}
-	
+	function order(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns (uint id) {} //returns(bool success)
+	function orderCFD(address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) returns (uint32 id) {} //returns(bool success)
+	function trade(address _tokenGet, uint _amountGet, address _tokenGive, uint amountGive, uint expires, address user, uint amount) returns (bool success) {}
+	function cancelOrder(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns (bool success) {}
+	function cancel(address _cfd, uint32 _id) returns (bool success) {}
+	function finalize(address _cfd, uint24 _id) returns (bool success) {}
+
 	function balanceOf(address token, address user) constant returns (uint256) {}
 	function balanceOf(address _who) constant returns (uint256) {}
 	function marginOf(address _who) constant returns (uint) {}
-	function availableVolume(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) constant returns(uint) {}
-	function amountFilled(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) constant returns(uint) {}
+	function availableVolume(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user) constant returns(uint) {}
+	function amountFilled(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user) constant returns(uint) {}
 	function getLastOrderId() constant returns (uint) {}
 	function isActive(uint id) constant returns (bool) {}
 	function getOwner(uint id) constant returns (address) {}
@@ -113,6 +113,7 @@ contract Authority {
     event WhitelistedExchange(address indexed exchange, bool approved);
     event WhitelistedRegistry(address indexed registry, bool approved);
     event WhitelistedFactory(address indexed factory, bool approved);
+    event NewEventful(address indexed eventful);
 
     // METHODS
 
@@ -164,10 +165,10 @@ contract Eventful {
     function changeDragoDAO(address _who, address _targetDrago, address _dragoDAO) returns(bool success) {}
     function depositToExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) returns(bool success) {}
     function withdrawFromExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) returns(bool success) {}
-    function placeOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) returns(bool success) {}
-    function placeTradeExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint _amount) returns(bool success) {}
+    function placeOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns(bool success) {}
+    function placeTradeExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) returns(bool success) {}
     function placeOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) returns(bool success) {}
-    function cancelOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) returns(bool success) {}
+    function cancelOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns(bool success) {}
     function cancelOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, uint32 _id) returns(bool success) {}
     function finalizedDealExchange(address _who, address _targetDrago, address _exchange, address _cfd, uint24 _id) returns(bool success) {}
     function createDrago(address _who, address _dragoFactory, address _newDrago, string _name, string _symbol, uint _dragoId, address _owner) returns(bool success) {}
@@ -185,8 +186,8 @@ contract DragoFace {
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
 	function changeDragoDAO(address _dragoDAO) {}
-	function depositToExchange(address _exchange, address _token, uint256 _value) returns(bool success) {}
-	function withdrawFromExchange(address _exchange, address _token, uint256 _value) returns (bool success) {}
+	function depositToExchange(address _exchange, address _token, uint256 _value) {}
+	function withdrawFromExchange(address _exchange, address _token, uint256 _value) {}
 	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {}
 	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint _amount) {}
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
@@ -299,7 +300,8 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) only_owner {
 		data.sellPrice = _newSellPrice;
 		data.buyPrice = _newBuyPrice;
-		////events.setDragoPrice(msg.sender, this, _newSellPrice, _newBuyPrice);
+		Eventful events = Eventful(admin.eventful);
+		if (!events.setDragoPrice(msg.sender, this, _newSellPrice, _newBuyPrice)) return;
 	}
 	
 	function changeMinPeriod(uint32 _minPeriod) only_dragoDAO {
@@ -312,26 +314,27 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 
 	function setTransactionFee(uint _transactionFee) only_owner {
 		data.transactionFee = safeDiv(_transactionFee, 10000); //fee is in basis points (1bps=0.01%)
-	    ////events.setTransactionFee(msg.sender, this, _transactionFee);
+		//Eventful events = Eventful(admin.eventful);
+	    //events.setTransactionFee(msg.sender, this, _transactionFee);
 	}
 
 	function changeFeeCollector(address _feeCollector) only_owner {	
 		admin.feeCollector = _feeCollector;
-		////events.changeFeeCollector(msg.sender, this, _feeCollector);
+		//events.changeFeeCollector(msg.sender, this, _feeCollector);
 	}
 
 	function changeDragoDAO(address _dragoDAO) only_dragoDAO {
 		admin.dragoDAO = _dragoDAO;
 	}
 
-	function depositToExchange(address _exchange, address _token, uint256 _value) only_owner when_approved_exchange(_exchange) returns(bool success) {
+	function depositToExchange(address _exchange, address _token, uint256 _value) only_owner when_approved_exchange(_exchange) {
 		Exchange exchange = Exchange(_exchange);
 		assert(exchange.deposit.value(_value)(_token, _value));
 		Eventful events = Eventful(admin.eventful);
 		if (!events.depositToExchange(msg.sender, this, _exchange,  _token, _value)) return;
 	}
 
-	function withdrawFromExchange(address _exchange, address _token, uint256 _value) only_owner when_approved_exchange(_exchange) returns (bool success) {
+	function withdrawFromExchange(address _exchange, address _token, uint256 _value) only_owner when_approved_exchange(_exchange) {
 		Exchange exchange = Exchange(_exchange);
 		exchange.withdraw(_token, _value); //for ETH token: _token = 0
 		//if (!exchange.withdraw(_token, _value)) return; will work only by adding return true; to the exchange
@@ -339,29 +342,29 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	    if (!events.withdrawFromExchange(msg.sender, this, _exchange, _token, _value)) return;
 	}
 	
-	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) only_owner when_approved_exchange(_exchange) {
+	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
 		Exchange exchange = Exchange(_exchange);
-		exchange.order(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce);
+		exchange.order(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
 		////events.placeOrderExchange(msg.sender, this, _exchange, _token, _value);
 	}
 
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) only_owner when_approved_exchange(_exchange) {
-		Exchange exchange = Exchange(_exchange);
-		exchange.orderCFD(_cfd, _is_stable, _adjustment, _stake);
 		Eventful events = Eventful(admin.eventful);
 		if (!events.placeOrderCFDExchange(msg.sender, this, _exchange, _cfd, _is_stable, _adjustment, _stake)) return;
+		Exchange exchange = Exchange(_exchange);
+		exchange.orderCFD(_cfd, _is_stable, _adjustment, _stake); //condition is checked in eventful
 	}
 	
-	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint _amount) only_owner when_approved_exchange(_exchange) {
+	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) only_owner when_approved_exchange(_exchange) {
 		Exchange exchange = Exchange(_exchange);
-		exchange.trade(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce, _user, _amount);
+		exchange.trade(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _user, _amount);
 		//Eventful events = Eventful(admin.eventful);
 	    //events.placeTradeExchange(msg.sender, this, _exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce, _user, _amount);
 	}
 	
-	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce) only_owner when_approved_exchange(_exchange) {
+	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
 		Exchange exchange = Exchange(_exchange);
-		exchange.cancelOrder(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, nonce);
+		exchange.cancelOrder(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
 	}
 
 	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) only_owner when_approved_exchange(_exchange) {
