@@ -3,7 +3,7 @@
 This factory makes use of library, each deploy has to manually input Hex of library address into bytecode
 Hex of address is address withour 0x.
 Whitelist new factory in registry + add new Factory to whitelister list
-Library at 31c9bb48c92ea720c50b521a818f87cc6cd5b03b
+Library at 0x8eaf5724b92ad0e55827e11379623d9a58b513bb
 
 ## Drago Factory contract version 0.2.2 
 ```
