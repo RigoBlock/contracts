@@ -114,18 +114,18 @@ contract Eventful is EventfulFace {
 	event DepositExchange(address indexed drago, address indexed exchange, address indexed token, uint value, uint256 amount);
 	event WithdrawExchange(address indexed drago, address indexed exchange, address indexed token, uint value, uint256 amount);
 	event OrderExchange(address indexed drago, address indexed exchange, address indexed cfd, uint value, uint revenue);
-	event TradeExchange(address indexed drago, address indexed exchange, address tokenGet, address tokenGive, uint amountGet, uint amountGive, address get, address give);
+	event TradeExchange(address indexed drago, address indexed exchange, address tokenGet, address tokenGive, uint amountGet, uint amountGive, address get);
 	event CancelOrder(address indexed drago, address indexed exchange, address indexed cfd, uint value, uint id);
 	event DealFinalized(address indexed drago, address indexed exchange, address indexed cfd, uint value, uint id);
 	event DragoCreated(address indexed drago, address indexed group, address indexed owner, uint dragoID, string name, string symbol);
     event NewFee(address indexed targetDrago, address indexed group, address indexed who, uint transactionFee);
     event NewCollector(address indexed targetDrago, address indexed group, address indexed who, address feeCollector);
 
-    modifier approved_factory_only(address _factory) { if (auth.isWhitelistedFactory(_factory)) _; }
-    modifier approved_drago_only(address _drago) { if (auth.isWhitelistedDrago(_drago)) _; }
-    modifier approved_exchange_only(address _exchange) { if (auth.isWhitelistedExchange(_exchange)) _; }
-    modifier approved_user_only(address _user) { if (auth.isWhitelistedUser(_user)) _; }
-    modifier approved_asset(address _asset) { if (auth.isWhitelistedAsset(_asset)) _; }
+    modifier approved_factory_only(address _factory) { Authority auth = Authority(authority); if (auth.isWhitelistedFactory(_factory)) _; }
+    modifier approved_drago_only(address _drago) { Authority auth = Authority(authority); if (auth.isWhitelistedDrago(_drago)) _; }
+    modifier approved_exchange_only(address _exchange) { Authority auth = Authority(authority); if (auth.isWhitelistedExchange(_exchange)) _; }
+    modifier approved_user_only(address _user) { Authority auth = Authority(authority); if (auth.isWhitelistedUser(_user)) _; }
+    modifier approved_asset(address _asset) { Authority auth = Authority(authority); if (auth.isWhitelistedAsset(_asset)) _; }
 
     function Eventful(address _authority) {
 	    authority = _authority;
@@ -195,7 +195,7 @@ contract Eventful is EventfulFace {
         //Drago drago = Drago(_targetDrago);
 		if (msg.sender != _targetDrago) return;
         //if (_who != drago.getOwner()) return;
-        TradeExchange(_targetDrago, _exchange, _tokenGet, _tokenGive, _amountGet, _amountGive, _user, msg.sender);
+        //TradeExchange(_targetDrago, _exchange, _tokenGet, _tokenGive, _amountGet, _amountGive, _user);
         return true;
 	}
 
@@ -248,6 +248,4 @@ contract Eventful is EventfulFace {
 	
 	address public authority;
 	string constant public version = 'DH0.2';
-
-	Authority auth = Authority(authority);
 }
