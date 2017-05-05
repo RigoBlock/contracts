@@ -15,32 +15,22 @@ library DragoFactoryLibrary {
 	    uint256 dragoID;
 	    address owner;
 	    address newAddress;
-	    address authority;
 	}
 
 	event DragoCreated(string name, string symbol, address indexed drago, address indexed owner, uint dragoID);
- 
-    function DragoFactoryLibrary(NewDrago storage newDrago/*, address _authority*/) {
-        //newDrago.authority = _authority;
-        newDrago.authority = 0xDFF383e12A7939779359bf6A7f8766E123a18452;
-        //remember to change address for different networks
-    }
-  
-	function createDrago(NewDrago storage newDrago, string _name, string _symbol, address _owner, uint _dragoID, address _authority, address _eventful) returns (bool) {
-	    Authority auth = Authority(newDrago.authority);
-	    if (!auth.isWhitelistedFactory(msg.sender)) return;
-	    createDragoInternal(newDrago, _name, _symbol, _owner, _dragoID, _authority, _eventful);
-	}
-	
-	function createDragoInternal(NewDrago storage newDrago, string _name, string _symbol, address _owner, uint _dragoID, address _authority, address _eventful) internal returns (bool success) {
+
+	function createDrago(NewDrago storage newDrago, string _name, string _symbol, address _owner, uint _dragoID, address _authority, address _eventful) returns (bool success) {
+	    Authority auth = Authority(0xDFF383e12A7939779359bf6A7f8766E123a18452);
+	    if (!auth.isWhitelistedFactory(this)) return;
 	    Drago drago = new Drago(_name, _symbol, _dragoID, _owner, _authority, _eventful);
-	    drago.setOwner(_owner);
 	    newDrago.name = _name;
 	    newDrago.symbol = _symbol;
 	    newDrago.dragoID = _dragoID;
 	    newDrago.newAddress = address(drago);
 	    newDrago.owner = _owner;
 	    DragoCreated(_name, _symbol, newDrago.newAddress, _owner, newDrago.dragoID);
-		return true;
+	    //Authority auth = Authority(newDrago.authority);
+	    //Authority auth = Authority(0xDFF383e12A7939779359bf6A7f8766E123a18452);
+	    //createDragoInternal(newDrago, _name, _symbol, _owner, _dragoID, _authority, _eventful);
 	}
 }
