@@ -3,6 +3,8 @@
 //! Released under the Apache Licence 2.
 //! Eventful pools together drago events.
 
+pragma solidity ^0.4.10;
+
 contract EventfulFace {
 
 	// EVENTS
