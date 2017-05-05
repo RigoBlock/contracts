@@ -300,8 +300,8 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) only_owner {
 		data.sellPrice = _newSellPrice;
 		data.buyPrice = _newBuyPrice;
-		Eventful events = Eventful(admin.eventful);
-		if (!events.setDragoPrice(msg.sender, this, _newSellPrice, _newBuyPrice)) return;
+		//Eventful events = Eventful(admin.eventful);
+		//if (!events.setDragoPrice(msg.sender, this, _newSellPrice, _newBuyPrice)) return;
 	}
 	
 	function changeMinPeriod(uint32 _minPeriod) only_dragoDAO {
