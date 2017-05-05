@@ -24,6 +24,7 @@ contract DragoFace {
 	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) {}
 	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) {}
 	function setOwner(address _new) {}
+	function() payable {}   // only_approved_exchange(msg.sender)
 
 	function balanceOf(address _who) constant returns (uint256) {}
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
