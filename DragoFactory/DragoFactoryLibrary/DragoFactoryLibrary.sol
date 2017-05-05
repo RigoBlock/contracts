@@ -22,7 +22,7 @@ library DragoFactoryLibrary {
  
     function DragoFactoryLibrary(NewDrago storage newDrago/*, address _authority*/) {
         //newDrago.authority = _authority;
-        newDrago.authority = 0xf6C2c542394dA50A6e73b4ff24724Fb69Da93eb7;
+        newDrago.authority = 0xDFF383e12A7939779359bf6A7f8766E123a18452;
         //remember to change address for different networks
     }
   
