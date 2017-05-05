@@ -7,7 +7,7 @@ Library at 31c9bb48c92ea720c50b521a818f87cc6cd5b03b
 
 ## Drago Factory contract version 0.2.2 
 ```
-0x26F5Ef8ba63Cb601a10f6A94c9e31ECe9412FaEF
+0xA215dD9E0d7c0E83f54e88CC8fDf86479F838b49
 
 ```
 ```
