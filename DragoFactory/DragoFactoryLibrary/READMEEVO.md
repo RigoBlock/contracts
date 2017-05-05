@@ -1,7 +1,8 @@
 # Drago Factory EVO Contracts
 ## Deploy dragos like a master! Set registry when deploy new one!
 This factory makes use of library, each deploy has to manually input Hex of library address into bytecode
-Hex of address is address withour 0x
+Hex of address is address withour 0x.
+Whitelist new factory in registry + add new Factory to whitelister list
 
 ## Drago Factory contract version 0.2.2 
 ```
