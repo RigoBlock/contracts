@@ -14,7 +14,8 @@ contract DragoFactoryFace {
 	// METHODS
 
 	function createDrago(string _name, string _symbol) returns (bool) {}
-	function setDragoDAO(address _targetDrago, address _dragoDAO) {}
+	function setTargetDragoDAO(address _targetDrago, address _dragoDAO) {}
+	function changeDragoDAO(address _newDragoDAO) {}
 	function setRegistry(address _newRegistry) {}
 	function setBeneficiary(address _dragoDAO) {}
 	function setFee(uint _fee) {}
@@ -24,6 +25,7 @@ contract DragoFactoryFace {
 	function getRegistry() constant returns (address) {}
 	function getStorage() constant returns (address dragoDAO, string version, uint nextDragoID) {}
 	function getNextID() constant returns (uint nextDragoID) {}
+	function getEventful() constant returns (address) {}
 	function getDragoDAO() constant returns (address dragoDAO) {}
 	function getVersion() constant returns (string version) {}
 	function getDragosByAddress(address _owner) constant returns (address[]) {}
