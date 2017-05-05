@@ -17,6 +17,7 @@ contract AuthorityFace {
     event WhitelistedExchange(address indexed exchange, bool approved);
     event WhitelistedRegistry(address indexed registry, bool approved);
     event WhitelistedFactory(address indexed factory, bool approved);
+    event NewEventful(address indexed eventful);
 
     // METHODS
 
