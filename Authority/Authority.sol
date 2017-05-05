@@ -70,6 +70,7 @@ contract Authority is Owned, AuthorityFace {
 		bool asset;
 		bool user;
 		bool registry;
+		bool factory;
 		bool authority;
 	}
 	
@@ -145,6 +146,13 @@ contract Authority is Owned, AuthorityFace {
         WhitelistedRegistry(_registry, _isWhitelisted);
     }
     
+    function whitelistFactory(address _factory, bool _isWhitelisted) {
+        accounts[_factory].account = _factory;
+        accounts[_factory].authorized = _isWhitelisted;
+        accounts[_factory].groups[true].registry = _isWhitelisted;		
+        WhitelistedFactory(_factory, _isWhitelisted);
+    }
+    
     function setEventful(address _eventful) only_owner {
 		events.eventful = _eventful;
 		NewEventful(events.eventful);
@@ -176,6 +184,10 @@ contract Authority is Owned, AuthorityFace {
     
     function isWhitelistedRegistry(address _registry) constant returns (bool) {
         return accounts[_registry].groups[true].registry;
+    }
+    
+    function isWhitelistedFactory(address _factory) constant returns (bool) {
+        return accounts[_factory].groups[true].registry;
     }
     
     function getEventful() constant returns (address) {
