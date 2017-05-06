@@ -17,16 +17,17 @@ contract DragoFace {
 	function changeDragoDAO(address _dragoDAO) {}
 	function depositToExchange(address _exchange, address _token, uint256 _value) {}
 	function withdrawFromExchange(address _exchange, address _token, uint256 _value) {}
-	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {}
-	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint _amount) {}
+	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
+	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) {}
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
-	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce) {}
+	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
 	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) {}
 	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) {}
 	function setOwner(address _new) {}
 	function() payable {}   // only_approved_exchange(msg.sender)
 
 	function balanceOf(address _who) constant returns (uint256) {}
+	function getEventful() constant returns (address) {}
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
 	function getOwner() constant returns (address) {}
