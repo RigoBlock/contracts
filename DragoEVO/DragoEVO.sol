@@ -143,7 +143,7 @@ contract DragoFace {
 	function buyDrago() payable returns (bool success) {}
 	function sellDrago(uint _amount) returns (uint revenue, bool success) {}
 	function setPrices(uint _newSellPrice, uint _newBuyPrice) {}
-	function changeMinPeriod(uint _minPeriod) {}
+	function changeMinPeriod(uint32 _minPeriod) {}
 	function changeRatio(uint _ratio) {}
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
@@ -370,6 +370,6 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	
 	mapping (address => Account) accounts;
 	
-	string constant version = 'HF 0.2.3';
+	string constant version = 'HF 0.3.1';
 	uint constant base = 1000000; // tokens are divisible by 1 million
 }
