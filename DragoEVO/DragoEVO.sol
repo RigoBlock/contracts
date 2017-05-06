@@ -188,10 +188,10 @@ contract DragoFace {
 	function changeDragoDAO(address _dragoDAO) {}
 	function depositToExchange(address _exchange, address _token, uint256 _value) {}
 	function withdrawFromExchange(address _exchange, address _token, uint256 _value) {}
-	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce) {}
-	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint _nonce, address _user, uint _amount) {}
+	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
+	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) {}
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
-	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, uint nonce) {}
+	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
 	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) {}
 	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) {}
 	function setOwner(address _new) {}
@@ -263,7 +263,8 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function buyDrago() payable minimum_stake(msg.value) returns (bool success) {
-		//if (!approvedAccount[msg.sender]) throw;
+		Eventful events = Eventful(admin.eventful);
+		if (!events.buyDrago(msg.sender, this, msg.value, amount)) return;
 		uint gross_amount = safeDiv(msg.value, data.buyPrice) * base;
 		uint fee = safeMul(gross_amount, data.transactionFee);
 		uint fee_drago = safeMul(fee, admin.ratio) / 100;
@@ -274,13 +275,12 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
  		accounts[msg.sender].receipt[data.buyPrice].activation = uint32(now) + data.minPeriod;
 		data.totalSupply = safeAdd(data.totalSupply, gross_amount);
-		Eventful events = Eventful(admin.eventful);
-		if (!events.buyDrago(msg.sender, this, msg.value, amount)) return;
 		return (true);
 	}
 
 	function sellDrago(uint256 _amount) minimum_period_past(data.buyPrice, _amount) returns (uint net_revenue, bool success) {
-		//if (!approvedAccount[msg.sender]) throw;
+		Eventful events = Eventful(admin.eventful);
+		if (!events.sellDrago(msg.sender, this, _amount, net_revenue)) return;
 		if (accounts[msg.sender].balance < _amount && accounts[msg.sender].balance + _amount <= accounts[msg.sender].balance) throw;
 		uint fee = safeMul (_amount, data.transactionFee);
 		uint fee_drago = safeMul(fee, admin.ratio) / 100;
@@ -292,16 +292,14 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
 		data.totalSupply = safeSub(data.totalSupply, _amount);
 		if (!msg.sender.call.value(net_revenue)()) throw;
-		Eventful events = Eventful(admin.eventful);
-		if (!events.sellDrago(msg.sender, this, _amount, net_revenue)) return;
 		return (net_revenue, true);
 	}
 	
 	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) only_owner {
+		Eventful events = Eventful(admin.eventful);
+		if (!events.setDragoPrice(msg.sender, this, _newSellPrice, _newBuyPrice)) return;
 		data.sellPrice = _newSellPrice;
 		data.buyPrice = _newBuyPrice;
-		//Eventful events = Eventful(admin.eventful);
-		//if (!events.setDragoPrice(msg.sender, this, _newSellPrice, _newBuyPrice)) return;
 	}
 	
 	function changeMinPeriod(uint32 _minPeriod) only_dragoDAO {
@@ -313,9 +311,9 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function setTransactionFee(uint _transactionFee) only_owner {
+	    //Eventful events = Eventful(admin.eventful);
+	    //if (!events.setTransactionFee(msg.sender, this, _transactionFee)) return;
 		data.transactionFee = safeDiv(_transactionFee, 10000); //fee is in basis points (1bps=0.01%)
-		//Eventful events = Eventful(admin.eventful);
-	    //events.setTransactionFee(msg.sender, this, _transactionFee);
 	}
 
 	function changeFeeCollector(address _feeCollector) only_owner {	
@@ -328,18 +326,18 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function depositToExchange(address _exchange, address _token, uint256 _value) only_owner when_approved_exchange(_exchange) {
-		Exchange exchange = Exchange(_exchange);
-		assert(exchange.deposit.value(_value)(_token, _value));
 		Eventful events = Eventful(admin.eventful);
 		if (!events.depositToExchange(msg.sender, this, _exchange,  _token, _value)) return;
+		Exchange exchange = Exchange(_exchange);
+		if (!exchange.deposit.value(_value)(_token, _value)) throw;
 	}
 
 	function withdrawFromExchange(address _exchange, address _token, uint256 _value) only_owner when_approved_exchange(_exchange) {
+		Eventful events = Eventful(admin.eventful);
+	    if (!events.withdrawFromExchange(msg.sender, this, _exchange, _token, _value)) return;
 		Exchange exchange = Exchange(_exchange);
 		exchange.withdraw(_token, _value); //for ETH token: _token = 0
 		//if (!exchange.withdraw(_token, _value)) return; will work only by adding return true; to the exchange
-		Eventful events = Eventful(admin.eventful);
-	    if (!events.withdrawFromExchange(msg.sender, this, _exchange, _token, _value)) return;
 	}
 	
 	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
@@ -350,7 +348,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) only_owner when_approved_exchange(_exchange) {
 		Eventful events = Eventful(admin.eventful);
-		if (!events.placeOrderCFDExchange(msg.sender, this, _exchange, _cfd, _is_stable, _adjustment, _stake)) return;
+		if (!events.placeOrderCFDExchange(msg.sender, this, _exchange, _cfd, _is_stable, _adjustment, _stake)) throw;
 		Exchange exchange = Exchange(_exchange);
 		exchange.orderCFD(_cfd, _is_stable, _adjustment, _stake); //condition is checked in eventful
 	}
@@ -368,17 +366,17 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) only_owner when_approved_exchange(_exchange) {
+		Eventful events = Eventful(admin.eventful);
+		if (!events.cancelOrderCFDExchange(msg.sender, this, _exchange, _cfd, _id)) throw;
 		Exchange exchange = Exchange(_exchange);
 		exchange.cancel(_cfd, _id);
-		Eventful events = Eventful(admin.eventful);
-		if (!events.cancelOrderCFDExchange(msg.sender, this, _exchange, _cfd, _id)) return;
 	}
 
 	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) only_owner when_approved_exchange(_exchange) {
+		Eventful events = Eventful(admin.eventful);
+		if (!events.finalizedDealExchange(msg.sender, this, _exchange, _cfd, _id)) throw;
 		Exchange exchange = Exchange(_exchange);
 		exchange.finalize(_cfd, _id);
-		Eventful events = Eventful(admin.eventful);
-		if (!events.finalizedDealExchange(msg.sender, this, _exchange, _cfd, _id)) return;
 	}
 
 	function balanceOf(address _who) constant returns (uint256) {
