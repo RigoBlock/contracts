@@ -230,7 +230,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
  		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint amount = safeSub(gross_amount, fee);
 		Eventful events = Eventful(getEventful());
-		if (!events.buyDrago(msg.sender, this, msg.value, amount)) return;
+		if (!events.buyDrago(msg.sender, this, msg.value, amount)) throw;
 		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, amount);
 		accounts[admin.feeCollector].balance = safeAdd(accounts[admin.feeCollector].balance, fee_drago);
 		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
@@ -246,8 +246,8 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint net_amount = safeSub(_amount, fee);
 		Eventful events = Eventful(getEventful());
-		if (!events.sellDrago(msg.sender, this, _amount, net_revenue)) return;
 		net_revenue = safeMul(net_amount, data.sellPrice) / base;
+		if (!events.sellDrago(msg.sender, this, _amount, net_revenue)) return;
 		accounts[msg.sender].balance = safeSub(accounts[msg.sender].balance, _amount);
 		accounts[admin.feeCollector].balance = safeAdd(accounts[admin.feeCollector].balance, fee_drago);
 		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
