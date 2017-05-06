@@ -234,7 +234,6 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	    address authority;
 		address dragoDAO;
 		address feeCollector;
-		//address eventful;
 		uint minOrder; // minimum stake to avoid dust clogging things up
 		uint ratio; //ratio is 80%
 	}
@@ -248,7 +247,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
 
- 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID, address _owner, address _authority/*, address _eventful*/) {
+ 	function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID, address _owner, address _authority) {
 		data.name = _dragoName;
 		data.symbol = _dragoSymbol;
 		data.dragoID = _dragoID;
@@ -260,7 +259,6 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		admin.minOrder = 100 finney;
 		admin.feeCollector = _owner;
 		admin.ratio = 80;
-		//admin.eventful = _eventful;
 	}
 
 	function buyDrago() payable minimum_stake(msg.value) returns (bool success) {
@@ -312,7 +310,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function setTransactionFee(uint _transactionFee) only_owner {
-	    //Eventful events = Eventful(admin.eventful);
+	    //Eventful events = Eventful(getEventful());
 	    //if (!events.setTransactionFee(msg.sender, this, _transactionFee)) return;
 		data.transactionFee = safeDiv(_transactionFee, 10000); //fee is in basis points (1bps=0.01%)
 	}
@@ -355,12 +353,12 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		Exchange exchange = Exchange(_exchange);
 		exchange.orderCFD(_cfd, _is_stable, _adjustment, _stake); //condition is checked in eventful
 	}
-	
+
 	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) only_owner when_approved_exchange(_exchange) {
+		Eventful events = Eventful(getEventful());
+	    events.placeTradeExchange(msg.sender, this, _exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _user, _amount);
 		Exchange exchange = Exchange(_exchange);
 		exchange.trade(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _user, _amount);
-		//Eventful events = Eventful(admin.eventful);
-	    //events.placeTradeExchange(msg.sender, this, _exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _nonce, _user, _amount);
 	}
 	
 	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
