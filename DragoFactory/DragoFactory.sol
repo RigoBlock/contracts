@@ -64,38 +64,38 @@ contract DragoFactoryFace {
 
 library DragoFactoryLibrary {
 
-	struct NewDrago {
-		string name;
-		string symbol;
-		uint256 dragoID;
-		address owner;
-		address newAddress;
+    struct NewDrago {
+	    string name;
+	    string symbol;
+	    uint256 dragoID;
+	    address owner;
+	    address newAddress;
 	}
 
-	modifier whitelisted_factory { Authority auth = Authority(0xDFF383e12A7939779359bf6A7f8766E123a18452); if (auth.isWhitelistedFactory(this)) _; }
+    modifier whitelisted_factory { Authority auth = Authority(0xDFF383e12A7939779359bf6A7f8766E123a18452); if (auth.isWhitelistedFactory(this)) _; }
 
 	event DragoCreated(string name, string symbol, address indexed drago, address indexed owner, uint dragoID, address indexed factory);
 
-	function createDrago(NewDrago storage self, string _name, string _symbol, address _owner, uint _dragoID, address _authority, address _eventful) whitelisted_factory returns (bool success) {
-		Drago drago = new Drago(_name, _symbol, _dragoID, _owner, _authority, _eventful);
-		self.name = _name;
-		self.symbol = _symbol;
-		self.dragoID = _dragoID;
-		self.newAddress = address(drago);
-		self.owner = _owner;
-		DragoCreated(_name, _symbol, address(drago), _owner, _dragoID, this);
-		return true;
+	function createDrago(NewDrago storage self, string _name, string _symbol, address _owner, uint _dragoID, address _authority/*, address _eventful*/) whitelisted_factory returns (bool success) {
+	    Drago drago = new Drago(_name, _symbol, _dragoID, _owner, _authority/*, _eventful*/);
+	    self.name = _name;
+	    self.symbol = _symbol;
+	    self.dragoID = _dragoID;
+	    self.newAddress = address(drago);
+	    self.owner = _owner;
+	    DragoCreated(_name, _symbol, address(drago), _owner, _dragoID, this);
+	    return true;
 	}
 }
 
 contract DragoFactory is Owned, DragoFactoryFace {
 
 	struct Data {
-		uint fee;
-		address dragoRegistry;
-		address dragoDAO;
-		address authority;
-		mapping(address => address[]) dragos;
+	    uint fee;
+	    address dragoRegistry;
+	    address dragoDAO;
+	    address authority;
+	    mapping(address => address[]) dragos;
 	}
 
 	event DragoCreated(string name, string symbol, address indexed drago, address indexed owner, uint dragoID);
@@ -105,24 +105,24 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	modifier only_drago_dao { if (msg.sender != data.dragoDAO) return; _; }
 
 	function DragoFactory(address _registry, address _dragoDAO, address _authority) {
-		data.dragoRegistry = _registry;
-		data.dragoDAO = _dragoDAO;
-		data.authority = _authority;
-		//REMEMBER TO SET FACTORY AS WHITELISTER WHEN CREATE A NEW ONE
-		//SO THAT IT CAN WHITELIST MSG.SENDER AND DRAGO IMMEDIATELY
+	    data.dragoRegistry = _registry;
+	    data.dragoDAO = _dragoDAO;
+	    data.authority = _authority;
+	    //REMEMBER TO SET FACTORY AS WHITELISTER WHEN CREATE A NEW ONE
+	    //SO THAT IT CAN WHITELIST MSG.SENDER AND DRAGO IMMEDIATELY
 	}
 
-	function createDrago(string _name, string _symbol) returns (bool success) {
-		DragoRegistry registry = DragoRegistry(data.dragoRegistry);
-        	uint dragoID = registry.dragoCount();
-        	if (!createDragoInternal(_name, _symbol, msg.sender, dragoID)) return;
-        	assert(registry.register(libraryData.newAddress, _name, _symbol, dragoID, this));
-        	return true;
-	}
+    function createDrago(string _name, string _symbol) returns (bool success) {
+        DragoRegistry registry = DragoRegistry(data.dragoRegistry);
+        uint dragoID = registry.dragoCount();
+        if (!createDragoInternal(_name, _symbol, msg.sender, dragoID)) return;
+        assert(registry.register(libraryData.newAddress, _name, _symbol, dragoID, this));
+        return true;
+    }
 
 	function createDragoInternal(string _name, string _symbol, address _owner, uint _dragoID) internal when_fee_paid returns (bool success) {
 	    Authority auth = Authority(data.authority);
-	    require(DragoFactoryLibrary.createDrago(libraryData, _name, _symbol, _owner, _dragoID, data.authority, auth.getEventful()));
+	    require(DragoFactoryLibrary.createDrago(libraryData, _name, _symbol, _owner, _dragoID, data.authority/*, auth.getEventful()*/));
 		data.dragos[msg.sender].push(libraryData.newAddress);
 		Eventful events = Eventful(getEventful());
 		if (!events.createDrago(msg.sender, this, libraryData.newAddress, _name, _symbol, _dragoID, _owner)) return;
@@ -189,7 +189,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	
 	DragoFactoryLibrary.NewDrago libraryData;
 
-	Data data;
+    Data data;
 
 	string public version = 'DF0.3.2';
 }
