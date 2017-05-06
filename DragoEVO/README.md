@@ -3,7 +3,7 @@ These dragos make use of eventful contract
 
 ## Drago EVO contract version 0.3.3
 ```
-0x68B7a4eb164bD870A32CeBb8eFF2b7dd2f5701ce
+0x4D163e1cCf040fd2b9b4f3085E3209e6DF50c0F3
 ```
 
 ```
