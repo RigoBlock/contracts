@@ -9,26 +9,26 @@ pragma solidity ^0.4.11;
 
 library DragoFactoryLibrary {
 
-	struct NewDrago {
-		string name;
-	    	string symbol;
-	    	uint256 dragoID;
-	    	address owner;
-	    	address newAddress;
+    struct NewDrago {
+	    string name;
+	    string symbol;
+	    uint256 dragoID;
+	    address owner;
+	    address newAddress;
 	}
 
-    	modifier whitelisted_factory { Authority auth = Authority(0xDFF383e12A7939779359bf6A7f8766E123a18452); if (auth.isWhitelistedFactory(this)) _; }
+    modifier whitelisted_factory { Authority auth = Authority(0xDFF383e12A7939779359bf6A7f8766E123a18452); if (auth.isWhitelistedFactory(this)) _; }
 
 	event DragoCreated(string name, string symbol, address indexed drago, address indexed owner, uint dragoID, address indexed factory);
 
 	function createDrago(NewDrago storage self, string _name, string _symbol, address _owner, uint _dragoID, address _authority/*, address _eventful*/) whitelisted_factory returns (bool success) {
-	    	Drago drago = new Drago(_name, _symbol, _dragoID, _owner, _authority/*, _eventful*/);
-	    	self.name = _name;
-	    	self.symbol = _symbol;
-	    	self.dragoID = _dragoID;
-	    	self.newAddress = address(drago);
-	    	self.owner = _owner;
-	    	DragoCreated(_name, _symbol, address(drago), _owner, _dragoID, this);
-	    	return true;
+	    Drago drago = new Drago(_name, _symbol, _dragoID, _owner, _authority/*, _eventful*/);
+	    self.name = _name;
+	    self.symbol = _symbol;
+	    self.dragoID = _dragoID;
+	    self.newAddress = address(drago);
+	    self.owner = _owner;
+	    DragoCreated(_name, _symbol, address(drago), _owner, _dragoID, this);
+	    return true;
 	}
 }
