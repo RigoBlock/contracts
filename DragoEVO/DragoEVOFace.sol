@@ -8,15 +8,15 @@ contract DragoFace {
 	// METHODS
 
 	function buyDrago() payable returns (bool success) {}
-	function sellDrago(uint256 _amount) returns (uint revenue, bool success) {}
-	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) {}
+	function sellDrago(uint _amount) returns (uint revenue, bool success) {}
+	function setPrices(uint _newSellPrice, uint _newBuyPrice) {}
 	function changeMinPeriod(uint32 _minPeriod) {}
-	function changeRatio(uint256 _ratio) {}
+	function changeRatio(uint _ratio) {}
 	function setTransactionFee(uint _transactionFee) {}
 	function changeFeeCollector(address _feeCollector) {}
 	function changeDragoDAO(address _dragoDAO) {}
-	function depositToExchange(address _exchange, address _token, uint256 _value) {}
-	function withdrawFromExchange(address _exchange, address _token, uint256 _value) {}
+	function depositToExchange(address _exchange, address _token, uint _value) {}
+	function withdrawFromExchange(address _exchange, address _token, uint _value) {}
 	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
 	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) {}
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
@@ -26,7 +26,7 @@ contract DragoFace {
 	function setOwner(address _new) {}
 	function() payable {}   // only_approved_exchange(msg.sender)
 
-	function balanceOf(address _who) constant returns (uint256) {}
+	function balanceOf(address _who) constant returns (uint) {}
 	function getEventful() constant returns (address) {}
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
