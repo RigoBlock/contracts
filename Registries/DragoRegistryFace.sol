@@ -2,13 +2,13 @@
 //! By Gabriele Rigo (Rigo Investment), 2017.
 //! Released under the Apache Licence 2.
 
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.11;
 
 contract DragoRegistryFace {
 
 	//EVENTS
 
-	event Registered(string indexed symbol, uint indexed id, address drago, string name);
+	event Registered(string name, string symbol, uint id, address indexed drago, address indexed owner, address indexed group);
 	event Unregistered(string indexed symbol, uint indexed id);
 	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
 	
@@ -29,6 +29,8 @@ contract DragoRegistryFace {
 	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
 	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
 	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
+	function fromNameSymbol(string _name, string _symbol) constant returns (address) {}
 	function meta(uint _id, bytes32 _key) constant returns (bytes32) {}
 	function getGroups(address _group) constant returns (address[]) {}
+	function getFee() constant returns (uint) {}
 }
