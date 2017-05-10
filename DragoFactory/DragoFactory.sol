@@ -105,21 +105,23 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	    data.dragoRegistry = _registry;
 	    data.dragoDAO = _dragoDAO;
 	    data.authority = _authority;
+	    owner = msg.sender; //has to be set since there was not enough space in drago to use standard Owned
 	    //REMEMBER TO SET FACTORY AS WHITELISTER WHEN CREATE A NEW ONE
 	    //SO THAT IT CAN WHITELIST MSG.SENDER AND DRAGO IMMEDIATELY
 	}
 
-    function createDrago(string _name, string _symbol) returns (bool success) {
-        DragoRegistry registry = DragoRegistry(data.dragoRegistry);
-        uint dragoID = registry.dragoCount();
-        if (!createDragoInternal(_name, _symbol, msg.sender, dragoID)) return;
-        assert(registry.register(libraryData.newAddress, _name, _symbol, dragoID, this));
-        return true;
-    }
+	function createDrago(string _name, string _symbol) returns (bool success) {
+        	DragoRegistry registry = DragoRegistry(data.dragoRegistry);
+        	uint regFee = registry.getFee();
+        	uint dragoID = registry.dragoCount();
+        	if (!createDragoInternal(_name, _symbol, msg.sender, dragoID)) return;
+        	assert(registry.register.value(regFee)(libraryData.newAddress, _name, _symbol, dragoID, msg.sender));
+        	return true;
+    	}
 
 	function createDragoInternal(string _name, string _symbol, address _owner, uint _dragoID) internal when_fee_paid returns (bool success) {
-	    Authority auth = Authority(data.authority);
-	    require(DragoFactoryLibrary.createDrago(libraryData, _name, _symbol, _owner, _dragoID, data.authority/*, auth.getEventful()*/));
+	    	Authority auth = Authority(data.authority);
+	    	require(DragoFactoryLibrary.createDrago(libraryData, _name, _symbol, _owner, _dragoID, data.authority));
 		data.dragos[msg.sender].push(libraryData.newAddress);
 		Eventful events = Eventful(getEventful());
 		if (!events.createDrago(msg.sender, this, libraryData.newAddress, _name, _symbol, _dragoID, _owner)) return;
@@ -186,7 +188,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	
 	DragoFactoryLibrary.NewDrago libraryData;
 
-    Data data;
+	Data data;
 
 	string public version = 'DF0.3.2';
 }
