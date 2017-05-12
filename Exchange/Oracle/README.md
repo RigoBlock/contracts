@@ -2,7 +2,8 @@ contracts:
 
 KrakenPriceTicker (ETHUSD Oracle)
 ```
-0x8c8E3a97Da29bb845585e1Bd46F16c6aFaB5fBB4
+Ropsten: 0x8c8E3a97Da29bb845585e1Bd46F16c6aFaB5fBB4
+Kovan: 0x49BA786Eb8542F1c6F7C383560791AefB55D8EEa
 ```
 
 Bytecode
