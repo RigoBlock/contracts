@@ -13,7 +13,7 @@ Authority Kovan: 0x96A7511e8CeA6Cf330473CadF1810410fBA81Daf
 ```
 
 Ropsten: 0x84a545fe23ea56fab04d86012756450746f074bb
-Kovan: 0x50cb275a3d6aee307a55368165bb98800a4ab6ef
+Kovan: 0xaceeaf3827bc7b96cbfc32d24e081d62328009eb
 
 ```
 ```
