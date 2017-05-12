@@ -2,12 +2,14 @@
 the library has to be manually deployed by solc (solidity compiler) and the hex of address has to be input 
 manually into the factory's bytecode
 This factory makes use of library, each deploy has to manually input Hex of library address into bytecode
+each factory contract on different network has a different bytecode (uses different library)
 
 ## Drago Factory Library version 0.3.1 (manually input hex address in factory bytecode)
 
 ```
 
-0x84a545fe23ea56fab04d86012756450746f074bb
+Ropsten: 0x84a545fe23ea56fab04d86012756450746f074bb
+Kovan: 0x50cb275a3d6aee307a55368165bb98800a4ab6ef
 
 ```
 
