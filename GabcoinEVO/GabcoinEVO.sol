@@ -80,6 +80,7 @@ contract Authority {
     event WhitelistedGabcoin(address indexed gabcoin, bool approved);
     event WhitelistedFactory(address indexed factory, bool approved);
     event NewEventful(address indexed eventful);
+    event NewCasper(address indexed casper);
 
     // METHODS
 
@@ -93,6 +94,7 @@ contract Authority {
     function whitelistRegistry(address _registry, bool _isWhitelisted) {}
     function whitelistFactory(address _factory, bool _isWhitelisted) {}
     function setEventful(address _eventful) {}
+    function setCasper(address _eventful) {}
 
     function isWhitelistedUser(address _target) constant returns (bool) {}
     function isWhitelister(address _whitelister) constant returns (bool) {}
@@ -225,7 +227,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		if (_validation != address(this)) throw;
 		Authority auth = Authority(authority);
 		Casper casper = Casper(auth.getCasper());
-		casper.deposit.value(_amount)(_validation, _withdrawal);
+		require(casper.deposit.value(_amount)(_validation, _withdrawal));
 		DepositCasper(_amount, msg.sender, _validation, _withdrawal);
 		return true;
 	}
