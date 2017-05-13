@@ -117,7 +117,7 @@ contract Casper {
     //asked viper devs to implement this function
 }
 
-contract GabcoinFace is Owned, SafeMath, ERC20Face {
+contract GabcoinFace {
 
 	event Buy(address indexed from, address indexed to, uint256 indexed amount, uint256 revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed amount,uint256 revenue);
@@ -146,7 +146,7 @@ contract GabcoinFace is Owned, SafeMath, ERC20Face {
 	function getFeeCollector() constant returns (address) {}
 }
 
-contract Gabcoin is Owned, ERC20Face, GabcoinFace {
+contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 
 	modifier only_gabcoinDAO { if (msg.sender != gabcoinDAO) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
