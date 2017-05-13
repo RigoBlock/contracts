@@ -240,7 +240,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function sellDrago(uint _amount) minimum_period_past(data.buyPrice, _amount) returns (uint net_revenue, bool success) {
-		if (accounts[msg.sender].balance < _amount && accounts[msg.sender].balance + _amount <= accounts[msg.sender].balance) throw;
+		if (accounts[msg.sender].balance < _amount || accounts[msg.sender].balance + _amount <= accounts[msg.sender].balance) throw;
 		uint fee = safeMul (_amount, data.transactionFee);
 		uint fee_drago = safeMul(fee, admin.ratio) / 100;
 		uint fee_dragoDAO = safeSub(fee, fee_drago);
