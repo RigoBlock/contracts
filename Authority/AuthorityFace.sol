@@ -3,8 +3,6 @@
 //! Released under the Apache Licence 2.
 //! Auth has the possibility of blocking/unblocking single user.
 
-pragma solidity ^0.4.11;
-
 contract AuthorityFace {
 
     // EVENTS
@@ -33,6 +31,9 @@ contract AuthorityFace {
     function whitelistRegistry(address _registry, bool _isWhitelisted) {}
     function whitelistFactory(address _factory, bool _isWhitelisted) {}
     function setEventful(address _eventful) {}
+    function setGabcoinEventful(address _gabcoinEventful) {}
+    function setExchangeEventful(address _exchangeEventful) {}
+    function setCasper(address _casper) {}
 
     function isWhitelistedUser(address _target) constant returns (bool) {}
     function isWhitelister(address _whitelister) constant returns (bool) {}
@@ -44,5 +45,8 @@ contract AuthorityFace {
     function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
     function isWhitelistedFactory(address _factory) constant returns (bool) {}
     function getEventful() constant returns (address) {}
+    function getGabcoinEventful() constant returns (address) {}
+    function getExchangeEventful() constant returns (address) {}
+    function getCasper() constant returns (address) {}
     function getOwner() constant returns (address) {}
 }
