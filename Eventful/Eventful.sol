@@ -3,7 +3,7 @@
 //! Released under the Apache Licence 2.
 //! Eventful is used to collect all events from all dragos automatically.
 
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.11;
 
 contract Drago {
 
@@ -189,7 +189,7 @@ contract Eventful is EventfulFace {
 		//Drago drago = Drago(_targetDrago);
 		if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return; //this might be useless
-		OrderExchange(_targetDrago, _exchange, _tokenGet, _amountGet);
+		OrderExchange(_targetDrago, _exchange, _tokenGet, _amountGet, 0);
 		return true;
 	}
 
@@ -215,7 +215,7 @@ contract Eventful is EventfulFace {
 		//Drago drago = Drago(_targetDrago);
 		if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return;
-		CancelOrder(_targetDrago, _exchange, _tokenGet, _amountGet);
+		CancelOrder(_targetDrago, _exchange, _tokenGet, _amountGet, 0);
 		return true;
 	}
 
