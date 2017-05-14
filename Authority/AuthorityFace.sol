@@ -3,6 +3,8 @@
 //! Released under the Apache Licence 2.
 //! Auth has the possibility of blocking/unblocking single user.
 
+pragma solidity ^0.4.11;
+
 contract AuthorityFace {
 
     // EVENTS
