@@ -3,7 +3,7 @@
 //! Released under the Apache Licence 2.
 //! Auth has the possibility of blocking/unblocking single user.
 
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.11;
 
 contract AuthorityFace {
 
@@ -17,6 +17,8 @@ contract AuthorityFace {
     event WhitelistedExchange(address indexed exchange, bool approved);
     event WhitelistedRegistry(address indexed registry, bool approved);
     event WhitelistedFactory(address indexed factory, bool approved);
+    event WhitelistedGabcoin(address indexed gabcoin, bool approved);
+    event WhitelistedDrago(address indexed drago, bool approved);
     event NewEventful(address indexed eventful);
 
     // METHODS
@@ -27,6 +29,7 @@ contract AuthorityFace {
     function whitelistAsset(address _asset, bool _isWhitelisted) {}
     function whitelistExchange(address _exchange, bool _isWhitelisted) {}
     function whitelistDrago(address _drago, bool _isWhitelisted) {}
+    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) {}
     function whitelistRegistry(address _registry, bool _isWhitelisted) {}
     function whitelistFactory(address _factory, bool _isWhitelisted) {}
     function setEventful(address _eventful) {}
@@ -37,7 +40,8 @@ contract AuthorityFace {
     function isWhitelistedAsset(address _asset) constant returns (bool) {}
     function isWhitelistedExchange(address _exchange) constant returns (bool) {}
     function isWhitelistedRegistry(address _registry) constant returns (bool) {}
-    function isWhitelistedDrago(address _drago) constant returns (bool) {} 
+    function isWhitelistedDrago(address _drago) constant returns (bool) {}
+    function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
     function isWhitelistedFactory(address _factory) constant returns (bool) {}
     function getEventful() constant returns (address) {}
     function getOwner() constant returns (address) {}
