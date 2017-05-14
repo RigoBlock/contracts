@@ -51,6 +51,9 @@ contract AuthorityFace {
     function whitelistRegistry(address _registry, bool _isWhitelisted) {}
     function whitelistFactory(address _factory, bool _isWhitelisted) {}
     function setEventful(address _eventful) {}
+    function setGabcoinEventful(address _gabcoinEventful) {}
+    function setExchangeEventful(address _exchangeEventful) {}
+    function setCasper(address _casper) {}
 
     function isWhitelistedUser(address _target) constant returns (bool) {}
     function isWhitelister(address _whitelister) constant returns (bool) {}
@@ -62,6 +65,9 @@ contract AuthorityFace {
     function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
     function isWhitelistedFactory(address _factory) constant returns (bool) {}
     function getEventful() constant returns (address) {}
+    function getGabcoinEventful() constant returns (address) {}
+    function getExchangeEventful() constant returns (address) {}
+    function getCasper() constant returns (address) {}
     function getOwner() constant returns (address) {}
 }
 
@@ -77,7 +83,6 @@ contract Authority is Owned, AuthorityFace {
 		bool registry;
 		bool factory;
 		bool authority;
-		mapping(address => Lists) lists;
 	}
 	
 	struct Account {
@@ -86,8 +91,11 @@ contract Authority is Owned, AuthorityFace {
 		mapping (bool => Group) groups; //mapping account to bool authorized to bool group
 	}
 	
-	struct Eventful {
+	struct BuildingBlocks {
 	    address eventful;
+	    address gabcoinEventful;
+	    address exchangeEventful;
+	    address casper;
 	}
 
     event SetAuthority (address indexed authority);
@@ -98,7 +106,10 @@ contract Authority is Owned, AuthorityFace {
     event WhitelistedDrago(address indexed drago, bool isWhitelisted);
     event WhitelistedRegistry(address indexed registry, bool approved);
     event NewEventful(address indexed eventful);
-		
+    event NewGabcoinEventful(address indexed exchangeEventful);
+    event NewExchangeEventful(address indexed gabcoinEventful);
+    event NewCasper(address indexed casper);
+
     modifier only_whitelister { if  (isWhitelister(msg.sender)) _; }
     modifier only_authority { if (isAuthority(msg.sender)) _; }
     modifier only_admin { if (msg.sender == owner || isWhitelister(msg.sender)) _; }
@@ -158,8 +169,8 @@ contract Authority is Owned, AuthorityFace {
         accounts[_registry].groups[true].registry = _isWhitelisted;		
         WhitelistedRegistry(_registry, _isWhitelisted);
     }
-    
-    function whitelistFactory(address _factory, bool _isWhitelisted) {
+
+    function whitelistFactory(address _factory, bool _isWhitelisted) only_admin {
         accounts[_factory].account = _factory;
         accounts[_factory].authorized = _isWhitelisted;
         accounts[_factory].groups[true].registry = _isWhitelisted;		
@@ -167,8 +178,23 @@ contract Authority is Owned, AuthorityFace {
     }
     
     function setEventful(address _eventful) only_owner {
-		events.eventful = _eventful;
-		NewEventful(events.eventful);
+		blocks.eventful = _eventful;
+		NewEventful(blocks.eventful);
+	}
+	
+	function setGabcoinEventful(address _gabcoinEventful) only_owner {
+		blocks.gabcoinEventful = _gabcoinEventful;
+		NewGabcoinEventful(blocks.gabcoinEventful);
+	}
+	
+	function setExchangeEventful(address _exchangeEventful) only_owner {
+		blocks.exchangeEventful = _exchangeEventful;
+		NewExchangeEventful(blocks.exchangeEventful);
+	}
+	
+	function setCasper(address _casper) only_owner {
+		blocks.casper = _casper;
+		NewCasper(blocks.casper);
 	}
 
     function isWhitelistedUser(address _target) constant returns (bool) {
@@ -206,12 +232,24 @@ contract Authority is Owned, AuthorityFace {
     function isWhitelistedFactory(address _factory) constant returns (bool) {
         return accounts[_factory].groups[true].registry;
     }
-    
+
     function getEventful() constant returns (address) {
-	    return events.eventful;
+	    return blocks.eventful;
 	}
     
-    Eventful events;
+    function getGabcoinEventful() constant returns (address) {
+        return blocks.gabcoinEventful;
+    }
+    
+    function getExchangeEventful() constant returns (address) {
+        return blocks.exchangeEventful;
+    }
+    
+    function getCasper() constant returns (address) {
+        return blocks.casper;
+    }
+    
+    BuildingBlocks blocks;
     
     mapping (address => Account) accounts;
 }
