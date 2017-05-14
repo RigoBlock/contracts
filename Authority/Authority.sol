@@ -1,9 +1,9 @@
 //! Authority contract.
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
-//! Auth has the possibility of blocking/unblocking single user.
+//! Auth has the possibility of blocking/unblocking single user, drago, gabcoin, factory.
 
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.11;
 
 contract Owned {
     
@@ -35,6 +35,8 @@ contract AuthorityFace {
     event WhitelistedExchange(address indexed exchange, bool approved);
     event WhitelistedRegistry(address indexed registry, bool approved);
     event WhitelistedFactory(address indexed factory, bool approved);
+    event WhitelistedGabcoin(address indexed gabcoin, bool approved);
+    event WhitelistedDrago(address indexed drago, bool approved);
     event NewEventful(address indexed eventful);
 
     // METHODS
@@ -45,6 +47,7 @@ contract AuthorityFace {
     function whitelistAsset(address _asset, bool _isWhitelisted) {}
     function whitelistExchange(address _exchange, bool _isWhitelisted) {}
     function whitelistDrago(address _drago, bool _isWhitelisted) {}
+    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) {}
     function whitelistRegistry(address _registry, bool _isWhitelisted) {}
     function whitelistFactory(address _factory, bool _isWhitelisted) {}
     function setEventful(address _eventful) {}
@@ -55,7 +58,8 @@ contract AuthorityFace {
     function isWhitelistedAsset(address _asset) constant returns (bool) {}
     function isWhitelistedExchange(address _exchange) constant returns (bool) {}
     function isWhitelistedRegistry(address _registry) constant returns (bool) {}
-    function isWhitelistedDrago(address _drago) constant returns (bool) {} 
+    function isWhitelistedDrago(address _drago) constant returns (bool) {}
+    function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
     function isWhitelistedFactory(address _factory) constant returns (bool) {}
     function getEventful() constant returns (address) {}
     function getOwner() constant returns (address) {}
@@ -67,11 +71,13 @@ contract Authority is Owned, AuthorityFace {
 		bool whitelister;
 		bool exchange;
 		bool drago;
+		bool gabcoin;
 		bool asset;
 		bool user;
 		bool registry;
 		bool factory;
 		bool authority;
+		mapping(address => Lists) lists;
 	}
 	
 	struct Account {
@@ -117,7 +123,7 @@ contract Authority is Owned, AuthorityFace {
         accounts[_target].groups[true].user = _isWhitelisted;
         WhitelistedUser(_target, _isWhitelisted);
     }
-    
+
     function whitelistAsset(address _asset, bool _isWhitelisted) only_whitelister {
         accounts[_asset].account = _asset;
         accounts[_asset].authorized = _isWhitelisted;
@@ -137,6 +143,13 @@ contract Authority is Owned, AuthorityFace {
         accounts[_drago].authorized = _isWhitelisted;
         accounts[_drago].groups[true].drago = _isWhitelisted;
         WhitelistedDrago(_drago, _isWhitelisted);
+    }
+    
+    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) only_admin {
+        accounts[_gabcoin].account = _gabcoin;
+        accounts[_gabcoin].authorized = _isWhitelisted;
+        accounts[_gabcoin].groups[true].gabcoin = _isWhitelisted;
+        WhitelistedDrago(_gabcoin, _isWhitelisted);
     }
     
     function whitelistRegistry(address _registry, bool _isWhitelisted) only_admin {
@@ -182,6 +195,10 @@ contract Authority is Owned, AuthorityFace {
         return accounts[_drago].groups[true].drago;
     }	
     
+    function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {
+        return accounts[_gabcoin].groups[true].gabcoin;
+    } 
+
     function isWhitelistedRegistry(address _registry) constant returns (bool) {
         return accounts[_registry].groups[true].registry;
     }
