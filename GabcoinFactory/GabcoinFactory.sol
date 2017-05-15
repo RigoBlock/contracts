@@ -35,7 +35,7 @@ contract DragoRegistry {
 	function getFee() constant returns (uint) {}
 }
 
-contract GabcoinFactoryFace is Owned {
+contract GabcoinFactoryFace {
 
 	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
 
