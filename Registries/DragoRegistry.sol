@@ -76,7 +76,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	
 	modifier when_fee_paid { if (msg.value < fee) return; _; }
 	modifier when_address_free(address _drago) { if (mapFromAddress[_drago] != 0) return; _; }
-	modifier when_symbol_free(string _symbol) { if (mapFromSymbol[_symbol] != 0) return; _; }
+	//modifier when_symbol_free(string _symbol) { if (mapFromSymbol[_symbol] != 0) return; _; }
 	modifier when_is_symbol(string _symbol) { if (bytes(_symbol).length != 3) return; _; }
 	modifier when_has_symbol(string _symbol) { if (mapFromSymbol[_symbol] == 0) return; _; }
 	modifier only_drago_owner(uint _id) { if (dragos[_id].owner != msg.sender) return; _; }
@@ -89,7 +89,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		return registerAs(_drago, _name, _symbol, _dragoID, _owner, msg.sender);
 	}
 
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) payable when_fee_paid when_address_free(_drago) when_name_free(_name) when_is_symbol(_symbol) when_symbol_free(_symbol) returns (bool) {
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) payable when_fee_paid when_address_free(_drago) when_name_free(_name) when_is_symbol(_symbol) returns (bool) {
 		dragos.push(Drago(_drago, _name, _symbol, _dragoID, _owner, _group));
 		mapFromAddress[_drago] = dragos.length;
 		mapFromName[_name] = dragos.length;
