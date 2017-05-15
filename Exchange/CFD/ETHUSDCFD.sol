@@ -66,7 +66,7 @@ contract ExchangeEventful {
 	function trade(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint amountGive, uint expires, address user, uint amount) returns (bool success) {}
 	function cancelOrder(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns (bool success) {}
 	function cancel(address _who, address _exchange, address _cfd, uint32 _id, uint128 _stake) returns (bool success) {}
-	function finalize(address _who, address _exchange, address _cfd, uint24 _id, address _stable, address _leveraged) returns (bool success) {}
+	function finalize(address _who, address _exchange, address _cfd, uint24 _id, address _stable, address _leveraged, uint128 price) returns (bool success) {}
 	function addCredits(address _who, address _exchange, address _stable, uint _stable_gets, address _leveraged, uint _leveraged_gets, uint24 id) returns (bool success) {}
 }
 
@@ -110,6 +110,7 @@ contract CFDFace {
 	function getLeveraged(uint32 _id) constant returns (address) {}
 	function getDealStake(uint32 _id) constant returns (uint128) {}
 	function getDealLev(uint32 _id) constant returns (uint) {}
+	function getPrice() constant returns (uint) {}
 }
 
 contract CFD is SafeMath, CFDFace {
@@ -448,13 +449,17 @@ contract CFD is SafeMath, CFDFace {
 	function getLeveraged(uint32 _id) constant returns (address) {
 	    return deals[_id].leveraged;
 	}
+	
+	function getPrice() constant returns (uint) {
+	    return oracle.get();
+	}
 
 	Oracle public oracle;
 	uint32 public period;
 	
 	address public exchange;
 
-    uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
+    	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
 	uint32 public next_id = 1;
 
 	mapping (uint32 => Order) public orders;
@@ -465,7 +470,7 @@ contract CFD is SafeMath, CFDFace {
 	uint32 public head;			// insert into linked ring; no order.
 	
 	uint128 min_stake = 100 finney;	// minimum stake to avoid dust clogging things up.
-    uint public maxLev = 1;
+    	uint public maxLev = 1;
     
 	mapping (address => uint) public accounts;
 }
