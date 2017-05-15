@@ -1,7 +1,9 @@
-//! Authority contract.
+//! Drago Interface contract.
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
 //! Drago EVO version uses eventful to pool events.
+
+pragma solidity ^0.4.11;
 
 contract DragoFace {
 
@@ -28,7 +30,8 @@ contract DragoFace {
 
 	function balanceOf(address _who) constant returns (uint) {}
 	function getEventful() constant returns (address) {}
-	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
+	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice) {}
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
 	function getOwner() constant returns (address) {}
+	function totalSupply() constant returns (uint256) {}
 }
