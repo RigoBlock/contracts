@@ -65,6 +65,32 @@ contract ERC20Face {
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 }
 
+contract GabcoinEventful {
+
+	// EVENTS
+
+    event BuyGabcoin(address indexed gabcoin, address indexed from, address indexed to, uint256 amount, uint256 revenue);
+	event SellGabcoin(address indexed gabcoin, address indexed from, address indexed to, uint256 amount, uint256 revenue);
+	event NewFee(address indexed gabcoin, address indexed from, address indexed to, uint fee);
+	event NewCollector(address indexed gabcoin, address indexed from, address indexed to, address collector);
+	event GabcoinDAO(address indexed gabcoin, address indexed from, address indexed to, address gabcoinDAO);
+	event DepositCasper(address indexed gabcoin, address indexed validator, address indexed casper, address withdrawal, uint amount);
+	event WithdrawCasper(address indexed gabcoin, address indexed validator, address indexed casper, uint validatorIndex);
+	event GabcoinCreated(address indexed gabcoin, address indexed group, address indexed owner, uint gabcoinID, string name, string symbol);
+
+    // METHODS
+
+    function buyGabcoin(address _who, address _targetGabcoin, uint _value, uint _amount) returns (bool success) {}
+    function sellGabcoin(address _who, address _targetGabcoin, uint _amount, uint _revenue) returns(bool success) {}
+    function changeRatio(address _who, address _targetGabcoin, uint256 _ratio) returns(bool success) {}
+    function setTransactionFee(address _who, address _targetGabcoin, uint _transactionFee) returns(bool success) {}
+    function changeFeeCollector(address _who, address _targetGabcoin, address _feeCollector) returns(bool success) {}
+    function changeGabcoinDAO(address _who, address _targetGabcoin, address _gabcoinDAO) returns(bool success) {}
+    function depositToCasper(address _who, address _targetGabcoin, address _casper, address _validation, address _withdrawal, uint _amount) returns(bool success) {}
+    function withdrawFromCasper(address _who, address _targetGabcoin, address _casper, uint _validatorIndex) returns(bool success) {}
+    function createGabcoin(address _who, address _gabcoinFactory, address _newGabcoin, string _name, string _symbol, uint _gabcoinId, address _owner) returns(bool success) {}
+}
+
 contract Authority {
 
     // EVENTS
@@ -76,11 +102,10 @@ contract Authority {
     event WhitelistedAsset(address indexed asset, bool approved);
     event WhitelistedExchange(address indexed exchange, bool approved);
     event WhitelistedRegistry(address indexed registry, bool approved);
-    event WhitelistedDrago(address indexed drago, bool approved);
-    event WhitelistedGabcoin(address indexed gabcoin, bool approved);
     event WhitelistedFactory(address indexed factory, bool approved);
+    event WhitelistedGabcoin(address indexed gabcoin, bool approved);
+    event WhitelistedDrago(address indexed drago, bool approved);
     event NewEventful(address indexed eventful);
-    event NewCasper(address indexed casper);
 
     // METHODS
 
@@ -94,7 +119,9 @@ contract Authority {
     function whitelistRegistry(address _registry, bool _isWhitelisted) {}
     function whitelistFactory(address _factory, bool _isWhitelisted) {}
     function setEventful(address _eventful) {}
-    function setCasper(address _eventful) {}
+    function setGabcoinEventful(address _gabcoinEventful) {}
+    function setExchangeEventful(address _exchangeEventful) {}
+    function setCasper(address _casper) {}
 
     function isWhitelistedUser(address _target) constant returns (bool) {}
     function isWhitelister(address _whitelister) constant returns (bool) {}
@@ -103,12 +130,17 @@ contract Authority {
     function isWhitelistedExchange(address _exchange) constant returns (bool) {}
     function isWhitelistedRegistry(address _registry) constant returns (bool) {}
     function isWhitelistedDrago(address _drago) constant returns (bool) {}
-    function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {}
+    function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
     function isWhitelistedFactory(address _factory) constant returns (bool) {}
     function getEventful() constant returns (address) {}
+    function getGabcoinEventful() constant returns (address) {}
+    function getExchangeEventful() constant returns (address) {}
     function getCasper() constant returns (address) {}
     function getOwner() constant returns (address) {}
+    function getListsByGroups(string _group) constant returns (address[]) {}
 }
+
+
 
 contract Casper {
     
@@ -149,16 +181,20 @@ contract GabcoinFace {
 }
 
 contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
+    
+    struct AtCasper {
+        uint deposits;
+    }
+    
+    event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
+	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
+	event DepositCasper(uint amount, address indexed who, address indexed validation, address indexed withdrawal);
+ 	event WithdrawCasper(uint deposit, address indexed who, address casper);
 
 	modifier only_gabcoinDAO { if (msg.sender != gabcoinDAO) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	modifier casper_contract_only(address _casper) { Authority auth = Authority(authority); if (_casper != auth.getCasper()) return; _; }
     modifier minimum_stake(uint _amount) { if (_amount < min_order) throw; _; }
-
-	event Buy(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
-	event Sell(address indexed from, address indexed to, uint256 indexed _amount, uint256 _revenue);
-	event DepositCasper(uint amount, address indexed who, address indexed validation, address indexed withdrawal);
- 	event WithdrawCasper(uint deposit, address indexed who, address casper);
 
 	function Gabcoin(string _gabcoinName,  string _gabcoinSymbol, uint _gabcoinID, address _owner, address _authority) {
 		name = _gabcoinName;    
@@ -168,7 +204,8 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		authority = _authority;
     }
 
-	function() payable casper_contract_only(msg.sender) {}
+	function() payable casper_contract_only(msg.sender) {
+	}
 	
 	//this function is used to allow dragos to buy gabcoins
 	function deposit(address _token, uint _amount) payable returns (bool success) {
@@ -190,9 +227,9 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		uint fee_gabcoin = safeMul(fee , ratio) / 100;
 		uint fee_gabcoinDAO = safeSub(fee, fee_gabcoin);
 		uint amount = safeSub(gross_amount, fee);
-		//double check whether to send operations to eventful
-		//Eventful events = Eventful(getEventful());
-		//if (!events.buyDrago(msg.sender, this, msg.value, amount)) throw;
+		Authority auth = Authority(authority);
+		GabcoinEventful events = GabcoinEventful(auth.getEventful());
+		require(events.buyGabcoin(msg.sender, this, msg.value, amount));
 		balances[msg.sender] = safeAdd(balances[msg.sender], amount);
 		balances[feeCollector] = safeAdd(balances[feeCollector] ,fee_gabcoin);
 		balances[gabcoinDAO] = safeAdd(balances[gabcoinDAO], fee_gabcoinDAO);
@@ -209,9 +246,9 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		uint fee_gabcoinDAO = safeSub(fee, fee_gabcoinDAO);
 		uint net_amount = safeSub(_amount, fee);	
 		uint net_revenue = safeMul(net_amount, price) / base;
-		//double check whether to render events in eventful
-		//Eventful events = Eventful(getEventful());
-		//if (!events.sellDrago(msg.sender, this, _amount, net_revenue)) return;
+		Authority auth = Authority(authority);
+        GabcoinEventful events = GabcoinEventful(auth.getEventful());		
+        require(events.sellGabcoin(msg.sender, this, _amount, net_revenue));
 		balances[msg.sender] = safeSub(balances[msg.sender], _amount);
 		balances[feeCollector] = safeAdd(balances[feeCollector], fee_gabcoin);
 		balances[gabcoinDAO] =safeAdd(balances[gabcoinDAO], fee_gabcoinDAO);
@@ -228,6 +265,9 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		Authority auth = Authority(authority);
 		Casper casper = Casper(auth.getCasper());
 		require(casper.deposit.value(_amount)(_validation, _withdrawal));
+		GabcoinEventful events = GabcoinEventful(auth.getEventful());
+		require(events.depositToCasper(msg.sender, this, auth.getCasper(), _validation, _withdrawal, _amount));
+		atCasper.deposits = safeAdd(atCasper.deposits, _amount);
 		DepositCasper(_amount, msg.sender, _validation, _withdrawal);
 		return true;
 	}
@@ -236,23 +276,38 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		Authority auth = Authority(authority);
 		Casper casper = Casper(auth.getCasper());
 		if (!casper.withdraw(_validatorIndex)) throw;
-		uint depositValue = casper.balanceOf(this);
+		GabcoinEventful events = GabcoinEventful(auth.getEventful());
+		require(events.withdrawFromCasper(msg.sender, this, auth.getCasper(), _validatorIndex));
+		uint depositValue = atCasper.deposits;
+		delete(atCasper.deposits);
 		WithdrawCasper(depositValue, msg.sender, auth.getCasper());
-	}	
+	}
 
 	function changeRatio(uint256 _ratio) only_gabcoinDAO {
+	    Authority auth = Authority(authority);
+	    GabcoinEventful events = GabcoinEventful(auth.getEventful());
+	    require(events.changeRatio(msg.sender, this, _ratio));
 		ratio = _ratio;
 	}
 	
 	function setTransactionFee(uint _transactionFee) only_owner {
+	    Authority auth = Authority(authority);
+	    GabcoinEventful events = GabcoinEventful(auth.getEventful());
+	    require(events.setTransactionFee(msg.sender, this, _transactionFee));
 		transactionFee = _transactionFee;	//fee is in basis points (1 bps = 0.01%)
 	}
 
-	function changeFeeCollector(address _feeCollector) only_owner {	
+	function changeFeeCollector(address _feeCollector) only_owner {
+	    Authority auth = Authority(authority);
+	    GabcoinEventful events = GabcoinEventful(auth.getEventful());
+	    require(events.changeFeeCollector(msg.sender, this, _feeCollector));
 	    feeCollector = _feeCollector; 
 	}
 	
 	function changeGabcoinDAO(address _gabcoinDAO) only_gabcoinDAO {
+	    Authority auth = Authority(authority);
+	    GabcoinEventful events = GabcoinEventful(auth.getEventful());
+	    require(events.changeGabcoinDAO(msg.sender, this, _gabcoinDAO));
         gabcoinDAO = _gabcoinDAO;
 	}
 	
@@ -292,6 +347,8 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 	function getSymbol() constant returns (string) {
 	    return symbol;
 	}
+
+	AtCasper atCasper;
 
 	string public name;
 	string public symbol;
