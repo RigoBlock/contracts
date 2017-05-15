@@ -11,7 +11,7 @@ contract GabcoinFace {
 	function buyGabcoin() payable returns (bool success) {}
 	function sellGabcoin(uint256 amount) returns (bool success) {}
 	function depositCasper(address _validation, address _withdrawal, uint _amount) returns (bool success) {}
-  function withdrawCasper(uint _validatorIndex) {}
+    function withdrawCasper(uint _validatorIndex) {}
 	function changeRatio(uint256 _ratio) {}	
 	function setTransactionFee(uint _transactionFee) {}	
 	function changeFeeCollector(address _feeCollector) {}	
