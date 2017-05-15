@@ -69,9 +69,14 @@ contract AuthorityFace {
     function getExchangeEventful() constant returns (address) {}
     function getCasper() constant returns (address) {}
     function getOwner() constant returns (address) {}
+    function getListsByGroups(address _group) constant returns (address[]) {}
 }
 
 contract Authority is Owned, AuthorityFace {
+    
+    struct List {
+        address target;
+    }
     
     struct Group {
 		bool whitelister;
@@ -83,6 +88,8 @@ contract Authority is Owned, AuthorityFace {
 		bool registry;
 		bool factory;
 		bool authority;
+		List[] list;
+		mapping (address=> address[]) mapFromGroup;
 	}
 	
 	struct Account {
@@ -118,6 +125,7 @@ contract Authority is Owned, AuthorityFace {
         accounts[_authority].account = _authority;
         accounts[_authority].authorized = _isWhitelisted;
         accounts[_authority].groups[true].authority = _isWhitelisted;
+        accounts[_authority].groups[true].list.push(List(_authority));
         SetAuthority(_authority);
     }
 
@@ -125,6 +133,7 @@ contract Authority is Owned, AuthorityFace {
         accounts[_whitelister].account = _whitelister;
         accounts[_whitelister].authorized = _isWhitelisted;
         accounts[_whitelister].groups[true].whitelister = _isWhitelisted;
+        accounts[_whitelister].groups[true].list.push(List(_whitelister));
         SetWhitelister(_whitelister);
     }
 	
@@ -132,6 +141,7 @@ contract Authority is Owned, AuthorityFace {
         accounts[_target].account = _target;
         accounts[_target].authorized = _isWhitelisted;
         accounts[_target].groups[true].user = _isWhitelisted;
+        accounts[_target].groups[true].list.push(List(_target));
         WhitelistedUser(_target, _isWhitelisted);
     }
 
@@ -139,6 +149,7 @@ contract Authority is Owned, AuthorityFace {
         accounts[_asset].account = _asset;
         accounts[_asset].authorized = _isWhitelisted;
         accounts[_asset].groups[true].asset = _isWhitelisted;
+        accounts[_asset].groups[true].list.push(List(_asset));
         WhitelistedAsset(_asset, _isWhitelisted);
     }
     
@@ -146,6 +157,7 @@ contract Authority is Owned, AuthorityFace {
         accounts[_exchange].account = _exchange;
         accounts[_exchange].authorized = _isWhitelisted;
         accounts[_exchange].groups[true].exchange = _isWhitelisted;
+        accounts[_exchange].groups[true].list.push(List(_exchange));
         WhitelistedExchange(_exchange, _isWhitelisted);
     }
     
@@ -153,6 +165,7 @@ contract Authority is Owned, AuthorityFace {
         accounts[_drago].account = _drago;
         accounts[_drago].authorized = _isWhitelisted;
         accounts[_drago].groups[true].drago = _isWhitelisted;
+        accounts[_drago].groups[true].list.push(List(_drago));
         WhitelistedDrago(_drago, _isWhitelisted);
     }
     
@@ -160,20 +173,23 @@ contract Authority is Owned, AuthorityFace {
         accounts[_gabcoin].account = _gabcoin;
         accounts[_gabcoin].authorized = _isWhitelisted;
         accounts[_gabcoin].groups[true].gabcoin = _isWhitelisted;
+        accounts[_gabcoin].groups[true].list.push(List(_gabcoin));
         WhitelistedDrago(_gabcoin, _isWhitelisted);
     }
     
     function whitelistRegistry(address _registry, bool _isWhitelisted) only_admin {
         accounts[_registry].account = _registry;
         accounts[_registry].authorized = _isWhitelisted;
-        accounts[_registry].groups[true].registry = _isWhitelisted;		
+        accounts[_registry].groups[true].registry = _isWhitelisted;
+        accounts[_registry].groups[true].list.push(List(_registry));
         WhitelistedRegistry(_registry, _isWhitelisted);
     }
 
     function whitelistFactory(address _factory, bool _isWhitelisted) only_admin {
         accounts[_factory].account = _factory;
         accounts[_factory].authorized = _isWhitelisted;
-        accounts[_factory].groups[true].registry = _isWhitelisted;		
+        accounts[_factory].groups[true].registry = _isWhitelisted;
+        accounts[_factory].groups[true].list.push(List(_factory));
         WhitelistedFactory(_factory, _isWhitelisted);
     }
     
@@ -249,7 +265,11 @@ contract Authority is Owned, AuthorityFace {
         return blocks.casper;
     }
     
+    function getListsByGroups(address _group) constant returns (address[]) {
+        return accounts[_group].groups[true].mapFromGroup[_group];
+    }
+
     BuildingBlocks blocks;
-    
+
     mapping (address => Account) accounts;
 }
