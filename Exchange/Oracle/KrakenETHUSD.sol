@@ -100,6 +100,8 @@ contract KrakenPriceTicker is usingOraclize, Oracle {
         }
     }
     
+    function() payable only_owner {} //allows to charge-up the contract without interfering with normal update loop
+    
     function get() constant returns (uint) {
         return ETHUSD;
     }
