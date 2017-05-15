@@ -2,6 +2,8 @@
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
 
+pragma solidity ^0.4.11;
+
 contract CFDFace {
 
   	// EVENTS
@@ -33,4 +35,5 @@ contract CFDFace {
 	function getLeveraged(uint32 _id) constant returns (address) {}
 	function getDealStake(uint32 _id) constant returns (uint128) {}
 	function getDealLev(uint32 _id) constant returns (uint) {}
+	function getPrice() constant returns (uint) {}
 }
