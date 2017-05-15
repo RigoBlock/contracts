@@ -60,13 +60,12 @@ contract ExchangeEventfulFace {
 
 	event Deposit(address exchange, address token, address user, uint amount, uint balance);
 	event Withdraw(address exchange, address token, address user, uint amount, uint balance);
-	event Order(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
-	event OrderPlaced(address exchange, address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
+	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
+	event OrderPlaced(address exchange, address indexed cfd, uint32 id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
     event OrderMatched(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 id, uint32 deal, uint64 strike, uint128 stake);
-	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event OrderCancelled(address exchange, address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
-	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
-	event Trade(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
+	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user);
+	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 	event DealFinalized(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
 
 	// METHODS
@@ -90,9 +89,8 @@ contract ExchangeEventful is ExchangeEventfulFace {
 	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event OrderPlaced(address exchange, address indexed cfd, uint32 id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
     event OrderMatched(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 id, uint32 deal, uint64 strike, uint128 stake);
-	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user);
 	event OrderCancelled(address exchange, address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
-	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
+	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user);
 	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 	event DealFinalized(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
 
@@ -120,9 +118,9 @@ contract ExchangeEventful is ExchangeEventfulFace {
 	    Order(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _who);
 	}
 	
-	function orderCFD(address _who, address _exchange, address _cfd, uint32 id, bool _is_stable, uint32 _adjustment, uint128 _stake) approved_exchange_only(_exchange) approved_asset_only(_cfd) returns (bool success) {
+	function orderCFD(address _who, address _exchange, address _cfd, uint32 _id, bool _is_stable, uint32 _adjustment, uint128 _stake) approved_exchange_only(_exchange) approved_asset_only(_cfd) returns (bool success) {
 	    if (msg.sender != _cfd) return;
-	    OrderPlaced(_exchange, _cfd, _who, _is_stable, _adjustment, _stake);
+	    OrderPlaced(_exchange, _cfd, _id, _who, _is_stable, _adjustment, _stake);
 	}
 	
 	function dealCFD(address _who, address _exchange, address _cfd, uint32 _order, address _stable, address _leveraged, bool _is_stable, uint32 _id, uint64 _strike, uint128 _stake) approved_exchange_only(_exchange) returns (bool success) {
