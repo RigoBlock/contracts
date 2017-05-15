@@ -151,7 +151,7 @@ contract Drago {
 
 contract NAVFace {
 
-  function estimateNAV() returns (uint) {}
+  function estimateNAV() constant returns (uint) {}
 }
 
 contract NAV is SafeMath, NAVFace {
