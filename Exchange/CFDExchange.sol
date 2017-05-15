@@ -254,7 +254,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 	function deposit(address _token, uint256 _amount) payable ether_only(_token) minimum_stake(msg.value) returns (bool success) {
 		tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
 		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
-		require(eventful.deposit(msg.sender, this, _token, _amount));
+		require(eventful.deposit(msg.sender, this, _token, _amount, tokens[address(0)][msg.sender]));
 		Deposit(0, msg.sender, msg.value, tokens[address(0)][msg.sender]);
 		return true;
 	}
@@ -264,7 +264,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		tokens[address(0)][msg.sender] = safeSub(tokens[address(0)][msg.sender], _amount);
 		if (!msg.sender.call.value(_amount)()) throw;
 		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
-		require(eventful.withdraw(msg.sender, this, _token, _amount));
+		require(eventful.withdraw(msg.sender, this, _token, _amount, tokens[address(0)][msg.sender]));
 		Withdraw(0, msg.sender, _amount, tokens[address(0)][msg.sender]);
 		return true;
 	}
