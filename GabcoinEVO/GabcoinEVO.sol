@@ -267,7 +267,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		require(casper.deposit.value(_amount)(_validation, _withdrawal));
 		GabcoinEventful events = GabcoinEventful(auth.getEventful());
 		require(events.depositToCasper(msg.sender, this, auth.getCasper(), _validation, _withdrawal, _amount));
-		atCasper.deposits = safeAdd(atCasper.deposits, _amount);
+		//atCasper.deposits = safeAdd(atCasper.deposits, _amount);
 		DepositCasper(_amount, msg.sender, _validation, _withdrawal);
 		return true;
 	}
@@ -278,8 +278,9 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		if (!casper.withdraw(_validatorIndex)) throw;
 		GabcoinEventful events = GabcoinEventful(auth.getEventful());
 		require(events.withdrawFromCasper(msg.sender, this, auth.getCasper(), _validatorIndex));
-		uint depositValue = atCasper.deposits;
-		delete(atCasper.deposits);
+		//uint depositValue = atCasper.deposits;
+		//delete(atCasper.deposits);
+		uint depositValue = casper.balanceOf(this);
 		WithdrawCasper(depositValue, msg.sender, auth.getCasper());
 	}
 
