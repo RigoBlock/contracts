@@ -227,12 +227,12 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 
 	// EVENTS
 
-	//event Deposit(address token, address user, uint amount, uint balance);
-  	//event Withdraw(address token, address user, uint amount, uint balance);
+	event Deposit(address token, address user, uint amount, uint balance);
+  	event Withdraw(address token, address user, uint amount, uint balance);
 	//event OrderPlaced(address indexed cfd, uint32 id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
 	//event OrderMatched(address indexed cfd, uint32 id, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
-	//event OrderCancelled(address indexed cfd, uint32 id, address indexed who, uint128 stake);
-	//event DealFinalized(address indexed cfd, uint32 id, address indexed stable, address indexed leveraged);
+	event OrderCancelled(address indexed cfd, uint32 id, address indexed who, uint128 stake);
+	event DealFinalized(address indexed cfd, uint32 id, address indexed stable, address indexed leveraged);
 
 	// MODIFIERS
  
@@ -254,7 +254,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
 		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
 		require(eventful.deposit(msg.sender, this, _token, _amount));
-		//Deposit(0, msg.sender, msg.value, tokens[address(0)][msg.sender]);
+		Deposit(0, msg.sender, msg.value, tokens[address(0)][msg.sender]);
 		return true;
 	}
 
@@ -264,7 +264,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		if (!msg.sender.call.value(_amount)()) throw;
 		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
 		require(eventful.withdraw(msg.sender, this, _token, _amount));
-		//Withdraw(0, msg.sender, _amount, tokens[address(0)][msg.sender]);
+		Withdraw(0, msg.sender, _amount, tokens[address(0)][msg.sender]);
 		return true;
 	}
 
@@ -283,7 +283,9 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		if (!cfd.cancelExchange(_id, msg.sender)) return;
 		tokens[address(0)][msg.sender] += stake / cfd.getMaxLeverage();
 		accounts[msg.sender].balance -= stake / cfd.getMaxLeverage();
-		//OrderCancelled(_cfd, _id, msg.sender, stake);
+		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
+		require(eventful.cancel(msg.sender, this, _cfd, _id));
+		OrderCancelled(_cfd, _id, msg.sender, stake);
 	}
 
 	function finalize(address _cfd, uint24 _id) approved_asset(_cfd) {
@@ -291,7 +293,9 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		if (msg.sender != cfd.getStable(_id) || msg.sender != cfd.getLeveraged(_id)) throw;
 		if (!cfd.finalizeExchange(_id, msg.sender)) return;
 		//cfd has callback to addCredits of P&L
-		//DealFinalized(_cfd, _id, cfd.getStable(_id), cfd.getLeveraged(_id));
+		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
+		require(eventful.finalize(msg.sender, this, _cfd, _id));
+		DealFinalized(_cfd, _id, cfd.getStable(_id), cfd.getLeveraged(_id));
 	}
 	
 	function addCredits(address stable, uint stable_gets, address leveraged, uint leveraged_gets, uint24 id) approved_asset(msg.sender) returns (bool success) {
