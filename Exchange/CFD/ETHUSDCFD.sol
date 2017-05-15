@@ -34,10 +34,40 @@ contract SafeMath {
 }
 
 contract Exchange {
-    
-	// contract only needs to know function to send user-credits to exchange
+    // contract only needs to know these 2 functions to send user-credits to exchange
+
     function addCredits(address stable, uint stable_gets, address leveraged, uint leveraged_gets, uint24 id) returns (bool success) {}
+
+    function getExchangeEventful() constant returns (address) {}
+}
+
+contract ExchangeEventful {
     
+	// EVENTS
+
+	event Deposit(address exchange, address token, address user, uint amount, uint balance);
+	event Withdraw(address exchange, address token, address user, uint amount, uint balance);
+	event Order(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
+	event OrderPlaced(address exchange, address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
+    event OrderMatched(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
+	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
+	event OrderCancelled(address exchange, address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
+	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
+	event Trade(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
+	event DealFinalized(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
+
+	// METHODS
+
+	function deposit(address _who, address _exchange, address _token, uint _amount) payable returns (bool success) {}
+	function withdraw(address _who, address _exchange, address _token, uint _amount) returns (bool success) {}
+	function order(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns (bool success) {}
+	function orderCFD(address _who, address _exchange, address _cfd, uint32 id, bool _is_stable, uint32 _adjustment, uint128 _stake) returns (bool success) {}
+	function dealCFD(address _who, address _exchange, address _cfd, uint32 order, address stable, address leveraged, bool _is_stable, uint32 id, uint64 strike, uint128 _stake) returns (bool success) {}
+	function trade(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint amountGive, uint expires, address user, uint amount) returns (bool success) {}
+	function cancelOrder(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns (bool success) {}
+	function cancel(address _who, address _exchange, address _cfd, uint32 _id) returns (bool success) {}
+	function finalize(address _who, address _exchange, address _cfd, uint24 _id) returns (bool success) {}
+	function addCredits(address _who, address _exchange, address _stable, uint _stable_gets, address _leveraged, uint _leveraged_gets, uint24 id) returns (bool success) {}
 }
 
 contract Oracle {
@@ -221,7 +251,7 @@ contract CFD is SafeMath, CFDFace {
 		    //THIS CALLBACK TO EXCHANGE IS IMPORTANT TO PROPERLY CREDIT P&L	
 			Exchange exch = Exchange(exchange);
 	        if (!exch.addCredits(deals[id].stable, stable_gets, deals[id].leveraged, leveraged_gets, id)) return;
-	        
+	      
 			DealFinalized(id, deals[id].stable, deals[id].leveraged, price);
 			removeDeal(id);
 		}
@@ -265,6 +295,9 @@ contract CFD is SafeMath, CFDFace {
 		}
 
 		OrderPlaced(id, who, is_stable, adjustment, stake);
+
+		ExchangeEventful eventful = ExchangeEventful(exchange);
+		require(eventful.orderCFD(who, msg.sender, this, id, is_stable, adjustment, stake));
 	}
 
 	// removes an order from one of the two lists
@@ -312,6 +345,10 @@ contract CFD is SafeMath, CFDFace {
 		}
 
 		OrderMatched(order, stable, leveraged, who == stable, id, strike, stake);
+	
+	    ExchangeEventful eventful = ExchangeEventful(exchange);
+		require(eventful.dealCFD(who, msg.sender, this, order, stable, leveraged, who == stable, id, strike, stake));    
+	    
 	}
 
 	// removes the deal id from deals.
