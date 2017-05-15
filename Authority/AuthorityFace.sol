@@ -51,4 +51,5 @@ contract AuthorityFace {
     function getExchangeEventful() constant returns (address) {}
     function getCasper() constant returns (address) {}
     function getOwner() constant returns (address) {}
+    function getListsByGroups(address _group) constant returns (address[]) {}
 }
