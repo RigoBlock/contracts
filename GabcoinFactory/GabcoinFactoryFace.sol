@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.11;
 
-contract GabcoinFactoryFace is Owned {
+contract GabcoinFactoryFace {
 
 	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
 
@@ -16,7 +16,7 @@ contract GabcoinFactoryFace is Owned {
 	function setFee(uint _fee) {}
 	function drain() {}
 
-	function getRegistry() constant returns (address) {}
+    function getRegistry() constant returns (address) {}
 	function getStorage() constant returns (address gabcoinDAO, string version, uint nextGabcoinID) {}
 	function getNextID() constant returns (uint nextGabcoinID) {}
 	function getEventful() constant returns (address) {}
