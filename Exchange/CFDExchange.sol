@@ -127,6 +127,7 @@ contract CFD {
 	function getMaxLeverage() constant returns (uint) {}
 	function getDealStake(uint32 _id) constant returns (uint128) {}
 	function getDealLev(uint32 _id) constant returns (uint) {}
+	function getPrice() constant returns (uint) {}
 }
 
 contract ERC20 {
@@ -156,7 +157,7 @@ contract ExchangeEventful {
 	event OrderCancelled(address exchange, address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
 	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event Trade(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
-	event DealFinalized(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
+	event DealFinalized(address exchange, address indexed cfd, address user, address indexed stable, address indexed leveraged, uint64 price);
 
 	// METHODS
 
@@ -168,7 +169,7 @@ contract ExchangeEventful {
 	function trade(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint amountGive, uint expires, address user, uint amount) returns (bool success) {}
 	function cancelOrder(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns (bool success) {}
 	function cancel(address _who, address _exchange, address _cfd, uint32 _id, uint128 _stake) returns (bool success) {}
-	function finalize(address _who, address _exchange, address _cfd, uint24 _id, address _stable, address _leveraged) returns (bool success) {}
+	function finalize(address _who, address _exchange, address _cfd, uint24 _id, address _stable, address _leveraged, uint64 price) returns (bool success) {}
 	function addCredits(address _who, address _exchange, address _stable, uint _stable_gets, address _leveraged, uint _leveraged_gets, uint24 id) returns (bool success) {}
 }
 
@@ -233,7 +234,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 	//event OrderPlaced(address indexed cfd, uint32 id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
 	//event OrderMatched(address indexed cfd, uint32 id, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
 	event OrderCancelled(address indexed cfd, uint32 id, address indexed who, uint128 stake);
-	event DealFinalized(address indexed cfd, uint32 id, address indexed stable, address indexed leveraged);
+	event DealFinalized(address indexed cfd, uint32 id, address indexed stable, address indexed leveraged, uint64 price);
 
 	// MODIFIERS
  
@@ -285,7 +286,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		tokens[address(0)][msg.sender] += stake / cfd.getMaxLeverage();
 		accounts[msg.sender].balance -= stake / cfd.getMaxLeverage();
 		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
-		require(eventful.cancel(msg.sender, this, _cfd, _id));
+		require(eventful.cancel(msg.sender, this, _cfd, _id, stake));
 		OrderCancelled(_cfd, _id, msg.sender, stake);
 	}
 
@@ -295,8 +296,8 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		if (!cfd.finalizeExchange(_id, msg.sender)) return;
 		//cfd has callback to addCredits of P&L
 		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
-		require(eventful.finalize(msg.sender, this, _cfd, _id));
-		DealFinalized(_cfd, _id, cfd.getStable(_id), cfd.getLeveraged(_id));
+		require(eventful.finalize(msg.sender, this, _cfd, _id, cfd.getStable(_id), cfd.getLeveraged(_id), uint64(cfd.getPrice())));
+		DealFinalized(_cfd, _id, cfd.getStable(_id), cfd.getLeveraged(_id), uint64(cfd.getPrice()));
 	}
 	
 	function addCredits(address stable, uint stable_gets, address leveraged, uint leveraged_gets, uint24 id) approved_asset(msg.sender) returns (bool success) {
