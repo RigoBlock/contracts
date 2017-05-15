@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.11;
 
-ccontract DragoRegistry {
+contract DragoRegistry {
 
 	//EVENTS
 
@@ -100,9 +100,8 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 	    data.gabcoinRegistry = _registry;
 	    data.gabcoinDAO = _gabcoinDAO;
 	    data.authority = _authority;
-	    //owner = msg.sender; //has to be set since there was not enough space in drago to use standard Owned
 	    //REMEMBER TO SET FACTORY AS WHITELISTER WHEN CREATE A NEW ONE
-	    //SO THAT IT CAN WHITELIST MSG.SENDER AND DRAGO IMMEDIATELY
+	    //SO THAT IT CAN WHITELIST MSG.SENDER AND GABCOIN IMMEDIATELY
 	}
 	
 	function createGabcoin(string _name, string _symbol) returns (bool success) {
@@ -113,13 +112,13 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
         assert(registry.register.value(regFee)(libraryData.newAddress, _name, _symbol, gabcoinID, msg.sender));
         return true;
     }
-    	
+    
     function createGabcoinInternal(string _name, string _symbol, address _owner, uint _gabcoinID) internal when_fee_paid returns (bool success) {
 	    Authority auth = Authority(data.authority);
 	    require(GabcoinFactoryLibrary.createGabcoin(libraryData, _name, _symbol, _owner, _gabcoinID, data.authority));
 		data.gabcoins[msg.sender].push(libraryData.newAddress);
-		//Eventful events = Eventful(getEventful());
-		//if (!events.createDrago(msg.sender, this, libraryData.newAddress, _name, _symbol, _gabcoinID, _owner)) return;
+		GabcoinEventful events = GabcoinEventful(getEventful());
+		if (!events.createGabcoin(msg.sender, this, libraryData.newAddress, _name, _symbol, _gabcoinID, _owner)) return;
 		auth.whitelistGabcoin(libraryData.newAddress, true);
 		auth.whitelistUser(msg.sender, true);
 		GabcoinCreated(_name, _symbol, libraryData.newAddress, _owner, _gabcoinID); //already mapping global events in library
