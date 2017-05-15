@@ -161,9 +161,10 @@ contract DragoFace {
 
 	function balanceOf(address _who) constant returns (uint) {}
 	function getEventful() constant returns (address) {}
-	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
+	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice) {}
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
 	function getOwner() constant returns (address) {}
+	function totalSupply() constant returns (uint256) {}
 }
 
 contract Drago is Owned, ERC20, SafeMath, DragoFace {
@@ -351,16 +352,19 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	    return auth.getEventful();
 	}
 	
-	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {
+	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice) {
 		name = data.name;
 		symbol = data.symbol;
 		sellPrice = data.sellPrice;
 		buyPrice = data.buyPrice;
-		totalSupply = data.totalSupply;
 	}
 
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {
 		return (admin.feeCollector, admin.dragoDAO, admin.ratio, data.transactionFee, data.minPeriod);
+	}
+
+	function totalSupply() constant returns (uint256) {
+	    return data.totalSupply;
 	}
 
 	function() payable when_approved_exchange(msg.sender) {}
