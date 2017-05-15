@@ -156,7 +156,7 @@ contract NAVFace {
 
 contract NAV is SafeMath, NAVFace {
 
-    function estimateAUM(address _drago, address[] _exchanges) returns (uint nav) {
+    function estimateAUM(address _drago, address[] _exchanges) constant returns (uint nav) {
         Drago drago = Drago(_drago);
         for (uint i = 0; i < _exchanges.length; ++i) {
             Exchange exchange = Exchange(_exchanges[i]);
