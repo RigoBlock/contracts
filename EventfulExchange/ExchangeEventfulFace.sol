@@ -11,13 +11,12 @@ contract ExchangeEventfulFace {
 
 	event Deposit(address exchange, address token, address user, uint amount, uint balance);
 	event Withdraw(address exchange, address token, address user, uint amount, uint balance);
-	event Order(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
-	event OrderPlaced(address exchange, address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
-	event OrderMatched(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 id, uint32 deal, uint64 strike, uint128 stake);
-	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
+	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
+	event OrderPlaced(address exchange, address indexed cfd, uint32 id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
+    	event OrderMatched(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 id, uint32 deal, uint64 strike, uint128 stake);
 	event OrderCancelled(address exchange, address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
-	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
-	event Trade(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
+	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user);
+	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 	event DealFinalized(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
 
 	// METHODS
