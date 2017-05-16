@@ -39,7 +39,7 @@ contract GabcoinFactoryFace {
 
 	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
 
-	function createGabcoin(string _name, string _symbol, address _owner) returns (address gabcoin, uint gabcoinID) {}
+	function createGabcoin(string _name, string _symbol) returns (bool success) {}
 	function setTargetGabcoinDAO(address _targetGabcoin, address _gabcoinDAO) {}
 	function changeGabcoinDAO(address _newGabcoinDAO) {}
 	function setRegistry(address _newRegistry) {}
@@ -164,7 +164,7 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 	
 	function getEventful() constant returns (address) {
 	    Authority auth = Authority(data.authority);
-	    return auth.getEventful();
+	    return auth.getGabcoinEventful();
 	}
 	
 	function getGabcoinDAO() constant returns (address) {
