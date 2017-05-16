@@ -21,7 +21,7 @@ contract Owned {
 	    return owner;
 	}
 
-	address public owner = msg.sender;
+	address public owner;// = msg.sender;
 }
 
 contract SafeMath {
@@ -197,10 +197,11 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
     modifier minimum_stake(uint _amount) { if (_amount < min_order) throw; _; }
 
 	function Gabcoin(string _gabcoinName,  string _gabcoinSymbol, uint _gabcoinID, address _owner, address _authority) {
-		name = _gabcoinName;    
+		name = _gabcoinName;
 		symbol = _gabcoinSymbol;
 		gabcoinID = _gabcoinID;
 		owner = _owner;
+		feeCollector = _owner;
 		authority = _authority;
     }
 
@@ -360,10 +361,10 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 	uint public base = 1000000; //tokens are divisible by 1 million
 	uint256 public transactionFee = 0; //in basis points (1bps=0.01%)
 	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
-	address public feeCollector = msg.sender;
+	address public feeCollector;
 	address public gabcoinDAO = msg.sender;
 	address public authority;
-	address public owner;
+	//address public owner;
 	uint256 public ratio = 80;
 	mapping (address => uint256) public balances;
 }
