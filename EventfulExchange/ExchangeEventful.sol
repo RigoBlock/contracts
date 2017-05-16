@@ -153,4 +153,5 @@ contract ExchangeEventful is ExchangeEventfulFace {
 	}
 
     address public authority;
+    string constant public version = 'DH 0.2.1';
 }
