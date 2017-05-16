@@ -17,7 +17,7 @@ library DragoFactoryLibrary {
 	    address newAddress;
 	}
 
-    modifier whitelisted_factory { Authority auth = Authority(0xDFF383e12A7939779359bf6A7f8766E123a18452); if (auth.isWhitelistedFactory(this)) _; }
+    modifier whitelisted_factory { Authority auth = Authority(0x0C9579829547c95E35535FE3C57cf42F90a98785); if (auth.isWhitelistedFactory(this)) _; }
 
 	function createDrago(NewDrago storage self, string _name, string _symbol, address _owner, uint _dragoID, address _authority) whitelisted_factory returns (bool success) {
 	    Drago drago = new Drago(_name, _symbol, _dragoID, _owner, _authority/*, _eventful*/);
