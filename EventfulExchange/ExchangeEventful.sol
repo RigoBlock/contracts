@@ -99,7 +99,7 @@ contract ExchangeEventful is ExchangeEventfulFace {
     modifier approved_user_only(address _user) { Authority auth = Authority(authority); if (auth.isWhitelistedUser(_user)) _; }
     modifier approved_exchange_or_asset(address _target) { Authority auth = Authority(authority); if (auth.isWhitelistedAsset(_target) || auth.isWhitelistedExchange(_target)) _; }
 
-    function Eventful(address _authority) {
+    function ExchangeEventful(address _authority) {
 	    authority = _authority;
 	}
 
