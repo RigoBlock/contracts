@@ -124,7 +124,7 @@ contract GabcoinEventful is GabcoinEventfulFace {
     modifier is_casper(address _casper) { Authority auth = Authority(authority); if (auth.getCasper() == _casper) _; }
     modifier approved_user_only(address _user) { Authority auth = Authority(authority); if (auth.isWhitelistedUser(_user)) _; }
 
-    function Eventful(address _authority) {
+    function GabcoinEventful(address _authority) {
 	    authority = _authority;
 	}
 
