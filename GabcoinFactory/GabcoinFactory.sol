@@ -66,7 +66,7 @@ library GabcoinFactoryLibrary {
 	    address newAddress;
 	}
 
-    modifier whitelisted_factory { Authority auth = Authority(0xDFF383e12A7939779359bf6A7f8766E123a18452); if (auth.isWhitelistedFactory(this)) _; }
+    modifier whitelisted_factory { Authority auth = Authority(0x0C9579829547c95E35535FE3C57cf42F90a98785); if (auth.isWhitelistedFactory(this)) _; }
 
 	function createGabcoin(NewGabcoin storage self, string _name, string _symbol, address _owner, uint _gabcoinID, address _authority) whitelisted_factory returns (bool success) {
 	    Gabcoin gabcoin = new Gabcoin(_name, _symbol, _gabcoinID, _owner, _authority);
