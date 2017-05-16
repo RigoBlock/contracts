@@ -94,7 +94,7 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
 	modifier when_fee_paid { if (msg.value < data.fee) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	modifier only_gabcoin_dao { if (msg.sender != data.gabcoinDAO) return; _; }
-    modifier whitelisted_factory { Authority auth = Authority(0xDFF383e12A7939779359bf6A7f8766E123a18452); if (auth.isWhitelistedFactory(this)) _; }
+    modifier whitelisted_factory { Authority auth = Authority(0x0C9579829547c95E35535FE3C57cf42F90a98785); if (auth.isWhitelistedFactory(this)) _; }
 
 	function GabcoinFactory(address _registry, address _gabcoinDAO, address _authority) {
 	    data.gabcoinRegistry = _registry;
