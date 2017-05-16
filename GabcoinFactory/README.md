@@ -9,7 +9,7 @@ Kovan: 43a908c1089d331f18cc8467fb365db08568ef34
 
 ```
 Ropstes:  //ropsten unaccessible
-Kovan: 0x64469fcaa02338ff4f5CCFCc5f430862a2B848F4
+Kovan: 0x30Bd56f5c23dEE3A4CCC4567d8c5AF799Db179b5
 ```
 
 ```
