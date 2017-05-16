@@ -10,7 +10,7 @@
    which is updated every ~60 minutes.
 */
 
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.11;
 import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 
 contract Owned {
