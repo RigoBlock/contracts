@@ -9,8 +9,8 @@ Kovan: 19fb33107907443f6ae063f5c73adcf6171ca9b1
 
 ## Drago Factory contract version 0.3.2 
 ```
-Ropsten: 0x10e95F5bA9D252c9073423f17F21C0aAa094D199
-Kovan: 0xA3FbedbACF87D02E5a1C9d935b47f47e17aFcf72
+Ropsten: 0x10e95F5bA9D252c9073423f17F21C0aAa094D199 // Ropsten unaccessible
+Kovan: 0xABFd283F8731108D8e1DbF03A1C582A5505e23EE
 
 ```
 ```
