@@ -8,7 +8,7 @@ contract GabcoinFactoryFace {
 
 	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
 
-	function createGabcoin(string _name, string _symbol, address _owner) returns (address gabcoin, uint gabcoinID) {}
+	function createGabcoin(string _name, string _symbol) returns (bool success) {}
 	function setTargetGabcoinDAO(address _targetGabcoin, address _gabcoinDAO) {}
 	function changeGabcoinDAO(address _newGabcoinDAO) {}
 	function setRegistry(address _newRegistry) {}
@@ -16,7 +16,7 @@ contract GabcoinFactoryFace {
 	function setFee(uint _fee) {}
 	function drain() {}
 
-    function getRegistry() constant returns (address) {}
+	function getRegistry() constant returns (address) {}
 	function getStorage() constant returns (address gabcoinDAO, string version, uint nextGabcoinID) {}
 	function getNextID() constant returns (uint nextGabcoinID) {}
 	function getEventful() constant returns (address) {}
