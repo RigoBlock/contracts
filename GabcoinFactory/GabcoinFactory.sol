@@ -111,12 +111,12 @@ contract GabcoinFactory is Owned, GabcoinFactoryFace {
         assert(registry.register.value(regFee)(libraryData.newAddress, _name, _symbol, gabcoinID, msg.sender));
         return true;
     }
-    
+
     function createGabcoinInternal(string _name, string _symbol, address _owner, uint _gabcoinID) internal when_fee_paid returns (bool success) {
 	    Authority auth = Authority(data.authority);
 	    require(GabcoinFactoryLibrary.createGabcoin(libraryData, _name, _symbol, _owner, _gabcoinID, data.authority));
 		data.gabcoins[msg.sender].push(libraryData.newAddress);
-		GabcoinEventful events = GabcoinEventful(getEventful());
+		GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());
 		if (!events.createGabcoin(msg.sender, this, libraryData.newAddress, _name, _symbol, _gabcoinID, _owner)) return;
 		auth.whitelistGabcoin(libraryData.newAddress, true);
 		auth.whitelistUser(msg.sender, true);
