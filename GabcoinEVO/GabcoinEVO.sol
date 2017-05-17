@@ -169,8 +169,10 @@ contract GabcoinFace {
 	function setTransactionFee(uint _transactionFee) {}	
 	function changeFeeCollector(address _feeCollector) {}	
 	function changeGabcoinDAO(address _gabcoinDAO) {}
+	function updatePrice() {}
 	function changeMinPeriod(uint32 _minPeriod) {}
 
+    function getMinPeriod() constant returns (uint32) {}
 	function balanceOf(address _from) constant returns (uint) {}
 	function getVersion() constant returns (string) {}
 	function getName() constant returns (string) {}
@@ -239,7 +241,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		uint fee_gabcoinDAO = safeSub(fee, fee_gabcoin);
 		uint amount = safeSub(gross_amount, fee);
 		Authority auth = Authority(authority);
-		GabcoinEventful events = GabcoinEventful(auth.getEventful());
+		GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());
 		require(events.buyGabcoin(msg.sender, this, msg.value, amount));
 		balances[msg.sender] = safeAdd(balances[msg.sender], amount);
 		balances[feeCollector] = safeAdd(balances[feeCollector] ,fee_gabcoin);
@@ -259,7 +261,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		uint net_amount = safeSub(_amount, fee);
 		uint net_revenue = safeMul(net_amount, price) / base;
 		Authority auth = Authority(authority);
-        GabcoinEventful events = GabcoinEventful(auth.getEventful());		
+        GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());		
         require(events.sellGabcoin(msg.sender, this, _amount, net_revenue));
 		balances[msg.sender] = safeSub(balances[msg.sender], _amount);
 		balances[feeCollector] = safeAdd(balances[feeCollector], fee_gabcoin);
@@ -277,7 +279,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		Authority auth = Authority(authority);
 		Casper casper = Casper(auth.getCasper());
 		require(casper.deposit.value(_amount)(_validation, _withdrawal));
-		GabcoinEventful events = GabcoinEventful(auth.getEventful());
+		GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());
 		require(events.depositToCasper(msg.sender, this, auth.getCasper(), _validation, _withdrawal, _amount));
 		//atCasper.deposits = safeAdd(atCasper.deposits, _amount);
 		DepositCasper(_amount, msg.sender, _validation, _withdrawal);
@@ -288,7 +290,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		Authority auth = Authority(authority);
 		Casper casper = Casper(auth.getCasper());
 		if (!casper.withdraw(_validatorIndex)) throw;
-		GabcoinEventful events = GabcoinEventful(auth.getEventful());
+		GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());
 		require(events.withdrawFromCasper(msg.sender, this, auth.getCasper(), _validatorIndex));
 		//uint depositValue = atCasper.deposits;
 		//delete(atCasper.deposits);
@@ -298,41 +300,45 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 
 	function changeRatio(uint256 _ratio) only_gabcoinDAO {
 	    Authority auth = Authority(authority);
-	    GabcoinEventful events = GabcoinEventful(auth.getEventful());
+	    GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());
 	    require(events.changeRatio(msg.sender, this, _ratio));
 		ratio = _ratio;
 	}
 	
 	function setTransactionFee(uint _transactionFee) only_owner {
 	    Authority auth = Authority(authority);
-	    GabcoinEventful events = GabcoinEventful(auth.getEventful());
+	    GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());
 	    require(events.setTransactionFee(msg.sender, this, _transactionFee));
 		transactionFee = _transactionFee;	//fee is in basis points (1 bps = 0.01%)
 	}
 
 	function changeFeeCollector(address _feeCollector) only_owner {
 	    Authority auth = Authority(authority);
-	    GabcoinEventful events = GabcoinEventful(auth.getEventful());
+	    GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());
 	    require(events.changeFeeCollector(msg.sender, this, _feeCollector));
 	    feeCollector = _feeCollector; 
 	}
 
 	function changeGabcoinDAO(address _gabcoinDAO) only_gabcoinDAO {
 	    Authority auth = Authority(authority);
-	    GabcoinEventful events = GabcoinEventful(auth.getEventful());
+	    GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());
 	    require(events.changeGabcoinDAO(msg.sender, this, _gabcoinDAO));
         gabcoinDAO = _gabcoinDAO;
 	}
-
-	function changeMinPeriod(uint32 _minPeriod) only_gabcoinDAO {
-		minPeriod = _minPeriod;
-	}
-
+	
 	function updatePrice() {
 	    Casper casper = Casper(getCasper());
 	    uint casperDeposit = casper.balanceOf(this);
 	    uint aum = safeAdd(this.balance, casperDeposit);
 	    price = safeDiv(aum * base, totalSupply);
+	}
+
+	function changeMinPeriod(uint32 _minPeriod) only_gabcoinDAO {
+		minPeriod = _minPeriod;
+	}
+	
+	function getMinPeriod() constant returns (uint32) {
+		return minPeriod;
 	}
 	
 	function balanceOf(address _from) constant returns (uint256) {
