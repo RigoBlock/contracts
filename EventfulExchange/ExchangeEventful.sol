@@ -93,6 +93,7 @@ contract ExchangeEventful is ExchangeEventfulFace {
 	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user);
 	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 	event DealFinalized(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
+	event Credits(address exchange, address indexed cfd, address indexed stable, uitn64 short_gets, address indexed leveraged, uint64 long_gets);
 
     modifier approved_asset_only(address _asset) { Authority auth = Authority(authority); if (auth.isWhitelistedAsset(_asset)) _; }
    	modifier approved_exchange_only(address _exchange) { Authority auth = Authority(authority); if (auth.isWhitelistedExchange(_exchange)) _; }
@@ -106,50 +107,61 @@ contract ExchangeEventful is ExchangeEventfulFace {
     function deposit(address _who, address _exchange, address _token, uint _amount, uint _balance) payable approved_exchange_only(_exchange) returns (bool success) {
         if (msg.sender != _exchange) return;
         Deposit(_exchange, _token, _who, _amount, 0);
+	return true;
     }
     
 	function withdraw(address _who, address _exchange, address _token, uint _amount, uint _balance) approved_exchange_only(_exchange) returns (bool success) {
 	    if (msg.sender != _exchange) return;
 	    Withdraw(_exchange, _token, _who, _amount, 0);
+	    return true;
 	}
 	
 	function order(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) approved_exchange_only(_exchange) returns (bool success) {
 	    if (msg.sender != _exchange) return;
 	    Order(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _who);
+	    return true;
 	}
 	
 	function orderCFD(address _who, address _exchange, address _cfd, uint32 _id, bool _is_stable, uint32 _adjustment, uint128 _stake) approved_exchange_only(_exchange) approved_asset_only(_cfd) returns (bool success) {
 	    if (msg.sender != _cfd) return;
 	    OrderPlaced(_exchange, _cfd, _id, _who, _is_stable, _adjustment, _stake);
+	    return true;
 	}
 	
 	function dealCFD(address _who, address _exchange, address _cfd, uint32 _order, address _stable, address _leveraged, bool _is_stable, uint32 _id, uint64 _strike, uint128 _stake) approved_exchange_only(_exchange) returns (bool success) {
 	    if (msg.sender != _cfd) return;
 	    OrderMatched(_exchange, _cfd, _stable, _leveraged, _is_stable, _order, _id, _strike, _stake);
+	    return true;
 	}
 	
 	function trade(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user) approved_exchange_only(_exchange) returns (bool success) {
 	    if (msg.sender != _exchange) return;
 	    Trade(_tokenGet, _amountGet, _tokenGive, _amountGive, _who, _user);
+	    return true;
 	}
 	
 	function cancelOrder(address _who, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) approved_exchange_only(_exchange) returns (bool success) {
 	    if (msg.sender != _exchange) return;
 	    Cancel(_exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _who);
+	    return true;
 	}
 	
 	function cancel(address _who, address _exchange, address _cfd, uint32 _id, uint128 _stake) approved_exchange_only(_exchange) approved_asset_only(_cfd) returns (bool success) {
 	    if (msg.sender != _exchange) return;
 	    OrderCancelled(_exchange, _cfd, _id, _who, _stake);
+	    return true;
 	}
 	
 	function finalize(address _who, address _exchange, address _cfd, uint24 _id, address _stable, address _leveraged, uint64 _price) approved_exchange_only(_exchange) approved_asset_only(_cfd) returns (bool success) {
 	    if (msg.sender != _exchange) return;
 	    DealFinalized(_exchange, _cfd, _stable, _leveraged, _price);
+	    return true;
 	}
 	
 	function addCredits(address _who, address _exchange, address _stable, uint _stable_gets, address _leveraged, uint _leveraged_gets, uint24 id) approved_exchange_only(_exchange) returns (bool success) {
 	    if (msg.sender != _exchange) return;
+	    Credits(_exchange, _cfd, _stable, _stable_gest, _leveraged, _leveraged_gets);
+	    return true;
 	}
 
     address public authority;
