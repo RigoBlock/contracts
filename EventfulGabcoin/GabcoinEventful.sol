@@ -163,16 +163,19 @@ contract GabcoinEventful is GabcoinEventfulFace {
 	function changeGabcoinDAO(address _who, address _targetGabcoin, address _gabcoinDAO) approved_gabcoin_only(_targetGabcoin) approved_user_only(_who) returns(bool success) {
 	    if (msg.sender != _targetGabcoin) return;
 	    GabcoinDAO(_targetGabcoin, msg.sender, _who, _gabcoinDAO);
+	    return true;
 	}
     
     function depositToCasper(address _who, address _targetGabcoin, address _casper, address _validation, address _withdrawal, uint _amount) approved_gabcoin_only(_targetGabcoin) approved_user_only(_who) returns(bool success) {
         if (msg.sender != _targetGabcoin) return;
         DepositCasper(_targetGabcoin, _validation, _casper, _withdrawal, _amount);
+	return true;
     }
     
     function withdrawFromCasper(address _who, address _targetGabcoin, address _casper, uint _validatorIndex) approved_gabcoin_only(_targetGabcoin) approved_user_only(_who) returns(bool success) {
         if (msg.sender != _targetGabcoin) return;
         WithdrawCasper(_targetGabcoin, _who, _casper, _validatorIndex);
+	return true;
     }
 	
 	function createGabcoin(address _who, address _gabcoinFactory, address _newGabcoin, string _name, string _symbol, uint _gabcoinID, address _owner) approved_factory_only(_gabcoinFactory) returns(bool success) {
