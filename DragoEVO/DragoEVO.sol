@@ -176,7 +176,8 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	
 	struct Account {
 		uint balance;
-		mapping (uint => Receipt) receipt;
+		//mapping (uint => Receipt) receipt;
+		Receipt receipt;
 		//mapping (address => uint) allowanceOf;
 		mapping(address => address[]) approvedAccount;
 	}
@@ -204,8 +205,9 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	modifier only_dragoDAO { if (msg.sender != admin.dragoDAO) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	modifier when_approved_exchange(address _exchange) { Authority auth = Authority(admin.authority); if (auth.isWhitelistedExchange(_exchange)) _; }
-	modifier minimum_period_past(uint buyPrice, uint amount) { if (now < accounts[msg.sender].receipt[buyPrice].activation) return; _; }
 	modifier minimum_stake(uint amount) { if (amount < admin.minOrder) throw; _; }
+    modifier minimum_period_past { if (now < accounts[msg.sender].receipt.activation) return; _; }
+    //modifier minimum_period_past(uint buyPrice, uint amount) { if (now < accounts[msg.sender].receipt[buyPrice].activation) return; _; }
 
 	event Buy(address indexed from, address indexed to, uint indexed _amount, uint _revenue);
 	event Sell(address indexed from, address indexed to, uint indexed _amount, uint _revenue);
@@ -225,10 +227,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function buyDrago() payable minimum_stake(msg.value) returns (bool success) {
-		uint gross_amount = safeDiv(msg.value, data.buyPrice) * base;
-		//THIS HAS TO BE AMENDED AND DRAGOLIBRARY AND FACTORY REDEPLOYED
-		//uint gross_amount = safeDiv(msg.value * base, data.buyPrice);
-		//in order to allow purchases of fractions of ether
+		uint gross_amount = safeDiv(msg.value * base, data.buyPrice);
 		uint fee = safeMul(gross_amount, data.transactionFee);
 		uint fee_drago = safeMul(fee, admin.ratio) / 100;
  		uint fee_dragoDAO = safeSub(fee, fee_drago);
@@ -238,12 +237,12 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, amount);
 		accounts[admin.feeCollector].balance = safeAdd(accounts[admin.feeCollector].balance, fee_drago);
 		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
- 		accounts[msg.sender].receipt[data.buyPrice].activation = uint32(now) + data.minPeriod;
+ 		accounts[msg.sender].receipt.activation = uint32(now) + data.minPeriod;
 		data.totalSupply = safeAdd(data.totalSupply, gross_amount);
 		return (true);
 	}
 
-	function sellDrago(uint _amount) minimum_period_past(data.buyPrice, _amount) returns (uint net_revenue, bool success) {
+	function sellDrago(uint _amount) minimum_period_past returns (uint net_revenue, bool success) {
 		if (accounts[msg.sender].balance < _amount || accounts[msg.sender].balance + _amount <= accounts[msg.sender].balance) throw;
 		uint fee = safeMul (_amount, data.transactionFee);
 		uint fee_drago = safeMul(fee, admin.ratio) / 100;
