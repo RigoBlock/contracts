@@ -22,8 +22,10 @@ contract GabcoinFace {
 	function setTransactionFee(uint _transactionFee) {}	
 	function changeFeeCollector(address _feeCollector) {}	
 	function changeGabcoinDAO(address _gabcoinDAO) {}
+	function updatePrice() {}
 	function changeMinPeriod(uint32 _minPeriod) {}
 
+    	function getMinPeriod() constant returns (uint32) {}
 	function balanceOf(address _from) constant returns (uint) {}
 	function getVersion() constant returns (string) {}
 	function getName() constant returns (string) {}
