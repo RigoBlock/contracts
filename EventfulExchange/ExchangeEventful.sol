@@ -67,6 +67,7 @@ contract ExchangeEventfulFace {
 	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user);
 	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 	event DealFinalized(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
+	event Credits(address exchange, address indexed cfd, address indexed stable, uint short_gets, address indexed leveraged, uint long_gets);
 
 	// METHODS
 
