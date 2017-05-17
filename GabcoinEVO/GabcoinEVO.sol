@@ -169,12 +169,13 @@ contract GabcoinFace {
 	function setTransactionFee(uint _transactionFee) {}	
 	function changeFeeCollector(address _feeCollector) {}	
 	function changeGabcoinDAO(address _gabcoinDAO) {}
+	function newPrice() internal returns (uint price) {}
 
 	function balanceOf(address _from) constant returns (uint) {}
 	function getVersion() constant returns (string) {}
 	function getName() constant returns (string) {}
 	function getSymbol() constant returns (string) {}
-	function getPrice() constant returns (uint256) {}
+	function getPrice() constant returns (uint256 newPrice) {}
 	function getCasper() constant returns (address) {}
 	function getTransactionFee() constant returns (uint) {}
 	function getFeeCollector() constant returns (address) {}
@@ -206,6 +207,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
     }
 
 	function() payable casper_contract_only(msg.sender) {
+	    newPrice(); //estimate new price when receive mining reward or deposit back from casper
 	}
 	
 	//this function is used to allow dragos to buy gabcoins
@@ -223,7 +225,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 
 	function buyGabcoin() payable minimum_stake(msg.value) returns (bool success) {
 		//if (!approvedAccount[msg.sender]) throw;
-		uint gross_amount = safeDiv(msg.value, price) * base;
+		uint gross_amount = safeDiv(msg.value, getPrice()) * base;
 		uint fee = safeMul(gross_amount, transactionFee);
 		uint fee_gabcoin = safeMul(fee , ratio) / 100;
 		uint fee_gabcoinDAO = safeSub(fee, fee_gabcoin);
@@ -246,7 +248,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		uint fee_gabcoin = safeMul(fee, ratio) / 100;
 		uint fee_gabcoinDAO = safeSub(fee, fee_gabcoinDAO);
 		uint net_amount = safeSub(_amount, fee);	
-		uint net_revenue = safeMul(net_amount, price) / base;
+		uint net_revenue = safeMul(net_amount, getPrice()) / base;
 		Authority auth = Authority(authority);
         GabcoinEventful events = GabcoinEventful(auth.getEventful());		
         require(events.sellGabcoin(msg.sender, this, _amount, net_revenue));
@@ -316,18 +318,24 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 	function balanceOf(address _from) constant returns (uint256) {
 		return balances[_from];
 	}
-	
+
 	function getCasper() constant returns (address) {
 	    Authority auth = Authority(authority);
 	    return auth.getCasper();
 	}
 	
-	function getPrice() constant returns (uint price) {
+	function newPrice() internal returns (uint price) {
+	    price = getPrice();
+	}
+	
+	function getPrice() constant returns (uint newPrice) {
 	    Authority auth = Authority(authority);
 	    Casper casper = Casper(auth.getCasper());
+	    if (totalSupply == 0) return newPrice = price;
 	    uint casperDeposit = casper.balanceOf(this);
 	    uint thisBalance = this.balance;
-	    return price = safeAdd(thisBalance, casperDeposit);
+	    uint aum = safeAdd(thisBalance, casperDeposit);
+	    return newPrice = safeDiv(aum, totalSupply);
 	}
 	
 	function getFeeCollector() constant returns (address) {
