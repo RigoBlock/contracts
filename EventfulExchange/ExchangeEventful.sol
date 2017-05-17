@@ -93,7 +93,7 @@ contract ExchangeEventful is ExchangeEventfulFace {
 	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user);
 	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 	event DealFinalized(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
-	event Credits(address exchange, address indexed cfd, address indexed stable, uitn64 short_gets, address indexed leveraged, uint64 long_gets);
+	event Credits(address exchange, address indexed cfd, address indexed stable, uint short_gets, address indexed leveraged, uint long_gets);
 
     modifier approved_asset_only(address _asset) { Authority auth = Authority(authority); if (auth.isWhitelistedAsset(_asset)) _; }
    	modifier approved_exchange_only(address _exchange) { Authority auth = Authority(authority); if (auth.isWhitelistedExchange(_exchange)) _; }
@@ -160,7 +160,7 @@ contract ExchangeEventful is ExchangeEventfulFace {
 	
 	function addCredits(address _who, address _exchange, address _stable, uint _stable_gets, address _leveraged, uint _leveraged_gets, uint24 id) approved_exchange_only(_exchange) returns (bool success) {
 	    if (msg.sender != _exchange) return;
-	    Credits(_exchange, _cfd, _stable, _stable_gest, _leveraged, _leveraged_gets);
+	    Credits(_exchange, _who, _stable, _stable_gets, _leveraged, _leveraged_gets);
 	    return true;
 	}
 
