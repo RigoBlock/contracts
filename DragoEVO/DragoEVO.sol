@@ -226,6 +226,9 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 
 	function buyDrago() payable minimum_stake(msg.value) returns (bool success) {
 		uint gross_amount = safeDiv(msg.value, data.buyPrice) * base;
+		//THIS HAS TO BE AMENDED AND DRAGOLIBRARY AND FACTORY REDEPLOYED
+		//uint gross_amount = safeDiv(msg.value * base, data.buyPrice);
+		//in order to allow purchases of fractions of ether
 		uint fee = safeMul(gross_amount, data.transactionFee);
 		uint fee_drago = safeMul(fee, admin.ratio) / 100;
  		uint fee_dragoDAO = safeSub(fee, fee_drago);
