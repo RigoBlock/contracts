@@ -37,7 +37,7 @@ contract DragoRegistry {
 
 contract GabcoinFactoryFace {
 
-	event GabcoinCreated(string _name, address _gabcoin, address _owner, uint _gabcoinID);
+	event GabcoinCreated(string name, string symbol, address indexed gabcoin, address indexed owner, uint gabcoinID);
 
 	function createGabcoin(string _name, string _symbol) returns (bool success) {}
 	function setTargetGabcoinDAO(address _targetGabcoin, address _gabcoinDAO) {}
