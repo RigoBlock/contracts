@@ -66,7 +66,7 @@ contract DragoFactoryFace {
 
 library DragoFactoryLibrary {
 
-    struct NewDrago {
+    	struct NewDrago {
 	    string name;
 	    string symbol;
 	    uint256 dragoID;
@@ -74,7 +74,7 @@ library DragoFactoryLibrary {
 	    address newAddress;
 	}
 
-    modifier whitelisted_factory { Authority auth = Authority(0x0C9579829547c95E35535FE3C57cf42F90a98785); if (auth.isWhitelistedFactory(this)) _; }
+    	modifier whitelisted_factory { Authority auth = Authority(0x0C9579829547c95E35535FE3C57cf42F90a98785); if (auth.isWhitelistedFactory(this)) _; }
 
 	function createDrago(NewDrago storage self, string _name, string _symbol, address _owner, uint _dragoID, address _authority) whitelisted_factory returns (bool success) {
 	    Drago drago = new Drago(_name, _symbol, _dragoID, _owner, _authority/*, _eventful*/);
@@ -104,12 +104,12 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	modifier only_drago_dao { if (msg.sender != data.dragoDAO) return; _; }
 
 	function DragoFactory(address _registry, address _dragoDAO, address _authority) {
-	    data.dragoRegistry = _registry;
-	    data.dragoDAO = _dragoDAO;
-	    data.authority = _authority;
-	    owner = msg.sender; //has to be set since there was not enough space in drago to use standard Owned
-	    //REMEMBER TO SET FACTORY AS WHITELISTER WHEN CREATE A NEW ONE
-	    //SO THAT IT CAN WHITELIST MSG.SENDER AND DRAGO IMMEDIATELY
+	    	data.dragoRegistry = _registry;
+	    	data.dragoDAO = _dragoDAO;
+	    	data.authority = _authority;
+	    	owner = msg.sender; //has to be set since there was not enough space in drago to use standard Owned
+	    	//REMEMBER TO SET FACTORY AS WHITELISTER WHEN CREATE A NEW ONE
+	    	//SO THAT IT CAN WHITELIST MSG.SENDER AND DRAGO IMMEDIATELY
 	}
 
 	function createDrago(string _name, string _symbol) returns (bool success) {
@@ -122,8 +122,8 @@ contract DragoFactory is Owned, DragoFactoryFace {
     	}
 
 	function createDragoInternal(string _name, string _symbol, address _owner, uint _dragoID) internal when_fee_paid returns (bool success) {
-	    	Authority auth = Authority(data.authority);
-	    	require(DragoFactoryLibrary.createDrago(libraryData, _name, _symbol, _owner, _dragoID, data.authority));
+		Authority auth = Authority(data.authority);
+		require(DragoFactoryLibrary.createDrago(libraryData, _name, _symbol, _owner, _dragoID, data.authority));
 		data.dragos[msg.sender].push(libraryData.newAddress);
 		Eventful events = Eventful(getEventful());
 		if (!events.createDrago(msg.sender, this, libraryData.newAddress, _name, _symbol, _dragoID, _owner)) return;
@@ -139,7 +139,7 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	}
 	
 	function changeDragoDAO(address _newDragoDAO) only_drago_dao {
-	    data.dragoDAO = _newDragoDAO;
+		data.dragoDAO = _newDragoDAO;
 	}
 	
 	function setRegistry(address _newRegistry) only_owner {
@@ -159,33 +159,33 @@ contract DragoFactory is Owned, DragoFactoryFace {
 	}
 
 	function getRegistry() constant returns (address) {
-	    return (data.dragoRegistry);
+		return (data.dragoRegistry);
 	}
 	
 	function getStorage() constant returns (address dragoDAO, string version, uint nextDragoID) {
-	    return (data.dragoDAO, version, nextDragoID);
+		return (data.dragoDAO, version, nextDragoID);
 	}
 	
 	function getNextID() constant returns (uint nextDragoID) {
-	    DragoRegistry registry = DragoRegistry(data.dragoRegistry);
-	    nextDragoID = registry.dragoCount();
+		DragoRegistry registry = DragoRegistry(data.dragoRegistry);
+		nextDragoID = registry.dragoCount();
 	}
 	
 	function getEventful() constant returns (address) {
-	    Authority auth = Authority(data.authority);
-	    return auth.getEventful();
+		Authority auth = Authority(data.authority);
+		return auth.getEventful();
 	}
 	
 	function getDragoDAO() constant returns (address dragoDAO) {
-	    return data.dragoDAO;
+		return data.dragoDAO;
 	}
 	
 	function getVersion() constant returns (string version) {
-	    return version;
+		return version;
 	}
 	
 	function getDragosByAddress(address _owner) constant returns (address[]) {
-	    return data.dragos[msg.sender];
+		return data.dragos[msg.sender];
 	}
 	
 	DragoFactoryLibrary.NewDrago libraryData;
