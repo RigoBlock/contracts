@@ -38,11 +38,11 @@ contract SafeMath {
 	}
 	
 	function safeDiv(uint a, uint b) internal returns (uint) {
-        assert(b > 0);
-        uint c = a / b;
-        assert(a == b * c + a % b);
-        return c;
-    }
+		assert(b > 0);
+		uint c = a / b;
+		assert(a == b * c + a % b);
+		return c;
+	}
 }
 
 contract AccountLevels {
@@ -51,54 +51,56 @@ contract AccountLevels {
 
 contract Authority {
 
-    // EVENTS
+	// EVENTS
 
-    event SetAuthority (address indexed authority);
-    event SetWhitelister (address indexed whitelister);
-    event SetEventful(address indexed eventful);
-    event WhitelistedUser(address indexed target, bool approved);
-    event WhitelistedAsset(address indexed asset, bool approved);
-    event WhitelistedExchange(address indexed exchange, bool approved);
-    event WhitelistedRegistry(address indexed registry, bool approved);
-    event WhitelistedFactory(address indexed factory, bool approved);
-    event WhitelistedGabcoin(address indexed gabcoin, bool approved);
-    event WhitelistedDrago(address indexed drago, bool approved);
-    event NewEventful(address indexed eventful);
+	event SetAuthority (address indexed authority);
+	event SetWhitelister (address indexed whitelister);
+	event SetEventful(address indexed eventful);
+	event WhitelistedUser(address indexed target, bool approved);
+	event WhitelistedAsset(address indexed asset, bool approved);
+	event WhitelistedExchange(address indexed exchange, bool approved);
+	event WhitelistedRegistry(address indexed registry, bool approved);
+	event WhitelistedFactory(address indexed factory, bool approved);
+	event WhitelistedGabcoin(address indexed gabcoin, bool approved);
+	event WhitelistedDrago(address indexed drago, bool approved);
+	event NewEventful(address indexed eventful);
 
-    // METHODS
+	// METHODS
 
-    function setAuthority(address _authority, bool _isWhitelisted) {}
-    function setWhitelister(address _whitelister, bool _isWhitelisted) {}
-    function whitelistUser(address _target, bool _isWhitelisted) {}
-    function whitelistAsset(address _asset, bool _isWhitelisted) {}
-    function whitelistExchange(address _exchange, bool _isWhitelisted) {}
-    function whitelistDrago(address _drago, bool _isWhitelisted) {}
-    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) {}
-    function whitelistRegistry(address _registry, bool _isWhitelisted) {}
-    function whitelistFactory(address _factory, bool _isWhitelisted) {}
-    function setEventful(address _eventful) {}
-    function setGabcoinEventful(address _gabcoinEventful) {}
-    function setExchangeEventful(address _exchangeEventful) {}
-    function setCasper(address _casper) {}
+	function setAuthority(address _authority, bool _isWhitelisted) {}
+	function setWhitelister(address _whitelister, bool _isWhitelisted) {}
+	function whitelistUser(address _target, bool _isWhitelisted) {}
+	function whitelistAsset(address _asset, bool _isWhitelisted) {}
+	function whitelistExchange(address _exchange, bool _isWhitelisted) {}
+	function whitelistDrago(address _drago, bool _isWhitelisted) {}
+	function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) {}
+	function whitelistRegistry(address _registry, bool _isWhitelisted) {}
+	function whitelistFactory(address _factory, bool _isWhitelisted) {}
+	function setEventful(address _eventful) {}
+	function setGabcoinEventful(address _gabcoinEventful) {}
+	function setExchangeEventful(address _exchangeEventful) {}
+	function setCasper(address _casper) {}
 
-    function isWhitelistedUser(address _target) constant returns (bool) {}
-    function isWhitelister(address _whitelister) constant returns (bool) {}
-    function isAuthority(address _authority) constant returns (bool) {}
-    function isWhitelistedAsset(address _asset) constant returns (bool) {}
-    function isWhitelistedExchange(address _exchange) constant returns (bool) {}
-    function isWhitelistedRegistry(address _registry) constant returns (bool) {}
-    function isWhitelistedDrago(address _drago) constant returns (bool) {}
-    function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
-    function isWhitelistedFactory(address _factory) constant returns (bool) {}
-    function getEventful() constant returns (address) {}
-    function getGabcoinEventful() constant returns (address) {}
-    function getExchangeEventful() constant returns (address) {}
-    function getCasper() constant returns (address) {}
-    function getOwner() constant returns (address) {}
-    function getListsByGroups(string _group) constant returns (address[]) {}
+	function isWhitelistedUser(address _target) constant returns (bool) {}
+	function isWhitelister(address _whitelister) constant returns (bool) {}
+	function isAuthority(address _authority) constant returns (bool) {}
+	function isWhitelistedAsset(address _asset) constant returns (bool) {}
+	function isWhitelistedExchange(address _exchange) constant returns (bool) {}
+	function isWhitelistedRegistry(address _registry) constant returns (bool) {}
+	function isWhitelistedDrago(address _drago) constant returns (bool) {}
+	function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
+	function isWhitelistedFactory(address _factory) constant returns (bool) {}
+	function getEventful() constant returns (address) {}
+	function getGabcoinEventful() constant returns (address) {}
+	function getExchangeEventful() constant returns (address) {}
+	function getCasper() constant returns (address) {}
+	function getOwner() constant returns (address) {}
+	function getListsByGroups(string _group) constant returns (address[]) {}
 }
 
 contract CFD {
+
+  	// EVENTS
 	
 	event Deposit(address indexed who, uint value);
 	event Withdraw(address indexed who, uint value);
@@ -107,26 +109,26 @@ contract CFD {
 	event OrderCancelled(uint32 indexed id, address indexed who, uint128 stake);
 	event DealFinalized(uint32 indexed id, address indexed stable, address indexed leveraged, uint64 price);
 
-	function deposit(address _who) payable {}
-	function withdraw(uint value) returns (bool success) {}
-	function orderExchange(bool is_stable, uint32 adjustment, uint128 stake, address _who) returns (bool success) {}
-	function cancelExchange(uint32 id, address _who) returns (bool success) {}
-	function finalizeExchange(uint24 id, address _who) returns (bool success) {}
-	function setMaxLeverage(uint _maxLeverage) {}
-	function setExchange (address _exchange) {} //this is used in order to update exchange in cfd in case of deployment of new exchange
+	// METHODS
+
+	function orderExchange(bool _is_stable, uint32 _adjustment, uint128 _stake, address _who) returns (bool success) {}
+	function cancelExchange(uint32 _id, address _who) returns (bool success) {}
+	function finalizeExchange(uint24 _id, address _who) returns (bool success) {}
+	function setMaxLeverage(uint24 _maxLeverage) {}
+	function setExchange (address _exchange) {}
 
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
 	function bestAdjustmentFor(bool _is_stable, uint128 _stake) constant returns (uint32) {}
 	function dealDetails(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time, uint VAR) {}
 	function orderDetails(uint32 _id) constant returns (uint128) {}
 	function balanceOf(address _who) constant returns (uint) {}
-	function getLastOrderId() constant returns (uint) {}
+	function getMaxLeverage() constant returns (uint24) {}
+	function getLastOrderId() constant returns (uint32) {}
 	function getOrderOwner(uint32 _id) constant returns (address) {}
 	function getStable(uint32 _id) constant returns (address) {}
 	function getLeveraged(uint32 _id) constant returns (address) {}
-	function getMaxLeverage() constant returns (uint) {}
 	function getDealStake(uint32 _id) constant returns (uint128) {}
-	function getDealLev(uint32 _id) constant returns (uint) {}
+	function getDealLev(uint32 _id) constant returns (uint24) {}
 	function getPrice() constant returns (uint) {}
 }
 
@@ -152,11 +154,12 @@ contract ExchangeEventful {
 	event Withdraw(address exchange, address token, address user, uint amount, uint balance);
 	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event OrderPlaced(address exchange, address indexed cfd, uint32 id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
-    event OrderMatched(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 id, uint32 deal, uint64 strike, uint128 stake);
+	event OrderMatched(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 id, uint32 deal, uint64 strike, uint128 stake);
 	event OrderCancelled(address exchange, address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
 	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user);
 	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
 	event DealFinalized(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, uint64 price);
+	event Credits(address exchange, address indexed cfd, address indexed stable, uint short_gets, address indexed leveraged, uint long_gets);
 
 	// METHODS
 
@@ -180,7 +183,7 @@ contract ExchangeFace {
 	event Withdraw(address token, address user, uint amount, uint balance);
 	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
-    event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
+	event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
 	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event OrderCancelled(address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
 	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
@@ -198,7 +201,8 @@ contract ExchangeFace {
 	function cancel(address _cfd, uint32 _id) {}
 	function finalize(address _cfd, uint24 _id) {}
 	function addCredits(address _stable, uint _stable_gets, address _leveraged, uint _leveraged_gets, uint24 id) returns (bool success) {}
-	function setExchange (address _cfd) {}
+	function setCfdMaxLeverage(address _cfd, uint24 _maxLeverage) {}
+	function setExchange (address _cfd, address _newExchange) {}
 	
 	function balanceOf(address token, address user) constant returns (uint) {}
 	function balanceOf(address _who) constant returns (uint) {}
@@ -238,20 +242,20 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 	// MODIFIERS
  
 	modifier only_owner { if (msg.sender != owner) return; _; } 
-	modifier margin_ok(address _cfd, uint _margin) { CFD cfd = CFD(_cfd); if (tokens[address(0)][msg.sender] / cfd.getMaxLeverage() < _margin) return; _; }
+	modifier margin_ok(address _cfd, uint128 _stake) { CFD cfd = CFD(_cfd); if (tokens[address(0)][msg.sender] < uint256(_stake / cfd.getMaxLeverage())) return; _; }
 	modifier ether_only(address _token) { if (_token != address(0)) throw; _; }
 	modifier minimum_stake(uint _amount) { if (_amount < min_order) throw; _; }
-    modifier approved_who_only(address _who) { Authority auth = Authority(authority); if (auth.isWhitelistedUser(_who) || auth.isWhitelistedDrago(_who)) _; }
-    modifier approved_asset(address _asset) { Authority auth = Authority(authority); if (auth.isWhitelistedAsset(_asset)) _; }
-    //modifier is_cfd { if (!cfds[msg.sender].approved) throw; _; } //for now we use the approved_asset modifier
+	modifier approved_who_only(address _who) { Authority auth = Authority(authority); if (auth.isWhitelistedUser(_who) || auth.isWhitelistedDrago(_who)) _; }
+	modifier approved_asset(address _asset) { Authority auth = Authority(authority); if (auth.isWhitelistedAsset(_asset)) _; }
+	//modifier is_cfd { if (!cfds[msg.sender].approved) throw; _; } //for now we use the approved_asset modifier
     
-    // METHODS
+	// METHODS
     	
-    function CFDExchange(address _authority) {
-        authority = _authority;
-    }
+	function CFDExchange(address _authority) {
+		authority = _authority;
+	}
 
-	function deposit(address _token, uint256 _amount) payable ether_only(_token) minimum_stake(msg.value) returns (bool success) {
+	function deposit(address _token, uint _amount) payable ether_only(_token) minimum_stake(msg.value) returns (bool success) {
 		tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
 		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
 		require(eventful.deposit(msg.sender, this, _token, _amount, tokens[address(0)][msg.sender]));
@@ -259,7 +263,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		return true;
 	}
 
-	function withdraw(address _token, uint256 _amount) ether_only(_token) minimum_stake(_amount) returns (bool success) {
+	function withdraw(address _token, uint _amount) ether_only(_token) minimum_stake(_amount) returns (bool success) {
 		if (tokens[address(0)][msg.sender] < _amount) throw;
 		tokens[address(0)][msg.sender] = safeSub(tokens[address(0)][msg.sender], _amount);
 		if (!msg.sender.call.value(_amount)()) throw;
@@ -269,12 +273,13 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		return true;
 	}
 
-	function orderCFD(address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) margin_ok(_cfd, _stake) minimum_stake(_stake) approved_asset(_cfd) approved_who_only(msg.sender) returns (uint32 id) {
+	function orderCFD(address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) /*margin_ok(_cfd, _stake)*/ minimum_stake(uint256(_stake)) approved_asset(_cfd) approved_who_only(msg.sender) returns (uint32 id) {
 		CFD cfd = CFD(_cfd);
 		if (!cfd.orderExchange(_is_stable, _adjustment, _stake, msg.sender)) return;
-		tokens[address(0)][msg.sender] = safeSub(tokens[address(0)][msg.sender], uint(_stake)) / cfd.getMaxLeverage();
-		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, uint(_stake)) / cfd.getMaxLeverage();
-		return uint32(cfd.getLastOrderId());
+		var margin = uint256(_stake / cfd.getMaxLeverage());
+		tokens[address(0)][msg.sender] = safeSub(tokens[address(0)][msg.sender], margin);
+		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, margin);
+		return cfd.getLastOrderId();
 	}
 
 	function cancel(address _cfd, uint32 _id) approved_asset(_cfd) {
@@ -300,32 +305,32 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 	}
 	
 	function addCredits(address stable, uint stable_gets, address leveraged, uint leveraged_gets, uint24 id) approved_asset(msg.sender) returns (bool success) {
-	    tokens[address(0)][stable] += stable_gets;
-	    tokens[address(0)][leveraged] += leveraged_gets;
-	    CFD cfd = CFD(msg.sender);
-	    var depositClaim = cfd.getDealStake(id) / cfd. getDealLev(id); //accounts are decreased by the margin
-	    accounts[stable].balance -= depositClaim;
-	    accounts[leveraged].balance -= depositClaim;
-	    return true;
+		tokens[address(0)][stable] += stable_gets;
+		tokens[address(0)][leveraged] += leveraged_gets;
+		CFD cfd = CFD(msg.sender);
+		var depositClaim = cfd.getDealStake(id) / cfd. getDealLev(id); //accounts are decreased by the margin
+		accounts[stable].balance -= depositClaim;
+		accounts[leveraged].balance -= depositClaim;
+		return true;
 	}
 
-	function setCfdMaxLeverage(address _cfd, uint _maxLeverage) only_owner {
-	    CFD cfd = CFD(_cfd);
-	    cfd.setMaxLeverage(_maxLeverage);
+	function setCfdMaxLeverage(address _cfd, uint24 _maxLeverage) only_owner {
+		CFD cfd = CFD(_cfd);
+		cfd.setMaxLeverage(_maxLeverage);
 	}
-	
-	function setExchange (address _cfd) {
-	    CFD cfd = CFD(_cfd);
-	    cfd.setExchange(this);
+
+	function setExchange (address _cfd, address _newExchange) only_owner {
+		CFD cfd = CFD(_cfd);
+		cfd.setExchange(_newExchange);
 	}
 
 	function balanceOf(address _who) constant returns (uint) {
-	    uint totalBalance = tokens[address(0)][_who] + accounts[_who].balance;
+		uint totalBalance = tokens[address(0)][_who] + accounts[_who].balance;
 		return totalBalance;
 	}
 	
 	function marginOf(address _who) constant returns (uint) {
-	    return tokens[address(0)][_who]; //free margin
+		return tokens[address(0)][_who]; //free margin
 	}
 	
 	function balanceOf(address _token, address _who) constant returns (uint) {
@@ -345,8 +350,8 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 	}
 	
 	function getExchangeEventful() constant returns (address) {
-	    Authority auth = Authority(authority);
-	    return auth.getExchangeEventful();
+		Authority auth = Authority(authority);
+		return auth.getExchangeEventful();
 	}
 	
 	mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
