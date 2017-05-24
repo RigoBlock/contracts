@@ -8,37 +8,37 @@ pragma solidity ^0.4.11;
 
 contract SafeMath {
 
-    function safeMul(uint a, uint b) internal returns (uint) {
-        uint c = a * b;
-        assert(a == 0 || c / a == b);
-        return c;
-    }
+	function safeMul(uint a, uint b) internal returns (uint) {
+		uint c = a * b;
+		assert(a == 0 || c / a == b);
+ 		return c;
+	}
     
-    function safeDiv(uint a, uint b) internal returns (uint) {
-        assert(b > 0);
-        uint c = a / b;
-        assert(a == b * c + a % b);
-        return c;
-    }
+	function safeDiv(uint a, uint b) internal returns (uint) {
+		assert(b > 0);
+		uint c = a / b;
+		assert(a == b * c + a % b);
+		return c;
+	}
 
-    function safeSub(uint a, uint b) internal returns (uint) {
-        assert(b <= a);
-        return a - b;
-    }
+	function safeSub(uint a, uint b) internal returns (uint) {
+		assert(b <= a);
+		return a - b;
+	}
 
-    function safeAdd(uint a, uint b) internal returns (uint) {
-        uint c = a + b;
-        assert(c>=a && c>=b);
-        return c;
-    }
+	function safeAdd(uint a, uint b) internal returns (uint) {
+		uint c = a + b;
+		assert(c>=a && c>=b);
+		return c;
+	}
 }
 
 contract Exchange {
-    // contract only needs to know these 2 functions to send user-credits to exchange
+	// contract only needs to know these 2 functions to send user-credits to exchange
 
-    function addCredits(address stable, uint stable_gets, address leveraged, uint leveraged_gets, uint24 id) returns (bool success) {}
+	function addCredits(address stable, uint stable_gets, address leveraged, uint leveraged_gets, uint24 id) returns (bool success) {}
 
-    function getExchangeEventful() constant returns (address) {}
+	function getExchangeEventful() constant returns (address) {}
 }
 
 contract ExchangeEventful {
@@ -49,7 +49,7 @@ contract ExchangeEventful {
 	event Withdraw(address exchange, address token, address user, uint amount, uint balance);
 	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event OrderPlaced(address exchange, address indexed cfd, uint32 id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
-    	event OrderMatched(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 id, uint32 deal, uint64 strike, uint128 stake);
+	event OrderMatched(address exchange, address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 id, uint32 deal, uint64 strike, uint128 stake);
 	event OrderCancelled(address exchange, address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
 	event Cancel(address exchange, address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user);
 	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
@@ -71,11 +71,11 @@ contract ExchangeEventful {
 
 contract Oracle {
 
-    event Changed(uint224 current);
+	event Changed(uint224 current);
 
-    function get() constant returns (uint) {}
-    function getPrice() constant returns (uint224) {}
-    function getTimestamp() constant returns (uint32) {}
+	function get() constant returns (uint) {}
+	function getPrice() constant returns (uint224) {}
+	function getTimestamp() constant returns (uint32) {}
 }
 
 contract CFDFace {
@@ -91,10 +91,10 @@ contract CFDFace {
 
 	// METHODS
 
-	function orderExchange(bool is_stable, uint32 adjustment, uint128 stake, address who) returns (bool success) {}
-	function cancelExchange(uint32 id, address who) returns (bool success) {}
-	function finalizeExchange(uint24 id, address who) returns (bool success) {}
-	function setMaxLeverage(uint maxLeverage) {}
+	function orderExchange(bool _is_stable, uint32 _adjustment, uint128 _stake, address _who) returns (bool success) {}
+	function cancelExchange(uint32 _id, address _who) returns (bool success) {}
+	function finalizeExchange(uint24 _id, address _who) returns (bool success) {}
+	function setMaxLeverage(uint24 _maxLeverage) {}
 	function setExchange (address _exchange) {}
 
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
@@ -102,19 +102,19 @@ contract CFDFace {
 	function dealDetails(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time, uint VAR) {}
 	function orderDetails(uint32 _id) constant returns (uint128) {}
 	function balanceOf(address _who) constant returns (uint) {}
-	function getMaxLeverage() constant returns (uint) {}
-	function getLastOrderId() constant returns (uint) {}
+	function getMaxLeverage() constant returns (uint24) {}
+	function getLastOrderId() constant returns (uint32) {}
 	function getOrderOwner(uint32 _id) constant returns (address) {}
 	function getStable(uint32 _id) constant returns (address) {}
 	function getLeveraged(uint32 _id) constant returns (address) {}
 	function getDealStake(uint32 _id) constant returns (uint128) {}
-	function getDealLev(uint32 _id) constant returns (uint) {}
+	function getDealLev(uint32 _id) constant returns (uint24) {}
 	function getPrice() constant returns (uint) {}
 }
 
 contract CFD is SafeMath, CFDFace {
     
-    event Deposit(address indexed who, uint value);
+	event Deposit(address indexed who, uint value);
 	event Withdraw(address indexed who, uint value);
 	event OrderPlaced(uint32 indexed id, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
 	event OrderMatched(uint32 indexed id, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
@@ -141,7 +141,7 @@ contract CFD is SafeMath, CFDFace {
 		uint32 prev_id;		// a linked ring
 		uint32 next_id;		// a linked ring
 		
-		uint lev;
+		uint24 lev;
 	}
 	
 	modifier is_exchange { if (msg.sender != exchange) return; _; }
@@ -296,7 +296,7 @@ contract CFD is SafeMath, CFDFace {
 
 		OrderPlaced(id, who, is_stable, adjustment, stake);
 
-		ExchangeEventful eventful = ExchangeEventful(exchange);
+		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
 		require(eventful.orderCFD(who, msg.sender, this, id, is_stable, adjustment, stake));
 	}
 
@@ -346,9 +346,8 @@ contract CFD is SafeMath, CFDFace {
 
 		OrderMatched(order, stable, leveraged, who == stable, id, strike, stake);
 	
-	    ExchangeEventful eventful = ExchangeEventful(exchange);
-		require(eventful.dealCFD(who, msg.sender, this, order, stable, leveraged, who == stable, id, strike, stake));    
-	    
+	    ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
+		require(eventful.dealCFD(who, msg.sender, this, order, stable, leveraged, who == stable, id, strike, stake));
 	}
 
 	// removes the deal id from deals.
@@ -367,7 +366,7 @@ contract CFD is SafeMath, CFDFace {
 		delete deals[id];
 	}
 	
-	function setMaxLeverage(uint128 _maxLev) is_exchange {
+	function setMaxLeverage(uint24 _maxLev) is_exchange {
 	    maxLev = _maxLev;
 	}
 	
@@ -412,15 +411,15 @@ contract CFD is SafeMath, CFDFace {
 		VAR = deals[_id].stake / deals[_id].lev;
 	}
 	
-	function getLastOrderId() constant returns (uint) {
+	function getLastOrderId() constant returns (uint32) {
 	    return next_id;
 	}
 	
-	function getMaxLeverage() constant returns (uint) {
+	function getMaxLeverage() constant returns (uint24) {
 	    return maxLev;
 	}
 	
-	function getDealLev(uint32 _id) constant returns (uint) {
+	function getDealLev(uint32 _id) constant returns (uint24) {
 	    return deals[_id].lev;
 	}
 	
@@ -452,13 +451,17 @@ contract CFD is SafeMath, CFDFace {
 	function getPrice() constant returns (uint) {
 	    return oracle.get();
 	}
+	
+	function getExchangeEventful() constant returns (address) {
+	    Exchange exch = Exchange(exchange);
+	    return exch.getExchangeEventful();
+	}
 
 	Oracle public oracle;
 	uint32 public period;
 	
 	address public exchange;
-
-    	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
+	uint min_order = 100 finney; // minimum stake to avoid dust clogging things up
 	uint32 public next_id = 1;
 
 	mapping (uint32 => Order) public orders;
@@ -469,7 +472,7 @@ contract CFD is SafeMath, CFDFace {
 	uint32 public head;			// insert into linked ring; no order.
 	
 	uint128 min_stake = 100 finney;	// minimum stake to avoid dust clogging things up.
-    	uint public maxLev = 1;
+	uint24 public maxLev = 1;
     
 	mapping (address => uint) public accounts;
 }
