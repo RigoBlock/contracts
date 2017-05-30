@@ -6,7 +6,7 @@ Exchange and CFDExchange.
 
 ## CfdExchange contract version 0.3.1
 ```
-Ropsten: 0xA4C06E4a5734224B9024Dbe8d87C41AAb324fE64 //Ropsten unaccessible
+Ropsten: 0xD462e11beD47F6A98f4A772068Ac76BbBB8ba5b7
 Kovan: 0x76d25c09C4816217179752582bf59531c75F8165
 ```
 ```
