@@ -7,7 +7,7 @@ This file is complete
 ## version 0.3.2
 
 ```
-Ropstes: 0xDFF383e12A7939779359bf6A7f8766E123a18452 //ropsten unaccessible
+Ropstes: 0x11bBdDED5e2eeB536fb0903224ed208823A6AfE6
 Kovan: 0x0C9579829547c95E35535FE3C57cf42F90a98785
 ```
 ```
