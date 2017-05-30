@@ -3,7 +3,7 @@ You have all the events here
 
 ## Drago events contract version 0.2.2
 ```
-Ropsten: 0x87f0737facf8E3D377ec389f2Aa2738427E60293 //ropsten unaccessible
+Ropsten: 0xa12d375b868cBA24E3A0e2A47f445A57cFf7ac82
 Kovan: 0xEb2D745462c46A6AE367bBf7DE5f9809Bba25DAc
 ```
 
