@@ -5,7 +5,7 @@ Collects all gabcoin events
 ## version 0.3.2
 
 ```
-Ropstes: NA //ropsten unaccessible
+Ropstes: 0x8832256345e4A94A9d6a8081eD50fF0465bf977a
 Kovan: 0x7514C86527DEAF8F80fF9D9eE4F20Ff1102Ac040
 ```
 ```
