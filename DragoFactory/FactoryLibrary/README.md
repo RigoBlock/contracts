@@ -5,8 +5,10 @@ This factory makes use of library, each deploy has to manually input Hex of libr
 each factory contract on different network has a different bytecode (uses different library)
 
 Manually input authority when deploy library on new network!
-Authority Ropsten:
+```
+Authority Ropsten: 0x11bBdDED5e2eeB536fb0903224ed208823A6AfE6
 Authority Kovan: 0x0C9579829547c95E35535FE3C57cf42F90a98785
+```
 
 ## Drago Factory Library version 0.3.1 (manually input hex address in factory bytecode)
 
