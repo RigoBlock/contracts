@@ -3,7 +3,7 @@ a Universal Contract for Dragos.
 
 ## Registry version 0.2.1
 ```
-Ropsten: 0xD0aF408Eb4CC5486C5E39657F7442B507B6ef791 //ropsten unaccessible
+Ropsten: 0x1C30EB76cA17F62bD7ea2B36a2CDcd0e6905ce7C
 Kovan: 0xC8581038A286DF134997Bf383b089C06664249d3
 ```
 ```
