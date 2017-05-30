@@ -1,4 +1,4 @@
-//! Drago Factory library.
+//! Gabcoin Factory library.
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
 //! ALWAYS DOUBLE CHECK ADDRESS AUTHORITY WHEN DEPLOY ON NEW NETWORK
