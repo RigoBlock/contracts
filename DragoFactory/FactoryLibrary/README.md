@@ -14,7 +14,7 @@ Authority Kovan: 0x0C9579829547c95E35535FE3C57cf42F90a98785
 
 ```
 
-Ropsten: 0x84a545fe23ea56fab04d86012756450746f074bb // Ropsten unaccessible
+Ropsten: 0x7425162c4660af8b849f46464c8b9d0ecf5b09f1
 Kovan: 0x2af877bf6b7a1ce3c36a09a8fedfd816c5007d5f
 
 ```
