@@ -5,7 +5,7 @@ Collects all events from exchange and exchange assets.
 ## version 0.3.1
 
 ```
-Ropstes: 0xD2Ad90e721d926D9ACdFAcD84f8c6616238ce784
+Ropsten: 0xD2Ad90e721d926D9ACdFAcD84f8c6616238ce784
 Kovan: 0xF26965Bef965Ba7bdb7F2Dc7b39f9009b700E22F
 ```
 ```
