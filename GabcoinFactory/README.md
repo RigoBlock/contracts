@@ -11,7 +11,7 @@ Kovan: e03284980c0152ec7cedd3ae94b31c0aa535aff9
 ## version 0.3.2
 
 ```
-Ropsten:  //ropsten unaccessible
+Ropsten: 0xd45c1854F87B7E0039a51C0071B8617d90Fc6CD0
 Kovan: 0xfcD76Ca82B1813E9B1575eC6455DB1E9b83d1300
 ```
 Generic Bytecode:
