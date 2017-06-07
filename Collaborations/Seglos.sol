@@ -33,4 +33,6 @@ contract Seglos {
     function door(bool _door) adminOnly {}
 
     function setFee(uint _fee) adminOnly {}
+    
+    function balanceOf(address _who) constant returns (uint) {}
 }
