@@ -1,6 +1,76 @@
 pragma solidity ^0.4.8;
 
-import "erc20/erc20.sol";
+contract DSAuthority {
+    function canCall(
+        address src, address dst, bytes4 sig
+    ) constant returns (bool);
+}
+
+contract DSAuthEvents {
+    event LogSetAuthority (address indexed authority);
+    event LogSetOwner     (address indexed owner);
+}
+
+contract DSAuth is DSAuthEvents {
+    DSAuthority  public  authority;
+    address      public  owner;
+
+    function DSAuth() {
+        owner = msg.sender;
+        LogSetOwner(msg.sender);
+    }
+
+    function setOwner(address owner_)
+        auth
+    {
+        owner = owner_;
+        LogSetOwner(owner);
+    }
+
+    function setAuthority(DSAuthority authority_)
+        auth
+    {
+        authority = authority_;
+        LogSetAuthority(authority);
+    }
+
+    modifier auth {
+        assert(isAuthorized(msg.sender, msg.sig));
+        _;
+    }
+
+    modifier authorized(bytes4 sig) {
+        assert(isAuthorized(msg.sender, sig));
+        _;
+    }
+
+    function isAuthorized(address src, bytes4 sig) internal returns (bool) {
+        if (src == owner) {
+            return true;
+        } else if (authority == DSAuthority(0)) {
+            return false;
+        } else {
+            return authority.canCall(src, this, sig);
+        }
+    }
+
+    function assert(bool x) internal {
+        if (!x) throw;
+    }
+}
+
+contract ERC20 {
+    function totalSupply() constant returns (uint supply);
+    function balanceOf( address who ) constant returns (uint value);
+    function allowance( address owner, address spender ) constant returns (uint _allowance);
+
+    function transfer( address to, uint value) returns (bool ok);
+    function transferFrom( address from, address to, uint value) returns (bool ok);
+    function approve( address spender, uint value ) returns (bool ok);
+
+    event Transfer( address indexed from, address indexed to, uint value);
+    event Approval( address indexed owner, address indexed spender, uint value);
+}
 
 contract EventfulMarket {
     event ItemUpdate( uint id );
@@ -302,5 +372,49 @@ contract SimpleMarket is EventfulMarket {
         );
 
         success = true;
+    }
+}
+
+
+// Simple Market with a market lifetime. When the lifetime has elapsed,
+// offers can only be cancelled (offer and buy will throw).
+
+contract ExpiringMarket is DSAuth, SimpleMarket {
+    uint public lifetime;
+    uint public close_time;
+    bool public stopped;
+
+    function stop() auth {
+        stopped = true;
+    }
+
+    function ExpiringMarket(uint lifetime_) {
+        lifetime = lifetime_;
+        close_time = getTime() + lifetime_;
+    }
+
+    function getTime() constant returns (uint) {
+        return block.timestamp;
+    }
+    function isClosed() constant returns (bool closed) {
+        return stopped || (getTime() > close_time);
+    }
+
+    // after market lifetime has elapsed, no new offers are allowed
+    modifier can_offer {
+        assert(!isClosed());
+        _;
+    }
+    // after close, no new buys are allowed
+    modifier can_buy(uint id) {
+        assert(isActive(id));
+        assert(!isClosed());
+        _;
+    }
+    // after close, anyone can cancel an offer
+    modifier can_cancel(uint id) {
+        assert(isActive(id));
+        assert(isClosed() || (msg.sender == getOwner(id)));
+        _;
     }
 }
