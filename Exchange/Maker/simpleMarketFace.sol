@@ -65,6 +65,6 @@ contract SimpleMarket is EventfulMarket {
     function kill(bytes32 id) {}
     function offer(uint sell_how_much, ERC20 sell_which_token, uint buy_how_much, ERC20 buy_which_token) returns (uint id) {}
     function bump(bytes32 id_) {}
-    function buy( uint id, uint quantity ) returns ( bool success ) {}
-    function cancel( uint id ) returns ( bool success ) {}
+    function buy(uint id, uint quantity) returns (bool success) {}
+    function cancel(uint id) returns (bool success) {}
 }
