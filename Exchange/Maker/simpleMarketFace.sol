@@ -1,3 +1,6 @@
+//! Maker Token Exchange interface
+//! Copyright 2017 Gabriele Rigo, RigoBlock (Rigo Investment Sagl)
+//! exchange contract from https://github.com/makerdao/maker-otc/blob/master/src/simple_market.sol
 
 pragma solidity ^0.4.8;
 
