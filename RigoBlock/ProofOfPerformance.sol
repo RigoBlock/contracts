@@ -52,13 +52,13 @@ contract ProofOfPerformance {
         uint256 poolAum = safeMul(poolPrice, poolTokens); //check whether to divide by a factor in order to prevent overflow
     }
     
-    function proofOfPerformance(address _ofPool) only_pool_owner minimum_rigoblock {
+    function proofOfPerformance(address _ofPool) only_pool_owner minimum_rigoblock returns (uint256 PoP) {
         require(poolValue != 0);
         var poolValue = calcPoolValue(_ofPool);
         var networkValue = calcNetworkValue();
         RigoTok rigoToken = RigoTok(rigoblock);
         var rigoblockTokens = rigoToken.totalSupply();
-        PoP = (rigoblockTokens * poolValue) / networkValue;  //TODO: double check for overflow
+        return PoP = (rigoblockTokens * poolValue) / networkValue;  //TODO: double check for overflow
         //mapping of value per user
         //can claim in proportion to participation in excess to what has already been claimed
     }
