@@ -6,7 +6,7 @@
 
 pragma solidity ^0.4.16;
 
-contract UnlimitedAllowanceToken is StandardToken {
+contract UnlimitedAllowanceToken is ERC20 {
 
     uint constant MAX_UINT = 2**256 - 1;
     
