@@ -58,11 +58,12 @@ contract ProofOfPerformance {
         var networkValue = calcNetworkValue();
         RigoTok rigoToken = RigoTok(rigoblock);
         var rigoblockTokens = rigoToken.totalSupply();
-        PoP = rigoblockTokens (*inflation / 100) * (poolValue) / networkValue;  //var PoP = networkValue / poolValue; (it is a multiplier, bigger as the fund is very small);
+        PoP = (rigoblockTokens * poolValue) / networkValue;  //TODO: double check for overflow
         //mapping of value per user
         //can claim in proportion to participation in excess to what has already been claimed
-        //this can be developed in Inflation.sol
     }
+    
+    //TODO: mapping of amount paid per fund, in order to only pay the excess not yet paid
     
     function setMinimumRigo(uint256 _amount) only_rigoblock {
         minimumRigo = _amount;
