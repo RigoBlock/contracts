@@ -20,6 +20,11 @@ pragma solidity 0.4.16;
 
 contract Inflation {
 
+     struct Account {
+  	uint balance;
+  	uint claimedTokens;
+     }
+
      modifier only_pool_owner(address thePool) {
         Pool pool = Pool(thePool);
         assert(msg.sender == pool.getOwner();
@@ -54,21 +59,32 @@ contract Inflation {
     	startTime = now;
 	endTime = now + period;
         RigoTok rigoToken = RigoTok(_rigoTok);
-	var inflation = rigoTok.totalSupply * rigoTok.inflationFactor) * 100 * 12 / 42); quartetly inflation of an annual rate
+	var inflation = rigoTok.totalSupply() * rigoTok.getInflationFactor() / 100 * 12 / 42); quartetly inflation of an annual rate
         rigoToken.mintToken(this, inflation);
-        balances[recipient] = safeAdd(balances[recipient], amount);
 	delete inflationTokens;
-        inflationTokens = safeAdd(inflationTokens, amount);
+        inflationTokens = safeAdd(inflationTokens, inflation);
     }
     
-    function PoP(address _pool) external only_pool_owner minimum_rigoblock {
+    function proof(address _pool) external only_pool_owner minimum_rigoblock {
     	RigoTok rigoToken = RigoTok(_rigoTok);
     	ProofOfPerformance pop = ProofOfPerformance(proofOfPerformance);
 	var networkContribution = pop.proofOfPerformance(_pool);
-	inflationTokens[_pool] = safeAdd(inflationTokens[_pool], safeMul(inflationTokens, networkContribution));
-	unclaimedTokens = networkContribution - inflationTokens[_pool];
-	rigoToken.transferFrom(this, msg.sender, unclaimedTokens[_pool]);
-	//double check how to make sure users missing a claim can catch back up
+	var claim = networContribution * inflationTokens;
+	accounts[_pool].claimedTokens = safeAdd(accounts[_pool].claimedTokens, claim);
+	require(rigoToken.transferFrom(this, msg.sender, claim));
+	
+	//TODO:
+	var unclaimedTokens = networkContribution * inflationTokens - claimedTokens[_pool];
+	claimedTokens[_pool] = safeAdd(claimedTokens[_pool], safeMul(inflationTokens, networkContribution));
+	//the function so written does not allow for further inflation payments
+	//decide how to handle changing weights over time
+    }
+    
+    function proofTokens(address _account) internal returns(uint) {
+    	update_account
+    	RigoTok rigoToken = RigoTok(_rigoTok);
+  	var newTokens = inflationTokens - accounts[_account].claimedTokens;
+  	return (accounts[account].balance * newTokens) / rigoTok.totalSupply();
     }
 
     function setInflationFactor(uint _inflationFactor, address _rigoTok) only_rigoblock {
@@ -91,6 +107,7 @@ contract Inflation {
     uint public period = 12 weeks; (inflation tokens can be minted every 3 months)
     address public rigoblock;
     address public proofOfPerformance;
+    mapping(address=>Account) accounts;
     
     RigoTok rigoTok;
 
