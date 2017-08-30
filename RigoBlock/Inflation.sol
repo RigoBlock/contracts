@@ -68,7 +68,7 @@ contract Inflation {
         RigoTok rigoToken = RigoTok(_rigoTok);
 	var inflation = rigoTok.totalSupply() * rigoTok.getInflationFactor() / 100 * 12 / 42); quartetly inflation of an annual rate
         rigoToken.mintToken(this, inflation);
-	delete inflationTokens;
+	delete inflationTokens; //if we ignore this, late users might be able to recover a portion
         inflationTokens = safeAdd(inflationTokens, inflation);
 	porformers[this].deposit = safeAdd(porformers[this].deposit, claim);
     }
@@ -84,14 +84,13 @@ contract Inflation {
 	require(rigoToken.transferFrom(this, msg.sender, claim));	
     }
     
-    validators[validator_index].deposit
-    
-    function proofTokens(address _account) internal returns(uint) {
-    	update_account
+    /* //TODO: double check as it is being used in Proof-of-Performance
+    function proofTokens(address _pool) internal returns(uint) { //or constant?
     	RigoTok rigoToken = RigoTok(_rigoTok);
-  	var newTokens = inflationTokens - performers[_account].claimedTokens;
-  	return (performers[_account].deposit * newTokens) / rigoTok.totalSupply();
+  	var newTokens = inflationTokens - performers[_pool].claimedTokens;
+  	return (performers[_pool].deposit * newTokens) / rigoTok.totalSupply();
     }
+    */
 
     function setInflationFactor(uint _inflationFactor, address _rigoTok) only_rigoblock {
 	RigoTok rigoToken = RigoTok(_rigoTok);
