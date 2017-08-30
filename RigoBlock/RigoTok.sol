@@ -23,6 +23,11 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
         _;
     }
 
+    modifier is_max_inflation(uint newSupply) {
+        assert(newSupply <= totalSupply * ( inflationFactor / 100 );
+        _;
+    }
+
     function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) {
         minter = setMinter;
         rigoblock = setRigoblock;
@@ -32,6 +37,11 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     }
 
     function mintToken(address recipient, uint amount) external only_minter {
+        balances[recipient] = safeAdd(balances[recipient], amount);
+        totalSupply = safeAdd(totalSupply, amount);
+    }
+    
+    function mintInflation(address recipient, uint amount) external only_minter is_max_inflation {
         balances[recipient] = safeAdd(balances[recipient], amount);
         totalSupply = safeAdd(totalSupply, amount);
     }
@@ -59,7 +69,11 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     function setEndTime(uint _endTime) only_rigoblock {
         endTime = _endtTime;
     }
-    
+   
+    function setInflationFactor(uint _inflationFactor) only_rigoblock {
+        inflationFactor = _inflationFactor;
+    }
+   
     string public constant name = "Rigo Token";
     string public constant symbol = "RGT";
     uint public constant decimals = 18;
@@ -67,5 +81,6 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     uint public startTime;
     uint public endTime;
     address public minter;
-    address public rigoblock;
+    address public rigoblock; 
+    uint public inflationFactor = 5; // an inflation factor of 5 is equal to an inflation of 5%
 }
