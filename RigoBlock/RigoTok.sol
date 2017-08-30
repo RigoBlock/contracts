@@ -20,8 +20,8 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     
 /*
 //this function should go in contribution contract
-    modifier is_later_than(uint x) {
-        assert(now > x);
+    modifier is_later_than(uint time) {
+        assert(now > time);
         _;
     }
 */
