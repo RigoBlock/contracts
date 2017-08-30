@@ -2,7 +2,7 @@
 //! By Gabriele Rigo (Rigo Investment), 2017.
 //! Released under the Apache Licence 2.
 
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.16;
 
 contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //UnlimitedAllowanceToken is ERC20
 
@@ -18,20 +18,17 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
         _;
     }
     
-/*
-//this function should go in contribution contract
     modifier is_later_than(uint time) {
         assert(now > time);
         _;
     }
-*/
 
     function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) {
         minter = setMinter;
         rigoblock = setRigoblock;
         startTime = setStartTime;
         endTime = setEndTime;
-        //balances[msg.sender] = totalSupply; //balances[rigoblock] = totalSupply;
+        balances[rigoblock] = totalSupply; //or balances[msg.sender] = totalSupply;
     }
 
     function mintToken(address recipient, uint amount) external only_minter {
@@ -55,14 +52,20 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
         rigoblock = newAddress;
     }
     
+    function setStartTime(uint _startTime) only_rigoblock {
+        startTime = _startTime;
+    }
+    
+    function setEndTime(uint _endTime) only_rigoblock {
+        endTime = _endtTime;
+    }
+    
     string public constant name = "Rigo Token";
     string public constant symbol = "RGT";
     uint public constant decimals = 18;
-    //uint public totalSupply = 10**27; // 1 billion tokens, 18 decimal places //decide whether to start from 0
-    contract ZRXToken is UnlimitedAllowanceToken {
-
-    //uint public startTime; watch out as this function binds contract forever
-    //uint public endTime; watch our as this function binds contract forever
+    uint public totalSupply = 10**27; // 1 billion tokens, 18 decimal places
+    uint public startTime;
+    uint public endTime;
     address public minter;
     address public rigoblock;
 }
