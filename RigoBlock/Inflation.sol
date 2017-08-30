@@ -20,9 +20,11 @@ pragma solidity 0.4.16;
 
 contract Inflation {
 
-     struct Account {
-  	uint balance;
+     struct Performer {
+  	uint deposit;
   	uint claimedTokens;
+	bool hasClaimed;
+	mapping(bool => uint);
      }
 
      modifier only_pool_owner(address thePool) {
@@ -46,6 +48,10 @@ contract Inflation {
         require(now >= endTime);
     }
     
+    modifier has_not_withdrawn_epoch(_thePool) {
+    	require(performers[_thePool].hasClaimed[epoch] != true);
+    }
+    
     function Inflation(address _rigoToken, address _proofOfPerformance, uint _inflationFactor) external only_rigoblock {
         rigoTok = RigoTok(_rigoToken);
 	rigoblock = msg.sender;
@@ -58,37 +64,33 @@ contract Inflation {
     function mintInflation() external only_rigoblock time_at_least {
     	startTime = now;
 	endTime = now + period;
+	++epoch;
         RigoTok rigoToken = RigoTok(_rigoTok);
 	var inflation = rigoTok.totalSupply() * rigoTok.getInflationFactor() / 100 * 12 / 42); quartetly inflation of an annual rate
         rigoToken.mintToken(this, inflation);
 	delete inflationTokens;
         inflationTokens = safeAdd(inflationTokens, inflation);
+	porformers[this].deposit = safeAdd(porformers[this].deposit, claim);
     }
     
-    function proof(address _pool) external only_pool_owner minimum_rigoblock {
+    function proof(address _pool) external only_pool_owner minimum_rigoblock has_not_withdrawn_epoch(_pool) {
     	RigoTok rigoToken = RigoTok(_rigoTok);
     	ProofOfPerformance pop = ProofOfPerformance(proofOfPerformance);
 	var networkContribution = pop.proofOfPerformance(_pool);
 	var claim = networContribution * inflationTokens;
-	accounts[_pool].claimedTokens = safeAdd(accounts[_pool].claimedTokens, claim);
-	require(rigoToken.transferFrom(this, msg.sender, claim));
-	
-	//TODO:
-	var unclaimedTokens = networkContribution * inflationTokens - claimedTokens[_pool];
-	claimedTokens[_pool] = safeAdd(claimedTokens[_pool], safeMul(inflationTokens, networkContribution));
-	//the function so written does not allow for further inflation payments
-	//decide how to handle changing weights over time
-	
-	//create account of user which is proportion of %contribution on totalNetworkValue
-	//create accounting for user claims
-	//user can claim even at a later stage
+	porformers[this].deposit = safeSub(porformers[this].deposit, claim);
+	performers[_pool].claimedTokens = safeAdd(performers[_pool].claimedTokens, claim);
+	performers[_pool].hasClaimed[epoch] = true;
+	require(rigoToken.transferFrom(this, msg.sender, claim));	
     }
+    
+    validators[validator_index].deposit
     
     function proofTokens(address _account) internal returns(uint) {
     	update_account
     	RigoTok rigoToken = RigoTok(_rigoTok);
-  	var newTokens = inflationTokens - accounts[_account].claimedTokens;
-  	return (accounts[account].balance * newTokens) / rigoTok.totalSupply();
+  	var newTokens = inflationTokens - performers[_account].claimedTokens;
+  	return (performers[_account].deposit * newTokens) / rigoTok.totalSupply();
     }
 
     function setInflationFactor(uint _inflationFactor, address _rigoTok) only_rigoblock {
@@ -100,18 +102,24 @@ contract Inflation {
     	rigoblock = _newRigoblock;
     }
     
-    //set period on smaller subsets of time for testing
+    //set period on shorter subsets of time for testing
     function setPeriod(address _newPeriod) only_rigoblock {
     	period = _newPeriod;
+    }
+    
+    function epochWithdrawal(address _pool) constant returns (bool) {
+    	return performers[_pool].hasClaimed[epoch]; //indexing by epoch
     }
     
     uint public inflationTokens;
     uint startTime; //in order to reset at each subperiod
     uint endTime; //maybe each quarter, or even on a daily basis
     uint public period = 12 weeks; (inflation tokens can be minted every 3 months)
+    uint public epoch; //mapping(uint=>bool/uint);
+    bool has_withdrawn_in_epoch;
     address public rigoblock;
     address public proofOfPerformance;
-    mapping(address=>Account) accounts;
+    mapping(address=>Performer) performers;
     
     RigoTok rigoTok;
 
