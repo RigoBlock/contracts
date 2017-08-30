@@ -17,17 +17,21 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
         assert(msg.sender == rigoblock);
         _;
     }
-
+    
+/*
+//this function should go in contribution contract
     modifier is_later_than(uint x) {
         assert(now > x);
         _;
     }
+*/
 
     function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) {
         minter = setMinter;
         rigoblock = setRigoblock;
         startTime = setStartTime;
         endTime = setEndTime;
+        //balances[msg.sender] = totalSupply; //balances[rigoblock] = totalSupply;
     }
 
     function mintToken(address recipient, uint amount) external only_minter {
@@ -54,8 +58,11 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     string public constant name = "Rigo Token";
     string public constant symbol = "RGT";
     uint public constant decimals = 18;
-    uint public startTime;
-    uint public endTime;
+    //uint public totalSupply = 10**27; // 1 billion tokens, 18 decimal places //decide whether to start from 0
+    contract ZRXToken is UnlimitedAllowanceToken {
+
+    //uint public startTime; watch out as this function binds contract forever
+    //uint public endTime; watch our as this function binds contract forever
     address public minter;
     address public rigoblock;
 }
