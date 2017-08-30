@@ -63,6 +63,10 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     function setInflationFactor(uint _inflationFactor) only_rigoblock {
         inflationFactor = _inflationFactor;
     }
+    
+    function getInflationFactor() constant returns (uint) {
+        return inflationFactor;
+     }
    
     string public constant name = "Rigo Token";
     string public constant symbol = "RGT";
