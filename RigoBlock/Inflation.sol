@@ -78,6 +78,10 @@ contract Inflation {
 	claimedTokens[_pool] = safeAdd(claimedTokens[_pool], safeMul(inflationTokens, networkContribution));
 	//the function so written does not allow for further inflation payments
 	//decide how to handle changing weights over time
+	
+	//create account of user which is proportion of %contribution on totalNetworkValue
+	//create accounting for user claims
+	//user can claim even at a later stage
     }
     
     function proofTokens(address _account) internal returns(uint) {
