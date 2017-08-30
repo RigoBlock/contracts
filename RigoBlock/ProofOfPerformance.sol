@@ -45,7 +45,7 @@ contract ProofOfPerformance {
         }
     }
     
-    function calcPoolValue(address _ofPool) internal constant return (uint256 poolAum) {
+    function calcPoolValue(address _ofPool) internal constant returns (uint256 poolAum) {
         Pool pool = Pool(_ofPool);
         uint poolPrice = pool.getPrice();       //uint256 poolPrice = Pool(ofPool).getPrice();
         uint poolTokens = pool.totalSupply();   //uint256 poolTokens = Pool(ofPool).totalSupply();
@@ -58,7 +58,7 @@ contract ProofOfPerformance {
         var networkValue = calcNetworkValue();
         RigoTok rigoToken = RigoTok(rigoblock);
         var rigoblockTokens = rigoToken.totalSupply();
-        var PoP = rigoblockTokens (*inflation / 100) * (poolValue) / networkValue;  //var PoP = networkValue / poolValue; (it is a multiplier, bigger as the fund is very small);
+        PoP = rigoblockTokens (*inflation / 100) * (poolValue) / networkValue;  //var PoP = networkValue / poolValue; (it is a multiplier, bigger as the fund is very small);
         //mapping of value per user
         //can claim in proportion to participation in excess to what has already been claimed
         //this can be developed in Inflation.sol
@@ -72,4 +72,5 @@ contract ProofOfPerformance {
     address public rigoblock;
     uint256 public totalAum;
     uint256 public minimumRigo;
+    uint256 PoP;
 }    
