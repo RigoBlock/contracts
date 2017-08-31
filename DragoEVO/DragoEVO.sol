@@ -3,7 +3,7 @@
 //! Released under the Apache Licence 2.
 //! These dragos make use of eventful contract.
 
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.16;
 
 contract Owned {
     
@@ -86,6 +86,33 @@ contract Exchange {
 	function isActive(uint id) constant returns (bool) {}
 	function getOwner(uint id) constant returns (address) {}
 	function getOrder(uint id) constant returns (uint, ERC20, uint, ERC20) {}
+	
+    //this is the 0x interface
+    //now checking that it fits
+    
+    // EVENTS
+
+    event LogFill(address indexed maker, address taker, address indexed feeRecipient, address makerToken, address takerToken, uint filledMakerTokenAmount, uint filledTakerTokenAmount, uint paidMakerFee, uint paidTakerFee, bytes32 indexed tokens, bytes32 orderHash );
+    event LogCancel(address indexed maker, address indexed feeRecipient, address makerToken, address takerToken, uint cancelledMakerTokenAmount, uint cancelledTakerTokenAmount, bytes32 indexed tokens, bytes32 orderHash );
+    event LogError(uint8 indexed errorId, bytes32 indexed orderHash);
+
+    // NON-CONSTANT METHODS
+
+    function fillOrder(address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8 v, bytes32 r, bytes32 s) returns (uint filledTakerTokenAmount) {}
+    function cancelOrder(address[5] orderAddresses, uint[6] orderValues, uint cancelTakerTokenAmount) returns (uint) {}
+    function fillOrKillOrder(address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount, uint8 v, bytes32 r, bytes32 s) {}
+    function batchFillOrders(address[5][] orderAddresses, uint[6][] orderValues, uint[] fillTakerTokenAmounts, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8[] v, bytes32[] r, bytes32[] s) {}
+    function batchFillOrKillOrders(address[5][] orderAddresses, uint[6][] orderValues, uint[] fillTakerTokenAmounts, uint8[] v, bytes32[] r, bytes32[] s) {}
+    function fillOrdersUpTo(address[5][] orderAddresses, uint[6][] orderValues, uint fillTakerTokenAmount, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8[] v, bytes32[] r, bytes32[] s) returns (uint) {}
+    function batchCancelOrders(address[5][] orderAddresses, uint[6][] orderValues, uint[] cancelTakerTokenAmounts) {}
+
+    // CONSTANT METHODS
+
+    function getOrderHash(address[5] orderAddresses, uint[6] orderValues) constant returns (bytes32) {}
+    function isValidSignature( address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) constant returns (bool) {}
+    function isRoundingError(uint numerator, uint denominator, uint target) constant returns (bool) {}
+    function getPartialAmount(uint numerator, uint denominator, uint target) constant returns (uint) {}
+    function getUnavailableTakerTokenAmount(bytes32 orderHash) constant returns (uint) {}
 }
 
 contract Authority {
@@ -127,8 +154,11 @@ contract Eventful {
     function changeDragoDAO(address _who, address _targetDrago, address _dragoDAO) returns(bool success) {}
     function depositToExchange(address _who, address _targetDrago, address _exchange, address _token, uint _value) returns(bool success) {}
     function withdrawFromExchange(address _who, address _targetDrago, address _exchange, address _token, uint _value) returns(bool success) {}
-    function placeOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns(bool success) {}
-    function placeTradeExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) returns(bool success) {}
+    //function placeOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns(bool success) {}
+    function placeOrderExchange(address _exchange, address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount) returns(bool success) {}
+    function placeOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint[] fillTakerTokenAmount) returns(bool success) {}
+    function placeOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint fillTakerTokenAmount) returns(bool success) {}
+    //function placeTradeExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) returns(bool success) {}
     function placeOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) returns(bool success) {}
     function cancelOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns(bool success) {}
     function cancelOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, uint32 _id) returns(bool success) {}
@@ -150,10 +180,10 @@ contract DragoFace {
 	function changeDragoDAO(address _dragoDAO) {}
 	function depositToExchange(address _exchange, address _token, uint _value) {}
 	function withdrawFromExchange(address _exchange, address _token, uint _value) {}
-	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
-	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) {}
+	//function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
+	//function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) {}
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
-	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
+	//function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
 	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) {}
 	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) {}
 	function setOwner(address _new) {}
@@ -233,7 +263,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
  		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint amount = safeSub(gross_amount, fee);
 		Eventful events = Eventful(getEventful());
-		if (!events.buyDrago(msg.sender, this, msg.value, amount)) throw;
+		require(events.buyDrago(msg.sender, this, msg.value, amount));
 		accounts[msg.sender].balance = safeAdd(accounts[msg.sender].balance, amount);
 		accounts[admin.feeCollector].balance = safeAdd(accounts[admin.feeCollector].balance, fee_drago);
 		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
@@ -255,7 +285,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		accounts[admin.feeCollector].balance = safeAdd(accounts[admin.feeCollector].balance, fee_drago);
 		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
 		data.totalSupply = safeSub(data.totalSupply, net_amount);
-		if (!msg.sender.call.value(net_revenue)()) throw;
+		require(msg.sender.call.value(net_revenue)());
 		return (net_revenue, true);
 	}
 	
@@ -291,56 +321,100 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 
 	function depositToExchange(address _exchange, address _token, uint _value) only_owner when_approved_exchange(_exchange) {
 		Eventful events = Eventful(getEventful());
-		if (!events.depositToExchange(msg.sender, this, _exchange,  _token, _value)) return;
+		require(events.depositToExchange(msg.sender, this, _exchange,  _token, _value));
 		Exchange exchange = Exchange(_exchange);
-		if (!exchange.deposit.value(_value)(_token, _value)) throw;
+		require(exchange.deposit.value(_value)(_token, _value));
 	}
 
 	function withdrawFromExchange(address _exchange, address _token, uint _value) only_owner when_approved_exchange(_exchange) {
 		Eventful events = Eventful(getEventful());
-	    if (!events.withdrawFromExchange(msg.sender, this, _exchange, _token, _value)) return;
+	    require(events.withdrawFromExchange(msg.sender, this, _exchange, _token, _value)); //this was a return
 		Exchange exchange = Exchange(_exchange);
-		if (!exchange.withdraw(_token, _value)) throw; //for ETH token: _token = 0
+		require(exchange.withdraw(_token, _value)); //for ETH token: _token = 0
 		//if (!exchange.withdraw(_token, _value)) return; will work only by adding return true; to the exchange
 	}
 
-	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
+	//function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
+	function placeOrderExchange(address _exchange, address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8 v, bytes32 r, bytes32 s) only_owner when_approved_exchange(_exchange) { 
 		Eventful events = Eventful(getEventful());
-		if (!events.placeOrderExchange(msg.sender, this, _exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires)) return;
+		//require(events.placeOrderExchange(msg.sender, this, _exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires)); //this was a return
+		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount));
 		Exchange exchange = Exchange(_exchange);
-		exchange.order(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
+		//exchange.order(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
+        //exchange.order(orderAddresses[1], orderValues[1], orderAddresses[2], orderValues[2], 0);
+		exchange.fillOrder(orderAddresses, orderValues, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, v, r, s);
 		////events.placeOrderExchange(msg.sender, this, _exchange, _token, _value);
+	}
+
+	function placeOrderExchange(address _exchange, address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount, uint8 v, bytes32 r, bytes32 s) only_owner when_approved_exchange(_exchange) { 
+		Eventful events = Eventful(getEventful());
+		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount)); //this was a return
+		Exchange exchange = Exchange(_exchange);
+		exchange.fillOrKillOrder(orderAddresses, orderValues, fillTakerTokenAmount, v, r, s);
+	}
+
+	function placeOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint[] fillTakerTokenAmounts, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8[] v, bytes32[] r, bytes32[] s) only_owner when_approved_exchange(_exchange) { 
+		Eventful events = Eventful(getEventful());
+		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmounts)); //this was a return
+		Exchange exchange = Exchange(_exchange);
+		exchange.batchFillOrders(orderAddresses, orderValues, fillTakerTokenAmounts, shouldThrowOnInsufficientBalanceOrAllowance, v, r, s);
+	}
+	
+	function placeOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint[] fillTakerTokenAmounts, uint8[] v, bytes32[] r, bytes32[] s) only_owner when_approved_exchange(_exchange) { 
+		Eventful events = Eventful(getEventful());
+		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmounts)); //this was a return
+		Exchange exchange = Exchange(_exchange);
+		exchange.batchFillOrKillOrders(orderAddresses, orderValues, fillTakerTokenAmounts, v, r, s);
+	}
+	
+	function placeOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint fillTakerTokenAmount, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8[] v, bytes32[] r, bytes32[] s) only_owner when_approved_exchange(_exchange) { 
+		Eventful events = Eventful(getEventful());
+		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount)); //this was a return
+		Exchange exchange = Exchange(_exchange);
+		exchange.fillOrdersUpTo(orderAddresses, orderValues, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, v, r, s);
 	}
 
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) only_owner when_approved_exchange(_exchange) {
 		Eventful events = Eventful(getEventful());
-		if (!events.placeOrderCFDExchange(msg.sender, this, _exchange, _cfd, _is_stable, _adjustment, _stake)) throw;
+		require(events.placeOrderCFDExchange(msg.sender, this, _exchange, _cfd, _is_stable, _adjustment, _stake));
 		Exchange exchange = Exchange(_exchange);
 		exchange.orderCFD(_cfd, _is_stable, _adjustment, _stake); //condition is checked in eventful
 	}
 
+/*
 	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) only_owner when_approved_exchange(_exchange) {
 		Eventful events = Eventful(getEventful());
 	    events.placeTradeExchange(msg.sender, this, _exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _user, _amount);
 		Exchange exchange = Exchange(_exchange);
 		exchange.trade(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _user, _amount);
 	}
-	
-	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
+*/
+
+	//function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
+	function cancelOrderExchange(address _exchange, address[5] orderAddresses, uint[6] orderValues, uint cancelTakerTokenAmount) only_owner when_approved_exchange(_exchange) {
 		Exchange exchange = Exchange(_exchange);
-		exchange.cancelOrder(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
+		//exchange.cancelOrder(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
+	    exchange.cancelOrder(orderAddresses, orderValues, cancelTakerTokenAmount);
+	}
+	
+	//probably won't fit in contract size
+	function cancelOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint[] cancelTakerTokenAmounts) only_owner when_approved_exchange(_exchange) {
+		Exchange exchange = Exchange(_exchange);
+		//exchange.cancelOrder(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
+	    exchange.batchCancelOrders(orderAddresses, orderValues, cancelTakerTokenAmounts);
 	}
 
 	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) only_owner when_approved_exchange(_exchange) {
 		Eventful events = Eventful(getEventful());
-		if (!events.cancelOrderCFDExchange(msg.sender, this, _exchange, _cfd, _id)) throw;
+		require(events.cancelOrderCFDExchange(msg.sender, this, _exchange, _cfd, _id));
 		Exchange exchange = Exchange(_exchange);
 		exchange.cancel(_cfd, _id);
 	}
+	
 
 	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) only_owner when_approved_exchange(_exchange) {
 		Eventful events = Eventful(getEventful());
-		if (!events.finalizedDealExchange(msg.sender, this, _exchange, _cfd, _id)) throw;
+		require(events.finalizedDealExchange(msg.sender, this, _exchange, _cfd, _id));
 		Exchange exchange = Exchange(_exchange);
 		exchange.finalize(_cfd, _id);
 	}
