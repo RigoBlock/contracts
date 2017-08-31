@@ -64,6 +64,13 @@ contract ERC20 {
 	function allowance(address _owner, address _spender) constant returns (uint256) {}
 }
 
+contract EtherToken {
+
+    /// a wrapped Ether token with infinite allowance for spender
+    function deposit() public payable {}
+    function withdraw(uint amount) public {}
+}
+
 contract Exchange {
 
 	// METHODS
@@ -334,6 +341,18 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		//if (!exchange.withdraw(_token, _value)) return; will work only by adding return true; to the exchange
 	}
 
+    //the following two functions have been added to allow for the ether wrapper
+    //double check whether 0x can implement our generalized deposit/withdraw functions
+	function wrapEther(address _wrapper, uint _value) only_owner when_approved_exchange(_wrapper) {
+	    EtherToken wrapper = EtherToken(_wrapper);
+	    wrapper.deposit.value(_value);
+	}
+	
+	function unwrapEther(address _wrapper, uint _value) only_owner when_approved_exchange(_wrapper) {
+	    EtherToken wrapper = EtherToken(_wrapper);
+	    wrapper.withdraw(_value);
+	}
+
 	function placeOrderExchange(address _exchange, address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8 v, bytes32 r, bytes32 s) only_owner when_approved_exchange(_exchange) { 
 		//Eventful events = Eventful(getEventful());
 		//require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount));
@@ -423,6 +442,11 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		Exchange exchange = Exchange(_exchange);
 		exchange.finalize(_cfd, _id);
 	}
+	
+	function approveSpending(address _exchange, ERC20 ofToken, uint256 amount) {
+        Exchange exchange = Exchange(_exchange);
+        assert(ofToken.approve(address(exchange), amount));
+    }
 
 	function balanceOf(address _who) constant returns (uint256) {
 		return accounts[_who].balance;
