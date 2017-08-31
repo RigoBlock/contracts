@@ -235,7 +235,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	modifier only_dragoDAO { if (msg.sender != admin.dragoDAO) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	modifier when_approved_exchange(address _exchange) { Authority auth = Authority(admin.authority); if (auth.isWhitelistedExchange(_exchange)) _; }
-	modifier minimum_stake(uint amount) { if (amount < admin.minOrder) throw; _; }
+	modifier minimum_stake(uint amount) { require(amount >= admin.minOrder); _; }
     modifier minimum_period_past { if (now < accounts[msg.sender].receipt.activation) return; _; }
     //modifier minimum_period_past(uint buyPrice, uint amount) { if (now < accounts[msg.sender].receipt[buyPrice].activation) return; _; }
 
@@ -273,29 +273,29 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function sellDrago(uint _amount) minimum_period_past returns (uint net_revenue, bool success) {
-		if (accounts[msg.sender].balance < _amount || accounts[msg.sender].balance + _amount <= accounts[msg.sender].balance) throw;
+		require(accounts[msg.sender].balance >= _amount || accounts[msg.sender].balance + _amount > accounts[msg.sender].balance);
 		uint fee = safeMul (_amount, data.transactionFee);
 		uint fee_drago = safeMul(fee, admin.ratio) / 100;
 		uint fee_dragoDAO = safeSub(fee, fee_drago);
 		uint net_amount = safeSub(_amount, fee);
 		Eventful events = Eventful(getEventful());
 		net_revenue = safeMul(net_amount, data.sellPrice) / base;
-		if (!events.sellDrago(msg.sender, this, _amount, net_revenue)) return;
+		require(events.sellDrago(msg.sender, this, _amount, net_revenue));
 		accounts[msg.sender].balance = safeSub(accounts[msg.sender].balance, _amount);
 		accounts[admin.feeCollector].balance = safeAdd(accounts[admin.feeCollector].balance, fee_drago);
 		accounts[admin.dragoDAO].balance = safeAdd(accounts[admin.dragoDAO].balance, fee_dragoDAO);
 		data.totalSupply = safeSub(data.totalSupply, net_amount);
-		require(msg.sender.call.value(net_revenue)());
+		msg.sender.transfer(net_revenue);
 		return (net_revenue, true);
 	}
 	
 	function setPrices(uint _newSellPrice, uint _newBuyPrice) only_owner {
 		Eventful events = Eventful(getEventful());
-		if (!events.setDragoPrice(msg.sender, this, _newSellPrice, _newBuyPrice)) return;
+		require(events.setDragoPrice(msg.sender, this, _newSellPrice, _newBuyPrice));
 		data.sellPrice = _newSellPrice;
 		data.buyPrice = _newBuyPrice;
 	}
-	
+
 	function changeMinPeriod(uint32 _minPeriod) only_dragoDAO {
 		data.minPeriod = _minPeriod;
 	}
@@ -335,43 +335,43 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function placeOrderExchange(address _exchange, address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8 v, bytes32 r, bytes32 s) only_owner when_approved_exchange(_exchange) { 
-		Eventful events = Eventful(getEventful());
-		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount));
+		//Eventful events = Eventful(getEventful());
+		//require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount));
 		Exchange exchange = Exchange(_exchange);
 		exchange.fillOrder(orderAddresses, orderValues, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, v, r, s);
 	}
 
 	function placeOrderExchange(address _exchange, address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount, uint8 v, bytes32 r, bytes32 s) only_owner when_approved_exchange(_exchange) { 
-		Eventful events = Eventful(getEventful());
-		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount)); //this was a return
+		//Eventful events = Eventful(getEventful());
+		//require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount)); //this was a return
 		Exchange exchange = Exchange(_exchange);
 		exchange.fillOrKillOrder(orderAddresses, orderValues, fillTakerTokenAmount, v, r, s);
 	}
 
 	function placeOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint[] fillTakerTokenAmounts, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8[] v, bytes32[] r, bytes32[] s) only_owner when_approved_exchange(_exchange) { 
-		Eventful events = Eventful(getEventful());
-		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmounts)); //this was a return
+		//Eventful events = Eventful(getEventful());
+		//require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmounts)); //this was a return
 		Exchange exchange = Exchange(_exchange);
 		exchange.batchFillOrders(orderAddresses, orderValues, fillTakerTokenAmounts, shouldThrowOnInsufficientBalanceOrAllowance, v, r, s);
 	}
-	
+
 	function placeOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint[] fillTakerTokenAmounts, uint8[] v, bytes32[] r, bytes32[] s) only_owner when_approved_exchange(_exchange) { 
-		Eventful events = Eventful(getEventful());
-		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmounts)); //this was a return
+		//Eventful events = Eventful(getEventful());
+		//require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmounts)); //this was a return
 		Exchange exchange = Exchange(_exchange);
 		exchange.batchFillOrKillOrders(orderAddresses, orderValues, fillTakerTokenAmounts, v, r, s);
 	}
 
 	function placeOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint fillTakerTokenAmount, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8[] v, bytes32[] r, bytes32[] s) only_owner when_approved_exchange(_exchange) { 
-		Eventful events = Eventful(getEventful());
-		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount)); //this was a return
+		//Eventful events = Eventful(getEventful());
+		//require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount)); //this was a return
 		Exchange exchange = Exchange(_exchange);
 		exchange.fillOrdersUpTo(orderAddresses, orderValues, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, v, r, s);
 	}
 
 	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) only_owner when_approved_exchange(_exchange) {
-		Eventful events = Eventful(getEventful());
-		require(events.placeOrderCFDExchange(msg.sender, this, _exchange, _cfd, _is_stable, _adjustment, _stake));
+		//Eventful events = Eventful(getEventful());
+		//require(events.placeOrderCFDExchange(msg.sender, this, _exchange, _cfd, _is_stable, _adjustment, _stake));
 		Exchange exchange = Exchange(_exchange);
 		exchange.orderCFD(_cfd, _is_stable, _adjustment, _stake); //condition is checked in eventful
 	}
@@ -402,7 +402,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		//exchange.cancelOrder(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
 	    exchange.cancelOrder(orderAddresses, orderValues, cancelTakerTokenAmount);
 	}
-	
+
 	//probably won't fit in contract size
 	function cancelOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint[] cancelTakerTokenAmounts) only_owner when_approved_exchange(_exchange) {
 		Exchange exchange = Exchange(_exchange);
@@ -411,15 +411,15 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) only_owner when_approved_exchange(_exchange) {
-		Eventful events = Eventful(getEventful());
-		require(events.cancelOrderCFDExchange(msg.sender, this, _exchange, _cfd, _id));
+		//Eventful events = Eventful(getEventful());
+		//require(events.cancelOrderCFDExchange(msg.sender, this, _exchange, _cfd, _id));
 		Exchange exchange = Exchange(_exchange);
 		exchange.cancel(_cfd, _id);
 	}
 	
 	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) only_owner when_approved_exchange(_exchange) {
-		Eventful events = Eventful(getEventful());
-		require(events.finalizedDealExchange(msg.sender, this, _exchange, _cfd, _id));
+		//Eventful events = Eventful(getEventful());
+		//require(events.finalizedDealExchange(msg.sender, this, _exchange, _cfd, _id));
 		Exchange exchange = Exchange(_exchange);
 		exchange.finalize(_cfd, _id);
 	}
