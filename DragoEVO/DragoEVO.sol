@@ -334,16 +334,11 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		//if (!exchange.withdraw(_token, _value)) return; will work only by adding return true; to the exchange
 	}
 
-	//function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
 	function placeOrderExchange(address _exchange, address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8 v, bytes32 r, bytes32 s) only_owner when_approved_exchange(_exchange) { 
 		Eventful events = Eventful(getEventful());
-		//require(events.placeOrderExchange(msg.sender, this, _exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires)); //this was a return
 		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount));
 		Exchange exchange = Exchange(_exchange);
-		//exchange.order(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
-        //exchange.order(orderAddresses[1], orderValues[1], orderAddresses[2], orderValues[2], 0);
 		exchange.fillOrder(orderAddresses, orderValues, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, v, r, s);
-		////events.placeOrderExchange(msg.sender, this, _exchange, _token, _value);
 	}
 
 	function placeOrderExchange(address _exchange, address[5] orderAddresses, uint[6] orderValues, uint fillTakerTokenAmount, uint8 v, bytes32 r, bytes32 s) only_owner when_approved_exchange(_exchange) { 
@@ -366,7 +361,7 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		Exchange exchange = Exchange(_exchange);
 		exchange.batchFillOrKillOrders(orderAddresses, orderValues, fillTakerTokenAmounts, v, r, s);
 	}
-	
+
 	function placeOrderExchange(address _exchange, address[5][] orderAddresses, uint[6][] orderValues, uint fillTakerTokenAmount, bool shouldThrowOnInsufficientBalanceOrAllowance, uint8[] v, bytes32[] r, bytes32[] s) only_owner when_approved_exchange(_exchange) { 
 		Eventful events = Eventful(getEventful());
 		require(events.placeOrderExchange(_exchange, orderAddresses, orderValues, fillTakerTokenAmount)); //this was a return
@@ -382,6 +377,17 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	}
 
 /*
+        //if event gets sampled here use the below
+        //exchange.order(orderAddresses[1], orderValues[1], orderAddresses[2], orderValues[2], 0);
+
+    function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) only_owner when_approved_exchange(_exchange) {
+		Eventful events = Eventful(getEventful());
+		if (!events.placeOrderExchange(msg.sender, this, _exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires)) return;
+		Exchange exchange = Exchange(_exchange);
+		exchange.order(_tokenGet, _amountGet, _tokenGive, _amountGive, _expires);
+		////events.placeOrderExchange(msg.sender, this, _exchange, _token, _value);
+	}
+
 	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) only_owner when_approved_exchange(_exchange) {
 		Eventful events = Eventful(getEventful());
 	    events.placeTradeExchange(msg.sender, this, _exchange, _tokenGet, _amountGet, _tokenGive, _amountGive, _expires, _user, _amount);
@@ -411,7 +417,6 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		exchange.cancel(_cfd, _id);
 	}
 	
-
 	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) only_owner when_approved_exchange(_exchange) {
 		Eventful events = Eventful(getEventful());
 		require(events.finalizedDealExchange(msg.sender, this, _exchange, _cfd, _id));
