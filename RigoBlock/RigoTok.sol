@@ -133,8 +133,12 @@ contract UnlimitedAllowanceToken is ERC20 {
 }
 
 contract RigoTokFace {
+    
+    // EVENTS
 
     event TokenMinted(address indexed recipient, uint amount);
+
+    // NON-CONSTANT METHODS
 
     function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) {}
     function mintToken(address recipient, uint amount) external {}
@@ -142,7 +146,12 @@ contract RigoTokFace {
     function transferFrom(address sender, address recipient, uint amount) returns (bool success) {}
     function changeMintingAddress(address newAddress) {}
     function changeRigoblockAddress(address newAddress) {}
+    function setStartTime(uint _startTime) {}
+    function setEndTime(uint _endTime) {}
+    function setInflationFactor(uint _inflationFactor) {}
     
+    // CONSTANT METHODS
+
     function getName() constant returns (string name) {}
     function getSymbol() constant returns (string symbol) {}
     function getDecimals() constant returns (uint decimals) {}
@@ -150,11 +159,16 @@ contract RigoTokFace {
     function getEndTime() constant returns (uint endTime) {}
     function getMinter() constant returns (address minter) {}
     function getRigoblock() constant returns (address rigoblock) {}
+    function getInflationFactor() constant returns (uint) {}
 }
 
 contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //UnlimitedAllowanceToken is ERC20
 
+    // EVENTS
+
     event TokenMinted(address indexed recipient, uint amount);
+    
+    // MODIFIERS
 
     modifier only_minter {
         assert(msg.sender == minter);
@@ -170,6 +184,8 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
         assert(now > time);
         _;
     }
+    
+    // MOTHODS
 
     function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) {
         minter = setMinter;
@@ -211,10 +227,41 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     function setInflationFactor(uint _inflationFactor) only_rigoblock {
         inflationFactor = _inflationFactor;
     }
+
+    // CONSTANT METHODS
+
+    function getName() constant returns (string) {
+        return name;
+    }
+    
+    function getSymbol() constant returns (string) {
+        return symbol;
+    }
+    
+    function getDecimals() constant returns (uint) {
+        return decimals;
+    }
+    
+    function getStartTime() constant returns (uint) {
+        return startTime;
+    }
+    
+    function getEndTime() constant returns (uint) {
+        return endTime;
+    }
+    
+    function getMinter() constant returns (address) {
+        return minter;
+    }
+    
+    function getRigoblock() constant returns (address) {
+        return rigoblock;
+    }
     
     function getInflationFactor() constant returns (uint) {
         return inflationFactor;
-     }
+    }
+    
    
     string public constant name = "Rigo Token";
     string public constant symbol = "RGT";
