@@ -66,9 +66,13 @@ contract ERC20 {
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 }
 
-contract RigoTok is ERC20 {
+contract RigoTok {
+
+    // EVENTS
 
     event TokenMinted(address indexed recipient, uint amount);
+
+    // NON-CONSTANT METHODS
 
     function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) {}
     function mintToken(address recipient, uint amount) external {}
@@ -76,14 +80,22 @@ contract RigoTok is ERC20 {
     function transferFrom(address sender, address recipient, uint amount) returns (bool success) {}
     function changeMintingAddress(address newAddress) {}
     function changeRigoblockAddress(address newAddress) {}
+    function setStartTime(uint _startTime) {}
+    function setEndTime(uint _endTime) {}
+    function setInflationFactor(uint _inflationFactor) {}
     
-    function getName() constant returns (string name) {}
-    function getSymbol() constant returns (string symbol) {}
-    function getDecimals() constant returns (uint decimals) {}
-    function getStartTime() constant returns (uint startTime) {}
-    function getEndTime() constant returns (uint endTime) {}
-    function getMinter() constant returns (address minter) {}
-    function getRigoblock() constant returns (address rigoblock) {}
+    // CONSTANT METHODS
+
+    function balanceOf(address _owner) constant returns (uint256) {}
+    function getName() constant returns (string) {}
+    function getSymbol() constant returns (string) {}
+    function getDecimals() constant returns (uint) {}
+    function getStartTime() constant returns (uint) {}
+    function getEndTime() constant returns (uint) {}
+    function getMinter() constant returns (address) {}
+    function getRigoblock() constant returns (address) {}
+    function getInflationFactor() constant returns (uint) {}
+    function totalSupply() constant returns (uint256) {}
 }
 
 contract Inflation {
