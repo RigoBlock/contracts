@@ -18,6 +18,49 @@
 
 pragma solidity 0.4.16;
 
+contract SafeMath {
+
+    function safeMul(uint a, uint b) internal returns (uint) {
+        uint c = a * b;
+        assert(a == 0 || c / a == b);
+        return c;
+    }
+    
+    function safeDiv(uint a, uint b) internal returns (uint) {
+        assert(b > 0);
+        uint c = a / b;
+        assert(a == b * c + a % b);
+        return c;
+    }
+
+    function safeSub(uint a, uint b) internal returns (uint) {
+        assert(b <= a);
+        return a - b;
+    }
+
+    function safeAdd(uint a, uint b) internal returns (uint) {
+        uint c = a + b;
+        assert(c>=a && c>=b);
+        return c;
+    }
+    
+    function max64(uint64 a, uint64 b) internal constant returns (uint64) {
+        return a >= b ? a : b;
+    }
+
+    function min64(uint64 a, uint64 b) internal constant returns (uint64) {
+        return a < b ? a : b;
+    }
+
+    function max256(uint256 a, uint256 b) internal constant returns (uint256) {
+        return a >= b ? a : b;
+    }
+
+    function min256(uint256 a, uint256 b) internal constant returns (uint256) {
+        return a < b ? a : b;
+    }
+}
+
 contract Pool {
     
 
@@ -98,9 +141,21 @@ contract RigoTok {
     function totalSupply() constant returns (uint256) {}
 }
 
-contract Inflation {
+contract ProofOfPerformance {
 
-     struct Performer {
+    function setRegistry(address _dragoRegistry) {}
+    function setRigoblock(address _rigoblock) {}
+    function setMinimumRigo(uint256 _amount) {}
+    
+    function calcNetworkValue() constant returns (uint256 totalAum) {}
+    function calcPoolValue(uint256 _ofPool) internal constant returns (uint256 poolAum) {}
+    function proofOfPerformance(uint _ofPool) constant returns (uint256 PoP) {}
+    function getPoolAddress(uint _ofPool) public constant returns (address) {}
+}
+
+contract Inflation is SafeMath {
+
+    struct Performer {
   	uint deposit;
   	uint claimedTokens;
 	bool hasClaimed;
@@ -121,47 +176,52 @@ contract Inflation {
     }
     
     modifier only_rigoblock {
-        require(msg.sender == _rigoblock); _;
+        require(msg.sender == rigoblock); _;
     }
     
     modifier time_at_least {
         require(now >= endTime); _;
     }
-    
+
     modifier has_not_withdrawn_epoch(address _thePool) {
-    	require(performers[_thePool].hasClaimed[epoch] != true); _;
+    	//require(performers[_thePool].hasClaimed[epoch] != true); _;
+    	require(performers[_thePool].hasClaimed != true); _; //this has to be corrected for sure
     }
     
-    function Inflation(address _rigoToken, address _proofOfPerformance, uint _inflationFactor) external only_rigoblock {
-        rigoTok = RigoTok(_rigoToken);
-	rigoblock = msg.sender;
-        rigoTok.inflationFactor = _inflationFactor;
-	startTime = now;
-	endTime = now + period;
-	proofOfPerformance = _proofOfPerformance;
+    function Inflation(address _rigoToken, address _proofOfPerformance, uint _inflationFactor) only_rigoblock {
+        RigoTok rigoToken = RigoTok(_rigoToken);
+        rigo = _rigoToken;
+	    rigoblock = msg.sender;
+        rigoToken.setInflationFactor(_inflationFactor);
+	    startTime = now;
+	    endTime = now + period;
+	    proofOfPerformance = _proofOfPerformance;
     }
 
     function mintInflation() external only_rigoblock time_at_least {
     	startTime = now;
-	endTime = now + period;
-	++epoch;
-        RigoTok rigoToken = RigoTok(_rigoTok);
-	var inflation = rigoTok.totalSupply() * rigoTok.getInflationFactor() / 100 * 12 / 42; //quartetly inflation of an annual rate
+	    endTime = now + period;
+	    ++epoch;
+        RigoTok rigoToken = RigoTok(rigo);
+	    var inflation = rigoToken.totalSupply() * rigoToken.getInflationFactor() / 100 * 12 / 42; //quartetly inflation of an annual rate
         rigoToken.mintToken(this, inflation);
-	delete inflationTokens; //if we ignore this, late users might be able to recover a portion
+	    delete inflationTokens; //if we ignore this, late users might be able to recover a portion
         inflationTokens = safeAdd(inflationTokens, inflation);
-	porformers[this].deposit = safeAdd(porformers[this].deposit, claim);
+	    performers[this].deposit = safeAdd(performers[this].deposit, inflationTokens); //claim);
     }
     
-    function proof(address _pool) external only_pool_owner minimum_rigoblock has_not_withdrawn_epoch(_pool) {
-    	RigoTok rigoToken = RigoTok(_rigoTok);
+    function proof(address _pool, uint _ofPool) external only_pool_owner(_pool) minimum_rigoblock has_not_withdrawn_epoch(_pool) {
+    	RigoTok rigoToken = RigoTok(rigo);
     	ProofOfPerformance pop = ProofOfPerformance(proofOfPerformance);
-	var networkContribution = pop.proofOfPerformance(_pool);
-	var claim = networContribution * inflationTokens;
-	porformers[this].deposit = safeSub(porformers[this].deposit, claim);
-	performers[_pool].claimedTokens = safeAdd(performers[_pool].claimedTokens, claim);
-	performers[_pool].hasClaimed[epoch] = true;
-	require(rigoToken.transferFrom(this, msg.sender, claim));	
+    	//DragoRegistry registry = DragoRegistry()
+    	address thePool = pop.getPoolAddress(_ofPool);
+	    var networkContribution = pop.proofOfPerformance(_ofPool);
+	    var claim = networkContribution * inflationTokens;
+	    performers[this].deposit = safeSub(performers[this].deposit, claim);
+	    performers[_pool].claimedTokens = safeAdd(performers[_pool].claimedTokens, claim);
+	    //performers[_pool].hasClaimed[epoch] = true;
+	    performers[_pool].hasClaimed = true; //we have to map per epoch, one claim allowed for each subperiod
+	    require(rigoToken.transferFrom(this, msg.sender, claim));	
     }
     
     /* //TODO: double check as it is being used in Proof-of-Performance
@@ -173,8 +233,13 @@ contract Inflation {
     */
 
     function setInflationFactor(uint _inflationFactor, address _rigoTok) only_rigoblock {
-	RigoTok rigoToken = RigoTok(_rigoTok);
-        rigoToken.inflationFactor(_inflationFactor);
+	    RigoTok rigoToken = RigoTok(_rigoTok);
+        rigoToken.setInflationFactor(_inflationFactor);
+    }
+    
+    //TODO: check whether this functions should be moved to authority or rigoDAO
+    function setMinimumRigo(uint _minimum) only_rigoblock {
+        minimumRigo = _minimum;
     }
     
     function setRigoblock(address _newRigoblock) only_rigoblock {
@@ -182,12 +247,13 @@ contract Inflation {
     }
     
     //set period on shorter subsets of time for testing
-    function setPeriod(address _newPeriod) only_rigoblock {
+    function setPeriod(uint _newPeriod) only_rigoblock {
     	period = _newPeriod;
     }
     
     function epochWithdrawal(address _pool) constant returns (bool) {
-    	return performers[_pool].hasClaimed[epoch]; //indexing by epoch
+    	//return performers[_pool].hasClaimed[epoch]; //indexing by epoch
+    	return performers[_pool].hasClaimed; //indexing by epoch. this function has to be amended
     }
     
     uint public inflationTokens;
@@ -195,9 +261,11 @@ contract Inflation {
     uint endTime; //maybe each quarter, or even on a daily basis
     uint public period = 12 weeks; //(inflation tokens can be minted every 3 months)
     uint public epoch; //mapping(uint=>bool/uint);
+    uint minimumRigo; //double check whether to get minimumRigo from an authority/Dao contract
     bool has_withdrawn_in_epoch;
     address public rigoblock;
     address public proofOfPerformance;
+    address public rigo; //double check whether we can find it differently
     mapping(address=>Performer) performers;
     
     //RigoTok rigoTok;
