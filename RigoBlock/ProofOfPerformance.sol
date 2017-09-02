@@ -153,6 +153,7 @@ contract ProofOfPerformanceFace {
     function calcNetworkValue() constant returns (uint256 totalAum) {}
     function calcPoolValue(uint256 _ofPool) internal constant returns (uint256 poolAum) {}
     function proofOfPerformance(uint _ofPool) constant returns (uint256 PoP) {}
+    function getPoolAddress(uint _ofPool) public constant returns (address) {}
 }
 
 contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
@@ -225,6 +226,11 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         //can claim in proportion to participation in excess to what has already been claimed
     }
     
+    function getPoolAddress(uint _ofPool) public constant returns (address) {
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
+        return registry.fromId(_ofPool);
+    }
+    
     //TODO: mapping of amount paid per fund, in order to only pay the excess not yet paid
     
     function setMinimumRigo(uint256 _amount) /*only_rigoblock*/ {
@@ -236,4 +242,4 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
     uint256 public totalAum;
     uint256 public minimumRigo;
     uint256 PoP;
-}   
+}
