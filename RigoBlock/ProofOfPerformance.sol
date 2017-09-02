@@ -2,14 +2,6 @@
 //! By Gabriele Rigo (RigoBlock, Rigo Investment), 2017.
 //! Released under the Apache Licence 2.
 
-//! Proof-of-Performance algorithm contract.
-//! By Gabriele Rigo (RigoBlock, Rigo Investment), 2017.
-//! Released under the Apache Licence 2.
-
-//! Proof-of-Performance algorithm contract.
-//! By Gabriele Rigo (RigoBlock, Rigo Investment), 2017.
-//! Released under the Apache Licence 2.
-
 pragma solidity ^0.4.16;
 
 contract SafeMath {
@@ -152,7 +144,18 @@ contract DragoRegistry {
 	function getFee() constant returns (uint) {}
 }
 
-contract ProofOfPerformance is SafeMath {
+contract ProofOfPerformanceFace {
+
+    function setRegistry(address _dragoRegistry) {}
+    function setRigoblock(address _rigoblock) {}
+    function setMinimumRigo(uint256 _amount) {}
+    
+    function calcNetworkValue() constant returns (uint256 totalAum) {}
+    function calcPoolValue(uint256 _ofPool) internal constant returns (uint256 poolAum) {}
+    function proofOfPerformance(uint _ofPool) constant returns (uint256 PoP) {}
+}
+
+contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
 
     modifier only_minter { RigoTok token = RigoTok(rigoblock);
         assert(msg.sender == token.getMinter());
@@ -233,4 +236,4 @@ contract ProofOfPerformance is SafeMath {
     uint256 public totalAum;
     uint256 public minimumRigo;
     uint256 PoP;
-}
+}   
