@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.10;
 
-contract RigoTok {
+contract RigoTokFace {
 
     // EVENTS
 
@@ -24,14 +24,14 @@ contract RigoTok {
     
     // CONSTANT METHODS
 
-    function balanceOf(address _owner) constant returns (uint256 balance) {}
-    function getName() constant returns (string name) {}
-    function getSymbol() constant returns (string symbol) {}
-    function getDecimals() constant returns (uint decimals) {}
-    function getStartTime() constant returns (uint startTime) {}
-    function getEndTime() constant returns (uint endTime) {}
-    function getMinter() constant returns (address minter) {}
-    function getRigoblock() constant returns (address rigoblock) {}
+    function balanceOf(address _owner) constant returns (uint256) {}
+    function getName() constant returns (string) {}
+    function getSymbol() constant returns (string) {}
+    function getDecimals() constant returns (uint) {}
+    function getStartTime() constant returns (uint) {}
+    function getEndTime() constant returns (uint) {}
+    function getMinter() constant returns (address) {}
+    function getRigoblock() constant returns (address) {}
     function getInflationFactor() constant returns (uint) {}
     function totalSupply() constant returns (uint256) {}
 }
