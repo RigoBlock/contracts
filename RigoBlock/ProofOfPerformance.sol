@@ -2,6 +2,14 @@
 //! By Gabriele Rigo (RigoBlock, Rigo Investment), 2017.
 //! Released under the Apache Licence 2.
 
+//! Proof-of-Performance algorithm contract.
+//! By Gabriele Rigo (RigoBlock, Rigo Investment), 2017.
+//! Released under the Apache Licence 2.
+
+//! Proof-of-Performance algorithm contract.
+//! By Gabriele Rigo (RigoBlock, Rigo Investment), 2017.
+//! Released under the Apache Licence 2.
+
 pragma solidity ^0.4.16;
 
 contract SafeMath {
@@ -70,6 +78,8 @@ contract Pool {
 	function() payable {}   // only_approved_exchange(msg.sender)
 
 	function balanceOf(address _who) constant returns (uint) {}
+	//TODO: the below function is implemented in Gaboins but is aggregated in Dragos
+	function getPrice() constant returns (uint256 price) {}
 	function getEventful() constant returns (address) {}
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice) {}
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
@@ -79,7 +89,11 @@ contract Pool {
 
 contract RigoTok {
 
+    // EVENTS
+
     event TokenMinted(address indexed recipient, uint amount);
+
+    // NON-CONSTANT METHODS
 
     function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) {}
     function mintToken(address recipient, uint amount) external {}
@@ -87,7 +101,13 @@ contract RigoTok {
     function transferFrom(address sender, address recipient, uint amount) returns (bool success) {}
     function changeMintingAddress(address newAddress) {}
     function changeRigoblockAddress(address newAddress) {}
+    function setStartTime(uint _startTime) {}
+    function setEndTime(uint _endTime) {}
+    function setInflationFactor(uint _inflationFactor) {}
     
+    // CONSTANT METHODS
+
+    function balanceOf(address _owner) constant returns (uint256 balance) {}
     function getName() constant returns (string name) {}
     function getSymbol() constant returns (string symbol) {}
     function getDecimals() constant returns (uint decimals) {}
@@ -95,6 +115,8 @@ contract RigoTok {
     function getEndTime() constant returns (uint endTime) {}
     function getMinter() constant returns (address minter) {}
     function getRigoblock() constant returns (address rigoblock) {}
+    function getInflationFactor() constant returns (uint) {}
+    function totalSupply() constant returns (uint256) {}
 }
 
 contract DragoRegistry {
@@ -118,7 +140,9 @@ contract DragoRegistry {
 	function kill() {}
 	
 	function dragoCount() constant returns (uint) {}
-	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
+	function drago(uint _id) constant returns (address Adrago, string name, string symbol, uint dragoID, address owner, address group) {}
+	// TODO: IMPLEMENT fromId function in registry
+	function fromId(uint id) constant returns (address) {}
 	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
 	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
 	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
@@ -130,13 +154,21 @@ contract DragoRegistry {
 
 contract ProofOfPerformance is SafeMath {
 
-    modifier only_minter {
-        assert(msg.sender == minter);
+    modifier only_minter { RigoTok token = RigoTok(rigoblock);
+        assert(msg.sender == token.getMinter());
         _;
     }
-    
+    /*
     modifier only_pool_owner(address thePool) {
         Pool pool = Pool(thePool);
+        assert(msg.sender == pool.getOwner());
+        _;
+    }
+    */
+    modifier only_pool_owner(uint thePool) {
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
+        var poolAddress = registry.fromId(thePool);
+        Pool pool = Pool(poolAddress);
         assert(msg.sender == pool.getOwner());
         _;
     }
@@ -165,20 +197,23 @@ contract ProofOfPerformance is SafeMath {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         for (uint256 i = 0; i < registry.dragoCount(); ++i) {
             calcPoolValue(i);
-            totalAum = safeAdd(poolAUM(i));
+            //totalAum = safeAdd(calcPoolValue(i));//(poolAUM(i));
         }
     }
     
-    function calcPoolValue(address _ofPool) internal constant returns (uint256 poolAum) {
-        Pool pool = Pool(_ofPool);
+    function calcPoolValue(uint256 _ofPool) internal constant returns (uint256 poolAum) {
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
+        address poolAddress = registry.fromId(_ofPool);//.address[0];
+        Pool pool = Pool(poolAddress);
         uint poolPrice = pool.getPrice();       //uint256 poolPrice = Pool(ofPool).getPrice();
         uint poolTokens = pool.totalSupply();   //uint256 poolTokens = Pool(ofPool).totalSupply();
         poolAum = safeMul(poolPrice, poolTokens); //check whether to divide by a factor in order to prevent overflow
     }
     
-    function proofOfPerformance(address _ofPool) only_pool_owner minimum_rigoblock returns (uint256 PoP) {
-        require(poolValue != 0);
+    function proofOfPerformance(uint _ofPool) constant only_pool_owner(_ofPool) minimum_rigoblock returns (uint256 PoP) {
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
         var poolValue = calcPoolValue(_ofPool);
+        require(poolValue != 0);
         var networkValue = calcNetworkValue();
         RigoTok rigoToken = RigoTok(rigoblock);
         var rigoblockTokens = rigoToken.totalSupply();
@@ -198,4 +233,4 @@ contract ProofOfPerformance is SafeMath {
     uint256 public totalAum;
     uint256 public minimumRigo;
     uint256 PoP;
-}  
+}
