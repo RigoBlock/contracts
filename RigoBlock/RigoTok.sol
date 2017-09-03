@@ -2,10 +2,6 @@
 //! By Gabriele Rigo (Rigo Investment), 2017.
 //! Released under the Apache Licence 2.
 
-//! RigoBlock Token contract.
-//! By Gabriele Rigo (Rigo Investment), 2017.
-//! Released under the Apache Licence 2.
-
 pragma solidity ^0.4.16;
 
 contract SafeMath {
@@ -60,7 +56,7 @@ contract ERC20Face {
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 	function approve(address _spender, uint256 _value) returns (bool success) {}
 
-	function totalSupply() constant returns (uint256 total) {}
+	function totalSupply() constant returns (uint256 totalSupply) {}
 	function balanceOf(address _owner) constant returns (uint256 balance) {}
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 }
@@ -156,7 +152,8 @@ contract RigoTokFace {
     
     // CONSTANT METHODS
 
-    function balanceOf(address _owner) constant returns (uint256) {}
+    //function balanceOf(address _owner) constant returns (uint256 balance) {}
+    //function totalSupply() constant returns (uint256 totalSupply) {}
     function getName() constant returns (string) {}
     function getSymbol() constant returns (string) {}
     function getDecimals() constant returns (uint) {}
@@ -165,7 +162,6 @@ contract RigoTokFace {
     function getMinter() constant returns (address) {}
     function getRigoblock() constant returns (address) {}
     function getInflationFactor() constant returns (uint) {}
-    function totalSupply() constant returns (uint256) {}
 }
 
 contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //UnlimitedAllowanceToken is ERC20
@@ -270,7 +266,7 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     
    
     string public constant name = "Rigo Token";
-    string public constant symbol = "RGT";
+    string public constant symbol = "GRG";
     uint public constant decimals = 18;
     uint public totalSupply = 10**27; // 1 billion tokens, 18 decimal places
     uint public startTime;
