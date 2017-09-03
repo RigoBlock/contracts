@@ -24,7 +24,8 @@ contract RigoTokFace {
     
     // CONSTANT METHODS
 
-    function balanceOf(address _owner) constant returns (uint256) {}
+    function balanceOf(address _owner) constant returns (uint256 balance) {}
+    function totalSupply() constant returns (uint256 totalSupply) {}
     function getName() constant returns (string) {}
     function getSymbol() constant returns (string) {}
     function getDecimals() constant returns (uint) {}
@@ -33,5 +34,4 @@ contract RigoTokFace {
     function getMinter() constant returns (address) {}
     function getRigoblock() constant returns (address) {}
     function getInflationFactor() constant returns (uint) {}
-    function totalSupply() constant returns (uint256) {}
 }
