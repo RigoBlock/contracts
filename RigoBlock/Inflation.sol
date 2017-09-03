@@ -83,12 +83,12 @@ contract Pool {
 	function setOwner(address _new) {}
 	function() payable {}   // only_approved_exchange(msg.sender)
 
-	function balanceOf(address _who) constant returns (uint) {}
+	function balanceOf(address _who) constant returns (uint256 balance) {}
+	function totalSupply() constant returns (uint256 totalSupply) {}
 	function getEventful() constant returns (address) {}
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice) {}
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
 	function getOwner() constant returns (address) {}
-	function totalSupply() constant returns (uint256) {}
 }
 
 contract ERC20 {
@@ -104,7 +104,7 @@ contract ERC20 {
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 	function approve(address _spender, uint256 _value) returns (bool success) {}
 
-	function totalSupply() constant returns (uint256 total) {}
+	function totalSupply() constant returns (uint256 totalSupply) {}
 	function balanceOf(address _who) constant returns (uint256 balance) {}
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 }
@@ -129,7 +129,8 @@ contract RigoTok {
     
     // CONSTANT METHODS
 
-    function balanceOf(address _owner) constant returns (uint256) {}
+    function balanceOf(address _owner) constant returns (uint256 balance) {}
+    function totalSupply() constant returns (uint256 totalSupply) {}
     function getName() constant returns (string) {}
     function getSymbol() constant returns (string) {}
     function getDecimals() constant returns (uint) {}
@@ -138,7 +139,6 @@ contract RigoTok {
     function getMinter() constant returns (address) {}
     function getRigoblock() constant returns (address) {}
     function getInflationFactor() constant returns (uint) {}
-    function totalSupply() constant returns (uint256) {}
 }
 
 contract ProofOfPerformance {
@@ -158,7 +158,7 @@ contract Inflation is SafeMath {
     struct Performer {
   	    uint deposit;
   	    uint claimedTokens;
-	    bool hasClaimed;
+	    //bool hasClaimed; //not used
 	    mapping(uint => bool) claim;
     }
 
@@ -265,5 +265,5 @@ contract Inflation is SafeMath {
     address public rigoblock;
     address public proofOfPerformance;
     address public rigo; //double check whether we can find it differently
-    mapping(address=>Performer) performers;
+    mapping(address => Performer) performers;
 }
