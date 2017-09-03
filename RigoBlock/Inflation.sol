@@ -156,11 +156,11 @@ contract ProofOfPerformance {
 contract Inflation is SafeMath {
 
     struct Performer {
-  	uint deposit;
-  	uint claimedTokens;
-	bool hasClaimed;
-	mapping(bool => uint) claim;
-     }
+  	    uint deposit;
+  	    uint claimedTokens;
+	    bool hasClaimed;
+	    mapping(uint => bool) claim;
+    }
 
      modifier only_pool_owner(address thePool) {
         Pool pool = Pool(thePool);
@@ -184,8 +184,8 @@ contract Inflation is SafeMath {
     }
 
     modifier has_not_withdrawn_epoch(address _thePool) {
-    	//require(performers[_thePool].hasClaimed[epoch] != true); _;
-    	require(performers[_thePool].hasClaimed != true); _; //this has to be corrected for sure
+    	require(performers[_thePool].claim[epoch] != true); _;
+    	//require(performers[_thePool].hasClaimed != true); _; //this has to be corrected for sure
     }
     
     function Inflation(address _rigoToken, address _proofOfPerformance, uint _inflationFactor) only_rigoblock {
@@ -213,22 +213,21 @@ contract Inflation is SafeMath {
     function proof(address _pool, uint _ofPool) external only_pool_owner(_pool) minimum_rigoblock has_not_withdrawn_epoch(_pool) {
     	RigoTok rigoToken = RigoTok(rigo);
     	ProofOfPerformance pop = ProofOfPerformance(proofOfPerformance);
-    	//DragoRegistry registry = DragoRegistry()
-    	address thePool = pop.getPoolAddress(_ofPool);
+    	//address thePool = pop.getPoolAddress(_ofPool); //NOT USED, IN CASPER DEPOSITS ARE LOOKED UP FROM ID VALIDATOR, DOUBLE CHECK WHETHER IT'S A SMART MOVE HERE AS WELL
 	    var networkContribution = pop.proofOfPerformance(_ofPool);
 	    var claim = networkContribution * inflationTokens;
 	    performers[this].deposit = safeSub(performers[this].deposit, claim);
 	    performers[_pool].claimedTokens = safeAdd(performers[_pool].claimedTokens, claim);
-	    //performers[_pool].hasClaimed[epoch] = true;
-	    performers[_pool].hasClaimed = true; //we have to map per epoch, one claim allowed for each subperiod
+	    performers[_pool].claim[epoch] = true;
+	    //performers[_pool].hasClaimed = true; //we have to map per epoch, one claim allowed for each subperiod
 	    require(rigoToken.transferFrom(this, msg.sender, claim));	
     }
     
     /* //TODO: double check as it is being used in Proof-of-Performance
     function proofTokens(address _pool) internal returns(uint) { //or constant?
     	RigoTok rigoToken = RigoTok(_rigoTok);
-  	var newTokens = inflationTokens - performers[_pool].claimedTokens;
-  	return (performers[_pool].deposit * newTokens) / rigoTok.totalSupply();
+  	    var newTokens = inflationTokens - performers[_pool].claimedTokens;
+  	    return (performers[_pool].deposit * newTokens) / rigoTok.totalSupply();
     }
     */
 
@@ -252,8 +251,8 @@ contract Inflation is SafeMath {
     }
     
     function epochWithdrawal(address _pool) constant returns (bool) {
-    	//return performers[_pool].hasClaimed[epoch]; //indexing by epoch
-    	return performers[_pool].hasClaimed; //indexing by epoch. this function has to be amended
+    	return performers[_pool].claim[epoch]; //indexing by epoch
+    	//return performers[_pool].hasClaimed; //indexing by epoch. this function has to be amended
     }
     
     uint public inflationTokens;
@@ -267,7 +266,4 @@ contract Inflation is SafeMath {
     address public proofOfPerformance;
     address public rigo; //double check whether we can find it differently
     mapping(address=>Performer) performers;
-    
-    //RigoTok rigoTok;
-
 }
