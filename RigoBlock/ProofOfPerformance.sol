@@ -69,14 +69,14 @@ contract Pool {
 	function setOwner(address _new) {}
 	function() payable {}   // only_approved_exchange(msg.sender)
 
-	function balanceOf(address _who) constant returns (uint) {}
+	function balanceOf(address _who) constant returns (uint balance) {}
+	function totalSupply() constant returns (uint256 totalSupply) {}
 	//TODO: the below function is implemented in Gaboins but is aggregated in Dragos
 	function getPrice() constant returns (uint256 price) {}
 	function getEventful() constant returns (address) {}
 	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice) {}
 	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
 	function getOwner() constant returns (address) {}
-	function totalSupply() constant returns (uint256) {}
 }
 
 contract RigoTok {
@@ -99,7 +99,8 @@ contract RigoTok {
     
     // CONSTANT METHODS
 
-    function balanceOf(address _owner) constant returns (uint256) {}
+    function balanceOf(address _owner) constant returns (uint256 balance) {}
+    function totalSupply() constant returns (uint256 totalSupply) {}
     function getName() constant returns (string) {}
     function getSymbol() constant returns (string) {}
     function getDecimals() constant returns (uint) {}
@@ -108,7 +109,6 @@ contract RigoTok {
     function getMinter() constant returns (address) {}
     function getRigoblock() constant returns (address) {}
     function getInflationFactor() constant returns (uint) {}
-    function totalSupply() constant returns (uint256) {}
 }
 
 contract DragoRegistry {
