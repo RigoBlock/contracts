@@ -132,7 +132,7 @@ contract DragoRegistry {
 	function kill() {}
 	
 	function dragoCount() constant returns (uint) {}
-	function drago(uint _id) constant returns (address Adrago, string name, string symbol, uint dragoID, address owner, address group) {}
+	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
 	// TODO: IMPLEMENT fromId function in registry
 	function fromId(uint id) constant returns (address) {}
 	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
@@ -203,6 +203,12 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
             calcPoolValue(i);
             //totalAum = safeAdd(calcPoolValue(i));//(poolAUM(i));
         }
+    }
+
+    function addressFromId(uint _ofPool) constant returns (address) {
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
+        var(a,b,c,d,e,f) = registry.drago(_ofPool);//.address[0];
+        return a;
     }
     
     function calcPoolValue(uint256 _ofPool) internal constant returns (uint256 poolAum) {
