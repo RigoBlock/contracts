@@ -3,7 +3,7 @@
 //! Released under the Apache Licence 2.
 //! Auth has the possibility of blocking/unblocking single user.
 
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.18;
 
 contract AuthorityFace {
 
@@ -23,33 +23,33 @@ contract AuthorityFace {
 
     // METHODS
 
-    function setAuthority(address _authority, bool _isWhitelisted) {}
-    function setWhitelister(address _whitelister, bool _isWhitelisted) {}
-    function whitelistUser(address _target, bool _isWhitelisted) {}
-    function whitelistAsset(address _asset, bool _isWhitelisted) {}
-    function whitelistExchange(address _exchange, bool _isWhitelisted) {}
-    function whitelistDrago(address _drago, bool _isWhitelisted) {}
-    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) {}
-    function whitelistRegistry(address _registry, bool _isWhitelisted) {}
-    function whitelistFactory(address _factory, bool _isWhitelisted) {}
-    function setEventful(address _eventful) {}
-    function setGabcoinEventful(address _gabcoinEventful) {}
-    function setExchangeEventful(address _exchangeEventful) {}
-    function setCasper(address _casper) {}
+    function setAuthority(address _authority, bool _isWhitelisted) public {}
+    function setWhitelister(address _whitelister, bool _isWhitelisted) public {}
+    function whitelistUser(address _target, bool _isWhitelisted) public {}
+    function whitelistAsset(address _asset, bool _isWhitelisted) public {}
+    function whitelistExchange(address _exchange, bool _isWhitelisted) public {}
+    function whitelistDrago(address _drago, bool _isWhitelisted) public {}
+    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) public {}
+    function whitelistRegistry(address _registry, bool _isWhitelisted) public {}
+    function whitelistFactory(address _factory, bool _isWhitelisted) public {}
+    function setEventful(address _eventful) public {}
+    function setGabcoinEventful(address _gabcoinEventful) public {}
+    function setExchangeEventful(address _exchangeEventful) public {}
+    function setCasper(address _casper) public {}
 
-    function isWhitelistedUser(address _target) constant returns (bool) {}
-    function isWhitelister(address _whitelister) constant returns (bool) {}
-    function isAuthority(address _authority) constant returns (bool) {}
-    function isWhitelistedAsset(address _asset) constant returns (bool) {}
-    function isWhitelistedExchange(address _exchange) constant returns (bool) {}
-    function isWhitelistedRegistry(address _registry) constant returns (bool) {}
-    function isWhitelistedDrago(address _drago) constant returns (bool) {}
-    function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
-    function isWhitelistedFactory(address _factory) constant returns (bool) {}
-    function getEventful() constant returns (address) {}
-    function getGabcoinEventful() constant returns (address) {}
-    function getExchangeEventful() constant returns (address) {}
-    function getCasper() constant returns (address) {}
-    function getOwner() constant returns (address) {}
-    function getListsByGroups(string _group) constant returns (address[]) {}
+    function isWhitelistedUser(address _target) public constant returns (bool) {}
+    function isWhitelister(address _whitelister) public constant returns (bool) {}
+    function isAuthority(address _authority) public constant returns (bool) {}
+    function isWhitelistedAsset(address _asset) public constant returns (bool) {}
+    function isWhitelistedExchange(address _exchange) public constant returns (bool) {}
+    function isWhitelistedRegistry(address _registry) public constant returns (bool) {}
+    function isWhitelistedDrago(address _drago) public constant returns (bool) {}
+    function isWhitelistedGabcoin(address _gabcoin) public constant returns (bool) {} 
+    function isWhitelistedFactory(address _factory) public constant returns (bool) {}
+    function getEventful() public constant returns (address) {}
+    function getGabcoinEventful() public constant returns (address) {}
+    function getExchangeEventful() public constant returns (address) {}
+    function getCasper() public constant returns (address) {}
+    function getOwner() public constant returns (address) {}
+    function getListsByGroups(string _group) public constant returns (address[]) {}
 }
