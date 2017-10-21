@@ -3,35 +3,35 @@
 //! Released under the Apache Licence 2.
 //! Eventful is used to collect all events from all dragos automatically.
 
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.18;
 
 contract Drago {
 
 	// METHODS
 
-	function buyDrago() payable returns (bool success) {}
-	function sellDrago(uint256 _amount) returns (uint revenue, bool success) {}
-	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) {}
-	function changeMinPeriod(uint32 _minPeriod) {}
-	function changeRatio(uint256 _ratio) {}
-	function setTransactionFee(uint _transactionFee) {}
-	function changeFeeCollector(address _feeCollector) {}
-	function changeDragoDAO(address _dragoDAO) {}
-	function depositToExchange(address _exchange, address _token, uint256 _value) returns(bool success) {}
-	function withdrawFromExchange(address _exchange, address _token, uint256 _value) returns (bool success) {}
-	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
-	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) {}
-	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) {}
-	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) {}
-	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) {}
-	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) {}
-	function setOwner(address _new) {}
-	function() payable {}   // only_approved_exchange(msg.sender)
+	function buyDrago() public payable returns (bool success) {}
+	function sellDrago(uint256 _amount) public returns (uint revenue, bool success) {}
+	function setPrices(uint256 _newSellPrice, uint256 _newBuyPrice) public {}
+	function changeMinPeriod(uint32 _minPeriod) public {}
+	function changeRatio(uint256 _ratio) public {}
+	function setTransactionFee(uint _transactionFee) public {}
+	function changeFeeCollector(address _feeCollector) public {}
+	function changeDragoDAO(address _dragoDAO) public {}
+	function depositToExchange(address _exchange, address _token, uint256 _value) public returns(bool success) {}
+	function withdrawFromExchange(address _exchange, address _token, uint256 _value) public returns (bool success) {}
+	function placeOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) public {}
+	function placeTradeExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) public {}
+	function placeOrderCFDExchange(address _exchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) public {}
+	function cancelOrderExchange(address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) public {}
+	function cancelOrderCFDExchange(address _exchange, address _cfd, uint32 _id) public {}
+	function finalizeDealCFDExchange(address _exchange, address _cfd, uint24 _id) public {}
+	function setOwner(address _new) public {}
+	function() external payable {}   // only_approved_exchange(msg.sender)
 
-	function balanceOf(address _who) constant returns (uint256) {}
-	function getData() constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
-	function getAdminData() constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
-	function getOwner() constant returns (address) {}
+	function balanceOf(address _who) public constant returns (uint256) {}
+	function getData() public constant returns (string name, string symbol, uint sellPrice, uint buyPrice, uint totalSupply) {}
+	function getAdminData() public constant returns (address feeCollector, address dragodAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
+	function getOwner() public constant returns (address) {}
 }
 
 contract Authority {
@@ -52,42 +52,75 @@ contract Authority {
 
     // METHODS
 
-    function setAuthority(address _authority, bool _isWhitelisted) {}
-    function setWhitelister(address _whitelister, bool _isWhitelisted) {}
-    function whitelistUser(address _target, bool _isWhitelisted) {}
-    function whitelistAsset(address _asset, bool _isWhitelisted) {}
-    function whitelistExchange(address _exchange, bool _isWhitelisted) {}
-    function whitelistDrago(address _drago, bool _isWhitelisted) {}
-    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) {}
-    function whitelistRegistry(address _registry, bool _isWhitelisted) {}
-    function whitelistFactory(address _factory, bool _isWhitelisted) {}
-    function setEventful(address _eventful) {}
-    function setGabcoinEventful(address _gabcoinEventful) {}
-    function setExchangeEventful(address _exchangeEventful) {}
-    function setCasper(address _casper) {}
+    function setAuthority(address _authority, bool _isWhitelisted) public {}
+    function setWhitelister(address _whitelister, bool _isWhitelisted) public {}
+    function whitelistUser(address _target, bool _isWhitelisted) public {}
+    function whitelistAsset(address _asset, bool _isWhitelisted) public {}
+    function whitelistExchange(address _exchange, bool _isWhitelisted) public {}
+    function whitelistDrago(address _drago, bool _isWhitelisted) public {}
+    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) public {}
+    function whitelistRegistry(address _registry, bool _isWhitelisted) public {}
+    function whitelistFactory(address _factory, bool _isWhitelisted) public {}
+    function setEventful(address _eventful) public {}
+    function setGabcoinEventful(address _gabcoinEventful) public {}
+    function setExchangeEventful(address _exchangeEventful) public {}
+    function setCasper(address _casper) public {}
 
-    function isWhitelistedUser(address _target) constant returns (bool) {}
-    function isWhitelister(address _whitelister) constant returns (bool) {}
-    function isAuthority(address _authority) constant returns (bool) {}
-    function isWhitelistedAsset(address _asset) constant returns (bool) {}
-    function isWhitelistedExchange(address _exchange) constant returns (bool) {}
-    function isWhitelistedRegistry(address _registry) constant returns (bool) {}
-    function isWhitelistedDrago(address _drago) constant returns (bool) {}
-    function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
-    function isWhitelistedFactory(address _factory) constant returns (bool) {}
-    function getEventful() constant returns (address) {}
-    function getGabcoinEventful() constant returns (address) {}
-    function getExchangeEventful() constant returns (address) {}
-    function getCasper() constant returns (address) {}
-    function getOwner() constant returns (address) {}
+    function isWhitelistedUser(address _target) public constant returns (bool) {}
+    function isWhitelister(address _whitelister) public constant returns (bool) {}
+    function isAuthority(address _authority) public constant returns (bool) {}
+    function isWhitelistedAsset(address _asset) public constant returns (bool) {}
+    function isWhitelistedExchange(address _exchange) public constant returns (bool) {}
+    function isWhitelistedRegistry(address _registry) public constant returns (bool) {}
+    function isWhitelistedDrago(address _drago) public constant returns (bool) {}
+    function isWhitelistedGabcoin(address _gabcoin) public constant returns (bool) {} 
+    function isWhitelistedFactory(address _factory) public constant returns (bool) {}
+    function getEventful() public constant returns (address) {}
+    function getGabcoinEventful() public constant returns (address) {}
+    function getExchangeEventful() public constant returns (address) {}
+    function getCasper() public constant returns (address) {}
+    function getOwner() public constant returns (address) {}
+}
+
+contract DragoRegistry {
+
+	//EVENTS
+
+	event Registered(string name, string symbol, uint id, address indexed drago, address indexed owner, address indexed group);
+	event Unregistered(string indexed symbol, uint indexed id);
+	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
+	
+	// METHODS
+
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable returns (bool) {}
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) internal returns (bool) {} //amended to internal function
+	function unregister(uint _id) public {}
+	function setMeta(uint _id, bytes32 _key, bytes32 _value) public {}
+	function setFee(uint _fee) public {}
+	function upgrade(address _newAddress) public payable {} //payable as there is a transfer of value, otherwise opcode might throw an error
+	function setUpgraded(uint _version) public {}
+	function drain() public {}
+	function kill() public {}
+
+	function dragoCount() public constant returns (uint) {}
+	function fromId(uint _id) public constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromAddress(address _drago) public constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromSymbol(string _symbol) public constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
+	function fromName(string _name) public constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
+	function fromNameSymbol(string _name, string _symbol) public constant returns (address) {}
+	function getNameFromAddress(address _pool) external constant returns (bytes32) {}
+	function getSymbolFromAddress(address _pool) external constant returns (bytes32) {}
+	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {}
+	function getGroups(address _group) public constant returns (address[]) {}
+	function getFee() public constant returns (uint) {}
 }
 
 contract EventfulFace {
 
 	// EVENTS
 
-    event BuyDrago(address indexed drago, address indexed from, address indexed to, uint256 amount, uint256 revenue);
-	event SellDrago(address indexed drago, address indexed from, address indexed to, uint256 amount, uint256 revenue);
+    event BuyDrago(address indexed drago, address indexed from, address indexed to, uint256 amount, uint256 revenue, bytes32 name, bytes32 symbol);
+	event SellDrago(address indexed drago, address indexed from, address indexed to, uint256 amount, uint256 revenue, bytes32 name, bytes32 symbol);
 	event NewNAV(address indexed drago, address indexed from, address indexed to, uint sellPrice, uint buyPrice);
 	event DepositExchange(address indexed drago, address indexed exchange, address indexed token, uint value, uint256 amount);
 	event WithdrawExchange(address indexed drago, address indexed exchange, address indexed token, uint value, uint256 amount);
@@ -99,28 +132,28 @@ contract EventfulFace {
 
     // METHODS
 
-    function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) returns (bool success) {}
-    function sellDrago(address _who, address _targetDrago, uint _amount, uint _revenue) returns(bool success) {}
-    function setDragoPrice(address _who, address _targetDrago, uint _sellPrice, uint _buyPrice) returns(bool success) {}
-    function changeRatio(address _who, address _targetDrago, uint256 _ratio) returns(bool success) {}
-    function setTransactionFee(address _who, address _targetDrago, uint _transactionFee) returns(bool success) {}
-    function changeFeeCollector(address _who, address _targetDrago, address _feeCollector) returns(bool success) {}
-    function changeDragoDAO(address _who, address _targetDrago, address _dragoDAO) returns(bool success) {}
-    function depositToExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) returns(bool success) {}
-    function withdrawFromExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) returns(bool success) {}
-    function placeOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns(bool success) {}
-    function placeTradeExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) returns(bool success) {}
-    function placeOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) returns(bool success) {}
-    function cancelOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) returns(bool success) {}
-    function cancelOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, uint32 _id) returns(bool success) {}
-    function finalizedDealExchange(address _who, address _targetDrago, address _exchange, address _cfd, uint24 _id) returns(bool success) {}
-    function createDrago(address _who, address _dragoFactory, address _newDrago, string _name, string _symbol, uint _dragoId, address _owner) returns(bool success) {}
+    function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) external returns (bool success) {}
+    function sellDrago(address _who, address _targetDrago, uint _amount, uint _revenue) external returns(bool success) {}
+    function setDragoPrice(address _who, address _targetDrago, uint _sellPrice, uint _buyPrice) external returns(bool success) {}
+    function changeRatio(address _who, address _targetDrago, uint256 _ratio) external returns(bool success) {}
+    function setTransactionFee(address _who, address _targetDrago, uint _transactionFee) external returns(bool success) {}
+    function changeFeeCollector(address _who, address _targetDrago, address _feeCollector) external returns(bool success) {}
+    function changeDragoDAO(address _who, address _targetDrago, address _dragoDAO) external returns(bool success) {}
+    function depositToExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) external returns(bool success) {}
+    function withdrawFromExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) external returns(bool success) {}
+    function placeOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) external returns(bool success) {}
+    function placeTradeExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) external returns(bool success) {}
+    function placeOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) external returns(bool success) {}
+    function cancelOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) external returns(bool success) {}
+    function cancelOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, uint32 _id) external returns(bool success) {}
+    function finalizedDealExchange(address _who, address _targetDrago, address _exchange, address _cfd, uint24 _id) external returns(bool success) {}
+    function createDrago(address _who, address _dragoFactory, address _newDrago, string _name, string _symbol, uint _dragoId, address _owner) external returns(bool success) {}
 } 
       
 contract Eventful is EventfulFace {
 
-    	event BuyDrago(address indexed drago, address indexed from, address indexed to, uint256 amount, uint256 revenue);
-	event SellDrago(address indexed drago, address indexed from, address indexed to, uint256 amount, uint256 revenue);
+    event BuyDrago(address indexed drago, address indexed from, address indexed to, uint256 amount, uint256 revenue, bytes name, bytes symbol);
+	event SellDrago(address indexed drago, address indexed from, address indexed to, uint256 amount, uint256 revenue, string name, string symbol);
 	event NewNAV(address indexed drago, address indexed from, address indexed to, uint sellPrice, uint buyPrice);
 	event DepositExchange(address indexed drago, address indexed exchange, address indexed token, uint value, uint256 amount);
 	event WithdrawExchange(address indexed drago, address indexed exchange, address indexed token, uint value, uint256 amount);
@@ -129,134 +162,214 @@ contract Eventful is EventfulFace {
 	event CancelOrder(address indexed drago, address indexed exchange, address indexed cfd, uint value, uint id);
 	event DealFinalized(address indexed drago, address indexed exchange, address indexed cfd, uint value, uint id);
 	event DragoCreated(address indexed drago, address indexed group, address indexed owner, uint dragoID, string name, string symbol);
-    	event NewFee(address indexed targetDrago, address indexed group, address indexed who, uint transactionFee);
-    	event NewCollector(address indexed targetDrago, address indexed group, address indexed who, address feeCollector);
+    event NewFee(address indexed targetDrago, address indexed group, address indexed who, uint transactionFee);
+    event NewCollector(address indexed targetDrago, address indexed group, address indexed who, address feeCollector);
 
-   	modifier approved_factory_only(address _factory) { Authority auth = Authority(authority); if (auth.isWhitelistedFactory(_factory)) _; }
-   	modifier approved_drago_only(address _drago) { Authority auth = Authority(authority); if (auth.isWhitelistedDrago(_drago)) _; }
-    	modifier approved_exchange_only(address _exchange) { Authority auth = Authority(authority); if (auth.isWhitelistedExchange(_exchange)) _; }
-    	modifier approved_user_only(address _user) { Authority auth = Authority(authority); if (auth.isWhitelistedUser(_user)) _; }
-    	modifier approved_asset(address _asset) { Authority auth = Authority(authority); if (auth.isWhitelistedAsset(_asset)) _; }
+   	modifier approved_factory_only(address _factory) { Authority auth = Authority(AUTHORITY); if (auth.isWhitelistedFactory(_factory)) _; }
+   	modifier approved_drago_only(address _drago) { Authority auth = Authority(AUTHORITY); if (auth.isWhitelistedDrago(_drago)) _; }
+    modifier approved_exchange_only(address _exchange) { Authority auth = Authority(AUTHORITY); if (auth.isWhitelistedExchange(_exchange)) _; }
+    modifier approved_user_only(address _user) { Authority auth = Authority(AUTHORITY); if (auth.isWhitelistedUser(_user)) _; }
+    modifier approved_asset(address _asset) { Authority auth = Authority(AUTHORITY); if (auth.isWhitelistedAsset(_asset)) _; }
 
-    	function Eventful(address _authority) {
-	    authority = _authority;
+    function Eventful(address _authority, address _registry) public {
+	    AUTHORITY = _authority;
+	    REGISTRY = _registry;
 	}
 
-	function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) approved_drago_only(_targetDrago) returns (bool success) {
+	function buyDrago(address _who, address _targetDrago, uint _value, uint _amount) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    returns (bool success) 
+	{
 		//if (_value < 100 finney) throw; //duplicate from before
-		if (msg.sender != _targetDrago) return;
-		BuyDrago(_targetDrago, _who, msg.sender, _value, _amount);
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
+		DragoRegistry registry = DragoRegistry(REGISTRY);
+		bytes32 kname = registry.getNameFromAddress(_targetDrago);
+		bytes32 ksymbol = registry.getSymbolFromAddress(_targetDrago);
+		//then transform in .js with web3.toAscii(bytes32_date)
+		BuyDrago(_targetDrago, _who, msg.sender, _value, _amount, kname, ksymbol);
 		return true;
 	}
 
-	function sellDrago(address _who, address _targetDrago, uint _amount, uint _revenue) approved_drago_only(_targetDrago) returns(bool success) {
-		if(_amount < 0) throw;
+	function sellDrago(address _who, address _targetDrago, uint _amount, uint _revenue) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    returns(bool success) 
+	{
+		require(_amount > 0);
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require(msg.sender == _targetDrago); //if (msg.sender != _targetDrago) return;
 		//if (drago.balanceOf(_who) < _amount) return; //this might be lifted as it's checked in the previous sell
-		SellDrago(_targetDrago, msg.sender, _who, _amount, _revenue);
+		DragoRegistry registry = DragoRegistry(REGISTRY);
+		bytes32 kname = registry.getNameFromAddress(_targetDrago);
+		bytes32 ksymbol = registry.getSymbolFromAddress(_targetDrago);
+		//then transform in .js with web3.toAscii(bytes32_date)
+		SellDrago(_targetDrago, msg.sender, _who, _amount, _revenue, kname, ksymbol);
 		return true;
 	}
 	
-	function setDragoPrice(address _who, address _targetDrago, uint _sellPrice, uint _buyPrice) approved_drago_only(_targetDrago) returns(bool success) {
-	    if(_sellPrice <= 10 finney || _buyPrice <= 10 finney) return;
+	function setDragoPrice(address _who, address _targetDrago, uint _sellPrice, uint _buyPrice) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    returns(bool success) 
+	{
+	    require(_sellPrice > 10 finney && _buyPrice > 10 finney);// if(_sellPrice <= 10 finney || _buyPrice <= 10 finney) return;
 	    //Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require(msg.sender == _targetDrago); //if (msg.sender != _targetDrago) return;
 	    //if( _who != drago.getOwner()) return; //this might be lifted as msg.sender has to be drago
 	    NewNAV(_targetDrago, msg.sender, _who, _sellPrice, _buyPrice);
 	    return true;
 	}
-    
-	function depositToExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) approved_drago_only(_targetDrago) approved_exchange_only(_exchange) returns(bool success) {
+
+	function depositToExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_exchange_only(_exchange) 
+	    returns(bool success) 
+	{
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return; //this might be useless
 		DepositExchange(_targetDrago, _exchange, _token, _value, 0);
 		return true;
 	}
 	
-	function withdrawFromExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) approved_drago_only(_targetDrago) approved_exchange_only(_exchange) returns(bool success) {
-		if(_targetDrago == 0) throw;
+	function withdrawFromExchange(address _who, address _targetDrago, address _exchange, address _token, uint256 _value) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_exchange_only(_exchange) 
+	    returns(bool success) 
+	{
+		require (_targetDrago != 0); // if(_targetDrago == 0) throw;
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return; //this might be useless
 		WithdrawExchange(_targetDrago, _exchange, _token, _value, 0);
 		return true;
 	}
 
-	function placeOrderExchange(address _who, address _exchange, address _targetDrago, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) approved_drago_only(_targetDrago) approved_exchange_only(_exchange) returns(bool success) {
-		if(_targetDrago == 0) throw;
+	function placeOrderExchange(address _who, address _exchange, address _targetDrago, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_exchange_only(_exchange) 
+	    returns(bool success) 
+	{
+		require (_targetDrago != 0); // if(_targetDrago == 0) throw;
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return; //this might be useless
 		OrderExchange(_targetDrago, _exchange, _tokenGet, _amountGet, 0);
 		return true;
 	}
 
-	function placeOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) approved_drago_only(_targetDrago) approved_exchange_only(_cfdExchange) approved_asset(_cfd) returns(bool success) {
+	function placeOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_exchange_only(_cfdExchange) 
+	    approved_asset(_cfd) 
+	    returns(bool success) 
+	{
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return;
 		OrderExchange(_targetDrago, _cfdExchange, _cfd, _stake, _adjustment);
 		return true;
 	}
 	
-	function placeTradeExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) approved_drago_only(_targetDrago) approved_exchange_only(_exchange) returns(bool success) {
-        	if(_targetDrago == 0) throw;
-        	//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
-        	//if (_who != drago.getOwner()) return;
-        	//TradeExchange(_targetDrago, _exchange, _tokenGet, _tokenGive, _amountGet, _amountGive, _user);
-        	return true;
+	function placeTradeExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires, address _user, uint _amount) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_exchange_only(_exchange) 
+	    returns(bool success) 
+	{
+        require (_targetDrago != 0); // if(_targetDrago == 0) throw;
+        //Drago drago = Drago(_targetDrago);
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
+        //if (_who != drago.getOwner()) return;
+        //TradeExchange(_targetDrago, _exchange, _tokenGet, _tokenGive, _amountGet, _amountGive, _user);
+        return true;
 	}
 
-	function cancelOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) approved_drago_only(_targetDrago) approved_exchange_only(_exchange) returns(bool success) {
-		if(_targetDrago == 0) throw;
+	function cancelOrderExchange(address _who, address _targetDrago, address _exchange, address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive, uint _expires) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_exchange_only(_exchange) 
+	    returns(bool success) 
+	{
+		require (_targetDrago != 0); // if(_targetDrago == 0) throw;
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return;
 		CancelOrder(_targetDrago, _exchange, _tokenGet, _amountGet, 0);
 		return true;
 	}
 
-	function cancelOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, uint32 _id) approved_drago_only(_targetDrago) approved_exchange_only(_cfdExchange) approved_asset(_cfd) returns(bool success) {
+	function cancelOrderCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, uint32 _id) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_exchange_only(_cfdExchange) 
+	    approved_asset(_cfd) 
+	    returns(bool success) 
+	{
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return;
 		CancelOrder(_targetDrago, _cfdExchange, _cfd, 0,_id);
 		return true;
 	}
 	
-	function finalizeDealCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, uint24 _id) approved_drago_only(_targetDrago) approved_exchange_only(_cfdExchange) approved_asset(_cfd) returns(bool success) {
+	function finalizeDealCFDExchange(address _who, address _targetDrago, address _cfdExchange, address _cfd, uint24 _id) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_exchange_only(_cfdExchange) 
+	    approved_asset(_cfd) 
+	    returns(bool success) 
+	{
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return;
 		DealFinalized(_targetDrago, _cfdExchange, _cfd, 0, _id);
 		return true;
 	}
     
-	function setTransactionFee(address _who, address _targetDrago, uint _transactionFee) approved_drago_only(_targetDrago) approved_user_only(_who) returns(bool success) {
+	function setTransactionFee(address _who, address _targetDrago, uint _transactionFee) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_user_only(_who) 
+	    returns(bool success) 
+	{
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return;
 		NewFee(_targetDrago, msg.sender, _who, _transactionFee);
 		return true;
 	}
     
-	function changeFeeCollector(address _who, address _targetDrago, address _feeCollector) approved_drago_only(_targetDrago) approved_user_only(_who) returns(bool success) {
+	function changeFeeCollector(address _who, address _targetDrago, address _feeCollector) 
+	    external //public 
+	    approved_drago_only(_targetDrago) 
+	    approved_user_only(_who) 
+	    returns(bool success) 
+	{
 		//Drago drago = Drago(_targetDrago);
-		if (msg.sender != _targetDrago) return;
+		require (msg.sender == _targetDrago); // if (msg.sender != _targetDrago) return;
 		//if (_who != drago.getOwner()) return;
 		NewCollector(_targetDrago, msg.sender, _who, _feeCollector);
 		return true;
 	}
 	
-	function createDrago(address _who, address _dragoFactory, address _newDrago, string _name, string _symbol, uint _dragoID, address _owner) approved_factory_only(_dragoFactory) returns(bool success) {
-	    	if (msg.sender != _dragoFactory) return;
-	    	DragoCreated(_newDrago, _dragoFactory, _owner, _dragoID, _name, _symbol);
-	    	return true;
+	function createDrago(address _who, address _dragoFactory, address _newDrago, string _name, string _symbol, uint _dragoID, address _owner) 
+	    external //compute whether it is better than public for gas costs 
+	    approved_factory_only(_dragoFactory) 
+	    returns(bool success) 
+	{
+	    require (msg.sender == _dragoFactory); // if (msg.sender != _dragoFactory) return;
+	    DragoCreated(_newDrago, _dragoFactory, _owner, _dragoID, _name, _symbol);
+	    return true;
 	}
-	
-	address public authority;
-	string constant public version = 'DH0.2';
+
+	//double check whether we want registry to be a constant, or should be queried from authority
+	address public AUTHORITY;
+	address public REGISTRY;
+	string constant public VERSION = 'DH0.4';
 }
