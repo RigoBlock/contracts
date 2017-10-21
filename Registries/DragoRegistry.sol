@@ -24,11 +24,6 @@ contract Owned {
 }
 
 contract DragoRegistryFace {
-    
-    // TODO: double check whether to implement 2 single-return functions:
-    //  getNameFromAddress(address pool) returns (string name);
-    //  getSymbolFromAddress(address pool) returns (string symbol);
-    //  and use the outputs to show name and symbol in eventfuls
 
 	//EVENTS
 
@@ -37,26 +32,28 @@ contract DragoRegistryFace {
 	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
 	
 	// METHODS
-    
+
 	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable returns (bool) {}
 	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) internal returns (bool) {} //amended to internal function
 	function unregister(uint _id) public {}
 	function setMeta(uint _id, bytes32 _key, bytes32 _value) public {}
 	function setFee(uint _fee) public {}
-	function upgrade(address _newAddress) public {} //this was payable, why?
+	function upgrade(address _newAddress) public payable {} //payable as there is a transfer of value, otherwise opcode might throw an error
 	function setUpgraded(uint _version) public {}
 	function drain() public {}
 	function kill() public {}
-	
-	function dragoCount() constant returns (uint) {}
-	function fromId(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
-	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
-	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
-	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
-	function fromNameSymbol(string _name, string _symbol) constant returns (address) {}
-	function meta(uint _id, bytes32 _key) constant returns (bytes32) {}
-	function getGroups(address _group) constant returns (address[]) {}
-	function getFee() constant returns (uint) {}
+
+	function dragoCount() public constant returns (uint) {}
+	function fromId(uint _id) public constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromAddress(address _drago) public constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromSymbol(string _symbol) public constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
+	function fromName(string _name) public constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
+	function fromNameSymbol(string _name, string _symbol) public constant returns (address) {}
+	function getNameFromAddress(address _pool) external constant returns (string) {}
+    function getSymbolFromAddress(address _pool) external constant returns (string) {}
+	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {}
+	function getGroups(address _group) public constant returns (address[]) {}
+	function getFee() public constant returns (uint) {}
 }
 
 contract DragoRegistry is DragoRegistryFace, Owned {
@@ -128,7 +125,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	}
 
 	//watch out, when the registry gets upgraded, a migration of all funds has to be perfromed
-	function upgrade(address _newAddress) public /*payable*/ only_owner {
+	function upgrade(address _newAddress) public payable only_owner {
 		DragoRegistry registry = DragoRegistry(_newAddress);
 		++version;
 		registry.setUpgraded(version);
@@ -201,6 +198,18 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	    address drago = t.drago;
 	    return drago;
 	}
+	
+	function getNameFromAddress(address _pool) external constant returns (string) {
+	    var id = mapFromAddress[_pool] - 1;
+		var t = dragos[id];
+		return t.name;
+	}
+	
+    function getSymbolFromAddress(address _pool) external constant returns (string) {
+        var id = mapFromAddress[_pool] - 1;
+		var t = dragos[id];
+		return t.symbol;
+    }
 
 	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {
 		return dragos[_id].meta[_key];
