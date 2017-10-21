@@ -3,20 +3,20 @@
 //! Released under the Apache Licence 2.
 //! Inspired by https://github.com/paritytech/contracts/blob/master/TokenReg.sol
 
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.18;
 
 contract Owned {
     
-	modifier only_owner { if (msg.sender != owner) return; _; }
+	modifier only_owner { require(msg.sender == owner); _; }
 
 	event NewOwner(address indexed old, address indexed current);
    
-	function setOwner(address _new) only_owner {
+	function setOwner(address _new) public only_owner {
 		owner = _new;
 		NewOwner(owner, _new);
 	}
 	
-	function getOwner() constant returns (address) {
+	function getOwner() public constant returns (address) {
 	    return owner;
 	}
 
@@ -24,6 +24,11 @@ contract Owned {
 }
 
 contract DragoRegistryFace {
+    
+    // TODO: double check whether to implement 2 single-return functions:
+    //  getNameFromAddress(address pool) returns (string name);
+    //  getSymbolFromAddress(address pool) returns (string symbol);
+    //  and use the outputs to show name and symbol in eventfuls
 
 	//EVENTS
 
@@ -32,19 +37,19 @@ contract DragoRegistryFace {
 	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
 	
 	// METHODS
-        
-	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {}
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) payable returns (bool) {}
-	function unregister(uint _id) {}
-	function setMeta(uint _id, bytes32 _key, bytes32 _value) {}
-	function setFee(uint _fee) {}
-	function upgrade(address _newAddress) payable {}
-	function setUpgraded(uint _version) {}
-	function drain() {}
-	function kill() {}
+    
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable returns (bool) {}
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) internal returns (bool) {} //amended to internal function
+	function unregister(uint _id) public {}
+	function setMeta(uint _id, bytes32 _key, bytes32 _value) public {}
+	function setFee(uint _fee) public {}
+	function upgrade(address _newAddress) public {} //this was payable, why?
+	function setUpgraded(uint _version) public {}
+	function drain() public {}
+	function kill() public {}
 	
 	function dragoCount() constant returns (uint) {}
-	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
+	function fromId(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
 	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
 	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
 	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
@@ -85,11 +90,18 @@ contract DragoRegistry is DragoRegistryFace, Owned {
     
 	// METHODS
 	
-	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) payable returns (bool) {
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable returns (bool) {
 		return registerAs(_drago, _name, _symbol, _dragoID, _owner, msg.sender);
 	}
 
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) payable when_fee_paid when_address_free(_drago) when_name_free(_name) when_is_symbol(_symbol) returns (bool) {
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) 
+	    internal 
+	    when_fee_paid 
+	    when_address_free(_drago) 
+	    when_name_free(_name) 
+	    when_is_symbol(_symbol) 
+	    returns (bool) 
+	{
 		dragos.push(Drago(_drago, _name, _symbol, _dragoID, _owner, _group));
 		mapFromAddress[_drago] = dragos.length;
 		mapFromName[_name] = dragos.length;
@@ -98,7 +110,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		return true;
 	}
 	
-	function unregister(uint _id) only_owner {
+	function unregister(uint _id) public only_owner {
 		Unregistered(dragos[_id].name, dragos[_id].symbol, _id);
 		delete mapFromAddress[dragos[_id].drago];
 		delete mapFromName[dragos[_id].name];
@@ -106,42 +118,42 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		delete dragos[_id];
 	}
 	
-	function setMeta(uint _id, bytes32 _key, bytes32 _value) only_drago_owner(_id) {
+	function setMeta(uint _id, bytes32 _key, bytes32 _value) public only_drago_owner(_id) {
 		dragos[_id].meta[_key] = _value;
 		MetaChanged(_id, _key, _value);
 	}
 	
-	function setFee(uint _fee) only_owner {
+	function setFee(uint _fee) public only_owner {
 		fee = _fee;
 	}
-	
-	function upgrade(address _newAddress) payable only_owner {
+
+	//watch out, when the registry gets upgraded, a migration of all funds has to be perfromed
+	function upgrade(address _newAddress) public /*payable*/ only_owner {
 		DragoRegistry registry = DragoRegistry(_newAddress);
 		++version;
 		registry.setUpgraded(version);
-	    if (!address(registry).call.value(msg.value)(msg.data)) throw;
+		address(registry).transfer(this.balance);
 	}
 
-	function setUpgraded(uint _version) only_owner {
+	function setUpgraded(uint _version) public only_owner {
     	version = _version;
   	}
 	
-	function drain() only_owner {
-		if (!msg.sender.send(this.balance))
-			throw;
+	function drain() public only_owner {
+		msg.sender.transfer(this.balance);
 	}
 	
-	function kill() only_owner {
-	    suicide(msg.sender);
+	function kill() public only_owner {
+	    selfdestruct(msg.sender);
 	}
-	
+
 	// CONSTANT METHODS
 	
-	function dragoCount() constant returns (uint) { 
+	function dragoCount() public constant returns (uint) { 
 	    return dragos.length; 
 	}
 	
-	function drago(uint _id) constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {
+	function fromId(uint _id) public constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {
 		var t = dragos[_id];
 		drago = t.drago;
 		name = t.name;
@@ -151,7 +163,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 
-	function fromAddress(address _drago) constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {
+	function fromAddress(address _drago) public constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {
 		id = mapFromAddress[_drago] - 1;
 		var t = dragos[id];
 		name = t.name;
@@ -161,7 +173,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 
-	function fromSymbol(string _symbol) constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {
+	function fromSymbol(string _symbol) public constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {
 		id = mapFromSymbol[_symbol] - 1;
 		var t = dragos[id];
 		drago = t.drago;
@@ -171,7 +183,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 	
-	function fromName(string _name) constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {
+	function fromName(string _name) public constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {
 		id = mapFromName[_name] - 1;
 		var t = dragos[id];
 		symbol = t.symbol;
@@ -181,7 +193,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 	
-	function fromNameSymbol(string _name, string _symbol) constant returns (address) {
+	function fromNameSymbol(string _name, string _symbol) public constant returns (address) {
 	    var id = mapFromName[_name] - 1;
 	    var idCheck = mapFromSymbol[_symbol] - 1;
 	    var t = dragos[id];
@@ -190,15 +202,15 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	    return drago;
 	}
 
-	function meta(uint _id, bytes32 _key) constant returns (bytes32) {
+	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {
 		return dragos[_id].meta[_key];
 	}
 	
-	function getGroups(address _group) constant returns (address[]) {
+	function getGroups(address _group) public constant returns (address[]) {
 	    return mapFromGroup[_group];
 	}
 	
-	function getFee() constant returns (uint) {
+	function getFee() public constant returns (uint) {
 	    return fee;
 	}
 	 
