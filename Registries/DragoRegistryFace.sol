@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.18;
 
-contract DragoRegistryFace {
+contract DragoRegistry {
 
 	//EVENTS
 
@@ -30,8 +30,8 @@ contract DragoRegistryFace {
 	function fromSymbol(string _symbol) public constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
 	function fromName(string _name) public constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
 	function fromNameSymbol(string _name, string _symbol) public constant returns (address) {}
-	function getNameFromAddress(address _pool) external constant returns (string) {}
-	function getSymbolFromAddress(address _pool) external constant returns (string) {}
+	function getNameFromAddress(address _pool) external constant returns (bytes32) {}
+	function getSymbolFromAddress(address _pool) external constant returns (bytes32) {}
 	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {}
 	function getGroups(address _group) public constant returns (address[]) {}
 	function getFee() public constant returns (uint) {}
