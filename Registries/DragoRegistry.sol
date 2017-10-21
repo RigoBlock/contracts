@@ -49,8 +49,8 @@ contract DragoRegistryFace {
 	function fromSymbol(string _symbol) public constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
 	function fromName(string _name) public constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
 	function fromNameSymbol(string _name, string _symbol) public constant returns (address) {}
-	function getNameFromAddress(address _pool) external constant returns (string) {}
-    function getSymbolFromAddress(address _pool) external constant returns (string) {}
+	function getNameFromAddress(address _pool) external constant returns (bytes32) {}
+    function getSymbolFromAddress(address _pool) external constant returns (bytes32) {}
 	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {}
 	function getGroups(address _group) public constant returns (address[]) {}
 	function getFee() public constant returns (uint) {}
@@ -199,16 +199,16 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	    return drago;
 	}
 	
-	function getNameFromAddress(address _pool) external constant returns (string) {
+	function getNameFromAddress(address _pool) external constant returns (bytes32) {
 	    var id = mapFromAddress[_pool] - 1;
 		var t = dragos[id];
-		return t.name;
+		return keccak256(t.name);
 	}
 	
-    function getSymbolFromAddress(address _pool) external constant returns (string) {
+    function getSymbolFromAddress(address _pool) external constant returns (bytes32) {
         var id = mapFromAddress[_pool] - 1;
 		var t = dragos[id];
-		return t.symbol;
+		return keccak256(t.symbol);
     }
 
 	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {
