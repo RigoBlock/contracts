@@ -1,31 +1,30 @@
-//! Nav Estimate contract.
+//! NAV contract.
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
-//! exchange list has to be input, this estimate is performed outside of drago.
 
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.18;
 
 contract SafeMath {
 
-    function safeMul(uint a, uint b) internal returns (uint) {
+    function safeMul(uint a, uint b) internal pure returns (uint) {
         uint c = a * b;
         assert(a == 0 || c / a == b);
         return c;
     }
     
-    function safeDiv(uint a, uint b) internal returns (uint) {
+    function safeDiv(uint a, uint b) internal pure returns (uint) {
         assert(b > 0);
         uint c = a / b;
         assert(a == b * c + a % b);
         return c;
     }
 
-    function safeSub(uint a, uint b) internal returns (uint) {
+    function safeSub(uint a, uint b) internal pure returns (uint) {
         assert(b <= a);
         return a - b;
     }
 
-    function safeAdd(uint a, uint b) internal returns (uint) {
+    function safeAdd(uint a, uint b) internal pure returns (uint) {
         uint c = a + b;
         assert(c>=a && c>=b);
         return c;
@@ -50,37 +49,38 @@ contract Authority {
 
     // METHODS
 
-    function setAuthority(address _authority, bool _isWhitelisted) {}
-    function setWhitelister(address _whitelister, bool _isWhitelisted) {}
-    function whitelistUser(address _target, bool _isWhitelisted) {}
-    function whitelistAsset(address _asset, bool _isWhitelisted) {}
-    function whitelistExchange(address _exchange, bool _isWhitelisted) {}
-    function whitelistDrago(address _drago, bool _isWhitelisted) {}
-    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) {}
-    function whitelistRegistry(address _registry, bool _isWhitelisted) {}
-    function whitelistFactory(address _factory, bool _isWhitelisted) {}
-    function setEventful(address _eventful) {}
-    function setGabcoinEventful(address _gabcoinEventful) {}
-    function setExchangeEventful(address _exchangeEventful) {}
-    function setCasper(address _casper) {}
+    function setAuthority(address _authority, bool _isWhitelisted) public {}
+    function setWhitelister(address _whitelister, bool _isWhitelisted) public {}
+    function whitelistUser(address _target, bool _isWhitelisted) public {}
+    function whitelistAsset(address _asset, bool _isWhitelisted) public {}
+    function whitelistExchange(address _exchange, bool _isWhitelisted) public {}
+    function whitelistDrago(address _drago, bool _isWhitelisted) public {}
+    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) public {}
+    function whitelistRegistry(address _registry, bool _isWhitelisted) public {}
+    function whitelistFactory(address _factory, bool _isWhitelisted) public {}
+    function setEventful(address _eventful) public {}
+    function setGabcoinEventful(address _gabcoinEventful) public {}
+    function setExchangeEventful(address _exchangeEventful) public {}
+    function setCasper(address _casper) public {}
 
-    function isWhitelistedUser(address _target) constant returns (bool) {}
-    function isWhitelister(address _whitelister) constant returns (bool) {}
-    function isAuthority(address _authority) constant returns (bool) {}
-    function isWhitelistedAsset(address _asset) constant returns (bool) {}
-    function isWhitelistedExchange(address _exchange) constant returns (bool) {}
-    function isWhitelistedRegistry(address _registry) constant returns (bool) {}
-    function isWhitelistedDrago(address _drago) constant returns (bool) {}
-    function isWhitelistedGabcoin(address _gabcoin) constant returns (bool) {} 
-    function isWhitelistedFactory(address _factory) constant returns (bool) {}
-    function getEventful() constant returns (address) {}
-    function getGabcoinEventful() constant returns (address) {}
-    function getExchangeEventful() constant returns (address) {}
-    function getCasper() constant returns (address) {}
-    function getOwner() constant returns (address) {}
-    function getListsByGroups(string _group) constant returns (address[]) {}
+    function isWhitelistedUser(address _target) public constant returns (bool) {}
+    function isWhitelister(address _whitelister) public constant returns (bool) {}
+    function isAuthority(address _authority) public constant returns (bool) {}
+    function isWhitelistedAsset(address _asset) public constant returns (bool) {}
+    function isWhitelistedExchange(address _exchange) public constant returns (bool) {}
+    function isWhitelistedRegistry(address _registry) public constant returns (bool) {}
+    function isWhitelistedDrago(address _drago) public constant returns (bool) {}
+    function isWhitelistedGabcoin(address _gabcoin) public constant returns (bool) {} 
+    function isWhitelistedFactory(address _factory) public constant returns (bool) {}
+    function getEventful() public constant returns (address) {}
+    function getGabcoinEventful() public constant returns (address) {}
+    function getExchangeEventful() public constant returns (address) {}
+    function getCasper() public constant returns (address) {}
+    function getOwner() public constant returns (address) {}
+    function getListsByGroups(string _group) public constant returns (address[]) {}
 }
 
+//this exchange interface has to be reviewed
 contract Exchange {
     
 	// EVENTS
@@ -118,6 +118,7 @@ contract Exchange {
 	//function getOrder(uint id) constant returns (uint, ERC20, uint, ERC20) {}
 }
 
+//this drago interface has to be reviewed
 contract Drago {
 
 	// METHODS
@@ -151,12 +152,33 @@ contract Drago {
 
 contract NAVFace {
 
-  function estimateNAV() constant returns (uint) {}
+  function estimateNAV() public constant returns (uint) {}
 }
 
 contract NAV is SafeMath, NAVFace {
+    
+    function NAV(address _authority) public {
+        AUTHORITY = _authority;
+    }
+    
+    string exchangeGroup;
+    
+    //exchanges should be queried from Authority
+    //problem1: does list take into account all exchanges,
+    //even if they get banned?
+    //problem2: double check f(getlistsbygroups(string group) returns what is expected
+    function getExchanges() public constant returns (address[]) {
+        Authority auth = Authority(AUTHORITY);
+        auth.getListsByGroups(exchangeGroup);
+    }
+    
+    function estimateNAV(address _drago) public constant returns (uint ) {
+        return estimateAUM(_drago, getExchanges());
+    }
 
-    function estimateAUM(address _drago, address[] _exchanges) constant returns (uint nav) {
+    //this function is set to public, so that we can estimate nav with an externally input array of exchanges
+    //until we get comfortable with automatic exchang list query
+    function estimateAUM(address _drago, address[] _exchanges) public constant returns (uint nav) {
         Drago drago = Drago(_drago);
         for (uint i = 0; i < _exchanges.length; ++i) {
             Exchange exchange = Exchange(_exchanges[i]);
@@ -166,4 +188,6 @@ contract NAV is SafeMath, NAVFace {
             return nav = safeDiv(aum, drago.totalSupply());
         }  
     }
+    
+    address public AUTHORITY;
 }
