@@ -1,7 +1,9 @@
-//! NAV contract.
+//! Nav Estimate contract.
 //! By Gabriele Rigo (Rigo Investment Sagl), 2017.
 //! Released under the Apache Licence 2.
-
+//! exchange list has to be input, this estimate is performed outside of drago.
+//! currently working on automatic exchange list query
+ 
 pragma solidity ^0.4.18;
 
 contract SafeMath {
