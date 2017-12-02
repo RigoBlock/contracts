@@ -30,8 +30,7 @@ contract Drago {
     function Drago(string _dragoName,  string _dragoSymbol, uint _dragoID, address _owner, address _authority) internal {
         AUTHORITY = _authority;
         // Signature of the Drago Library's init function
-        // bytes4 sig = bytes4(sha3("Drago(string,string,uint,address,address)"));
-        bytes4 sig = 0x86cc4621;
+        bytes4 sig = bytes4(sha3("initDrago(string,string,uint,address,address)"));
 
         // Compute the size of the call data : arrays has 2
         // 32bytes for offset and length, plus 32bytes per element ;
