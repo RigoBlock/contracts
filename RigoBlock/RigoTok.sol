@@ -142,8 +142,8 @@ contract RigoTokFace {
 
     function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) public {}
     function mintToken(address recipient, uint amount) external {}
-    function transfer(address recipient, uint amount) public returns (bool success) {}
-    function transferFrom(address sender, address recipient, uint amount) public returns (bool success) {}
+    //function transfer(address recipient, uint amount) public returns (bool success) {}
+    //function transferFrom(address sender, address recipient, uint amount) public returns (bool success) {}
     function changeMintingAddress(address newAddress) public {}
     function changeRigoblockAddress(address newAddress) public {}
     function setStartTime(uint _startTime) public {}
