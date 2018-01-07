@@ -150,10 +150,11 @@ contract ProofOfPerformanceFace {
     function setRigoblock(address _rigoblock) external{}
     function setMinimumRigo(uint256 _amount) external {}
     
+    function addressFromId(uint _ofPool) public constant returns (address) {}
+    function calcPoolValue(uint256 _ofPool) public constant returns (uint256 poolAum) {}
     function calcNetworkValue() public constant returns (uint256 totalAum) {}
-    function calcPoolValue(uint256 _ofPool) internal constant returns (uint256 poolAum) {}
     function proofOfPerformance(uint _ofPool) public constant returns (uint256 PoP) {}
-    function getPoolAddress(uint _ofPool) public constant returns (address) {}
+    //function getPoolAddress(uint _ofPool) public constant returns (address) {}
 }
 
 contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
@@ -162,6 +163,7 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         assert(msg.sender == token.getMinter());
         _;
     }
+
     /*
     modifier only_pool_owner(address thePool) {
         Pool pool = Pool(thePool);
@@ -169,6 +171,7 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         _;
     }
     */
+
     modifier only_pool_owner(uint thePool) {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         var poolAddress = registry.fromId(thePool);
@@ -176,7 +179,7 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         assert(msg.sender == pool.getOwner());
         _;
     }
-    
+
     //in order to qualify for PoP user has to told at least some rigo token
     modifier minimum_rigoblock {
         RigoTok rigoToken = RigoTok(rigoblock);
@@ -196,30 +199,31 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
     function setRigoblock(address _rigoblock) external /*only_rigoblock*/ {
         rigoblock = _rigoblock;
     }
-    
-    function calcNetworkValue() public constant returns (uint256 totalAum) {
-        DragoRegistry registry = DragoRegistry(dragoRegistry);
-        for (uint256 i = 0; i < registry.dragoCount(); ++i) {
-            totalAum += calcPoolValue(i);
-            //totalAum = safeAdd(calcPoolValue(i));//(poolAUM(i));
-        }
-    }
 
     function addressFromId(uint _ofPool) public constant returns (address) {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         var(a,b,c,d,e,f) = registry.drago(_ofPool);//.address[0];
         return a;
     }
-    
-    function calcPoolValue(uint256 _ofPool) internal constant returns (uint256 poolAum) {
-        DragoRegistry registry = DragoRegistry(dragoRegistry);
-        address poolAddress = registry.fromId(_ofPool);//.address[0];
+
+    function calcPoolValue(uint256 _ofPool) public /*internal*/ constant returns (uint256 poolAum) {
+        //DragoRegistry registry = DragoRegistry(dragoRegistry);
+        //address poolAddress = registry.fromId(_ofPool);//.address[0];
+        address poolAddress = addressFromId(_ofPool);
         Pool pool = Pool(poolAddress);
         uint poolPrice = pool.getPrice();       //uint256 poolPrice = Pool(ofPool).getPrice();
         uint poolTokens = pool.totalSupply();   //uint256 poolTokens = Pool(ofPool).totalSupply();
         poolAum = safeMul(poolPrice, poolTokens); //check whether to divide by a factor in order to prevent overflow
     }
-    
+
+    function calcNetworkValue() public constant returns (uint256 totalAum) {
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
+        for (uint256 i = 0; i < registry.dragoCount(); ++i) {
+            return totalAum += calcPoolValue(i);
+            //totalAum = safeAdd(calcPoolValue(i));//(poolAUM(i));
+        }
+    }
+
     function proofOfPerformance(uint _ofPool) public constant only_pool_owner(_ofPool) minimum_rigoblock returns (uint256 PoP) {
         //DragoRegistry registry = DragoRegistry(dragoRegistry);
         var poolValue = calcPoolValue(_ofPool);
@@ -232,11 +236,13 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         //mapping of value per user
         //can claim in proportion to participation in excess to what has already been claimed
     }
-    
+
+/*
     function getPoolAddress(uint _ofPool) public constant returns (address) {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         return registry.fromId(_ofPool);
     }
+*/
     
     //TODO: mapping of amount paid per fund, in order to only pay the excess not yet paid
     
