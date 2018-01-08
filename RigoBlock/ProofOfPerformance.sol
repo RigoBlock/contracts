@@ -1,5 +1,5 @@
 //! Proof-of-Performance algorithm contract.
-//! By Gabriele Rigo (RigoBlock, Rigo Investment), 2017.
+//! By Gabriele Rigo (RigoBlock, Rigo Investment), 2017-2018.
 //! Released under the Apache Licence 2.
 
 pragma solidity ^0.4.19;
@@ -151,7 +151,7 @@ contract ProofOfPerformanceFace {
     function setMinimumRigo(uint256 _amount) external {}
     
     function addressFromId(uint _ofPool) public constant returns (address) {}
-    function calcPoolValue(uint256 _ofPool) public constant returns (uint256 poolAum) {}
+    function calcPoolValue(uint256 _ofPool) public constant returns (uint256) {}
     function calcNetworkValue() public constant returns (uint256 totalAum) {}
     function proofOfPerformance(uint _ofPool) public constant returns (uint256 PoP) {}
     //function getPoolAddress(uint _ofPool) public constant returns (address) {}
@@ -203,25 +203,44 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
     function addressFromId(uint _ofPool) public constant returns (address) {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         var(a,b,c,d,e,f) = registry.drago(_ofPool);//.address[0];
-        return a;
+        return address(a); //modified to address in order to test calcPoolValue
     }
 
-    function calcPoolValue(uint256 _ofPool) public /*internal*/ constant returns (uint256 poolAum) {
-        //DragoRegistry registry = DragoRegistry(dragoRegistry);
-        //address poolAddress = registry.fromId(_ofPool);//.address[0];
+    function getPoolPrice(uint _ofPool) public constant returns (uint poolPrice, uint totalTokens) {
         address poolAddress = addressFromId(_ofPool);
         Pool pool = Pool(poolAddress);
-        uint poolPrice = pool.getPrice();       //uint256 poolPrice = Pool(ofPool).getPrice();
-        uint poolTokens = pool.totalSupply();   //uint256 poolTokens = Pool(ofPool).totalSupply();
-        poolAum = safeMul(poolPrice, poolTokens); //check whether to divide by a factor in order to prevent overflow
+        var(a,b,c,d) = pool.getData();
+        poolPrice = c;
+        totalTokens = pool.totalSupply();
     }
 
-    function calcNetworkValue() public constant returns (uint256 totalAum) {
+    function calcPoolValue(uint256 _ofPool) public /*internal*/ constant returns (uint256) {
+        //DragoRegistry registry = DragoRegistry(dragoRegistry);
+        //address poolAddress = registry.fromId(_ofPool);//.address[0];
+        var(price,supply) = getPoolPrice(_ofPool);
+        return price * supply / 1000000; //1000000 is the base (decimals)
+        //address poolAddress = addressFromId(_ofPool);
+        //Pool pool = Pool(poolAddress);
+        //var(a,b,c,d) = pool.getData();
+        //uint poolPrice = c;
+        ////uint poolPrice = pool.getPrice();       //uint256 poolPrice = Pool(ofPool).getPrice();
+        //uint poolTokens = pool.totalSupply();   //uint256 poolTokens = Pool(ofPool).totalSupply();
+        //return safeMul(poolPrice, poolTokens); //check whether to divide by a factor in order to prevent overflow
+    }
+
+    function calcNetworkValue() public constant returns (uint) {
+        uint networkValue;
         DragoRegistry registry = DragoRegistry(dragoRegistry);
-        for (uint256 i = 0; i < registry.dragoCount(); ++i) {
-            return totalAum += calcPoolValue(i);
-            //totalAum = safeAdd(calcPoolValue(i));//(poolAUM(i));
+        uint length = registry.dragoCount();
+        for (uint i = 0; i < length; i++) {
+            /*if (calcPoolValue(i) == 0) {
+                continue;
+            }*/
+            var pools = calcPoolValue(i);
+            //networkValue += poolValue;
+            networkValue += pools;
         }
+        return networkValue;
     }
 
     function proofOfPerformance(uint _ofPool) public constant only_pool_owner(_ofPool) minimum_rigoblock returns (uint256 PoP) {
