@@ -233,11 +233,11 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         uint length = registry.dragoCount();
         for (uint i = 0; i < length; i++) {
-            /*if (calcPoolValue(i) == 0) {
-                continue;
-            }*/
+            var(a,b,c,d,e,f) = registry.drago(i);
+            var group = f;
+            if (group == address(0xe0EA5C76FEB69C14AF9EAF3652849Ea069740ac4)) continue;
             var pools = calcPoolValue(i);
-            //networkValue += poolValue;
+            //var pools = uint(12 ether); //works with constant value
             networkValue += pools;
         }
         return networkValue;
