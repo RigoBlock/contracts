@@ -242,6 +242,29 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         }
         return networkValue;
     }
+    
+    /*
+    function calcNetworkValue() public constant returns (uint) {
+        uint networkValue;
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
+        uint length = registry.dragoCount();
+        for (uint i = 0; i < length; i++) {
+            var(a,b,c,d,e,f) = registry.drago(i);
+            var group = f;
+            while (group == address(0xe0EA5C76FEB69C14AF9EAF3652849Ea069740ac4)) {
+                var pools = calcPoolValue(i);
+            }
+            /*
+            if (group != address(0xe0EA5C76FEB69C14AF9EAF3652849Ea069740ac4)) {
+                continue;
+            }
+            */
+            //var pools = uint(12 ether); //works with constant value
+            networkValue += pools;
+        }
+        return networkValue;
+    }
+    */
 
     function proofOfPerformance(uint _ofPool) public constant only_pool_owner(_ofPool) minimum_rigoblock returns (uint256 PoP) {
         //DragoRegistry registry = DragoRegistry(dragoRegistry);
