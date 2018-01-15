@@ -211,21 +211,24 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         Pool pool = Pool(poolAddress);
         var(a,b,c,d) = pool.getData();
         poolPrice = c;
+        /*
+        TODO: amend gabcoin/vault interface to make drago compatible
+        //uint poolPrice = pool.getPrice();
+        //uint256 poolPrice = Pool(ofPool).getPrice();
+        */
         totalTokens = pool.totalSupply();
     }
 
-    function calcPoolValue(uint256 _ofPool) public /*internal*/ constant returns (uint256) {
-        //DragoRegistry registry = DragoRegistry(dragoRegistry);
-        //address poolAddress = registry.fromId(_ofPool);//.address[0];
+    function calcPoolValue(uint256 _ofPool) public /*internal*/ constant returns (uint256 aum, bool success) {
         var(price,supply) = getPoolPrice(_ofPool);
-        return price * supply / 1000000; //1000000 is the base (decimals)
-        //address poolAddress = addressFromId(_ofPool);
-        //Pool pool = Pool(poolAddress);
-        //var(a,b,c,d) = pool.getData();
-        //uint poolPrice = c;
-        ////uint poolPrice = pool.getPrice();       //uint256 poolPrice = Pool(ofPool).getPrice();
-        //uint poolTokens = pool.totalSupply();   //uint256 poolTokens = Pool(ofPool).totalSupply();
+        return (aum = price * supply / 1000000, true); //1000000 is the base (decimals)
         //return safeMul(poolPrice, poolTokens); //check whether to divide by a factor in order to prevent overflow
+    }
+    
+    function isActive(uint _ofPool) public /*internal*/ constant returns (bool) {
+        var(poolValue, active) = calcPoolValue(_ofPool);
+        active = !! active;
+        return active;
     }
 
     function calcNetworkValue() public constant returns (uint) {
@@ -233,38 +236,16 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         uint length = registry.dragoCount();
         for (uint i = 0; i < length; i++) {
-            var(a,b,c,d,e,f) = registry.drago(i);
-            var group = f;
-            if (group == address(0xe0EA5C76FEB69C14AF9EAF3652849Ea069740ac4)) continue;
-            var pools = calcPoolValue(i);
-            //var pools = uint(12 ether); //works with constant value
-            networkValue += pools;
-        }
-        return networkValue;
-    }
-    
-    /*
-    function calcNetworkValue() public constant returns (uint) {
-        uint networkValue;
-        DragoRegistry registry = DragoRegistry(dragoRegistry);
-        uint length = registry.dragoCount();
-        for (uint i = 0; i < length; i++) {
-            var(a,b,c,d,e,f) = registry.drago(i);
-            var group = f;
-            while (group == address(0xe0EA5C76FEB69C14AF9EAF3652849Ea069740ac4)) {
-                var pools = calcPoolValue(i);
-            }
-            /*
-            if (group != address(0xe0EA5C76FEB69C14AF9EAF3652849Ea069740ac4)) {
+            if (!isActive(i)) {
                 continue;
             }
-            */
-            //var pools = uint(12 ether); //works with constant value
+            /*var (m, isActive) = calcPoolValue(i);*/
+            //var pools = m;
+            var pools = uint(12 ether); //works with constant value
             networkValue += pools;
         }
-        return networkValue;
+        //return networkValue;
     }
-    */
 
     function proofOfPerformance(uint _ofPool) public constant only_pool_owner(_ofPool) minimum_rigoblock returns (uint256 PoP) {
         //DragoRegistry registry = DragoRegistry(dragoRegistry);
