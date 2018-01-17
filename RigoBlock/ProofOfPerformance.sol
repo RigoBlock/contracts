@@ -195,8 +195,13 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         uint rewardRatio;
     }
 
-    modifier only_minter { RigoTok token = RigoTok(rigoblock);
+    modifier only_minter { RigoTok token = RigoTok(rigoblockToken);
         assert(msg.sender == token.getMinter());
+        _;
+    }
+
+    modifier only_rigoblock_dao {
+        require(msg.sender == rigoblockDao);
         _;
     }
 
@@ -241,26 +246,31 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         require(infl.mintInflation(poolAddress, PoP));
     }
 
-    function setRegistry(address _dragoRegistry) external /*only_rigoblock*/ {
+    function setRegistry(address _dragoRegistry) external only_rigoblock_dao {
         dragoRegistry = _dragoRegistry;
     }
 
-    function setRigoblockDao(address _rigoblockDao) external /*only_rigoblock*/ {
+    function setRigoblockDao(address _rigoblockDao) external only_rigoblock_dao {
         rigoblockDao = _rigoblockDao;
     }
 
-    function setRigoblockToken(address _rigoblockToken) external /*only_rigoblock*/ {
+    function setRigoblockToken(address _rigoblockToken) external only_rigoblock_dao {
         rigoblockToken = _rigoblockToken;
     }
 
-    function setMinimumRigo(uint256 _amount) external /*only_rigoblock*/ {
+    function setMinimumRigo(uint256 _amount) external only_rigoblock_dao {
         minimumRigo = _amount;
     }
 
-    function setRatio(address _ofGroup, uint _ratio) public /*only_rigoblock_Dao*/ {
+    function setRatio(address _ofGroup, uint _ratio)
+        public
+        only_rigoblock_dao
+        //maybe only_authority
+        //and in authority associate authority array to each factory
+    {
         groups[_ofGroup].rewardRatio = _ratio;
     }
-    
+
     function isActive(uint _ofPool) public constant returns (bool) {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         var (a,b,c,d,e,f) = registry.drago(_ofPool);
@@ -315,7 +325,7 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         var (a,group) = addressFromId(_ofPool);
         return inflate.getInflationFactor(group);
     }
-    
+
     function getRatio(uint _ofPool) public constant returns (uint) {
         var (a,group) = addressFromId(_ofPool);
         return groups[group].rewardRatio;
