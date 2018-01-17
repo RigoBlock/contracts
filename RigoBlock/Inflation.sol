@@ -152,9 +152,10 @@ contract InflationFace {
     // CONSTANT METHODS
     
     function canWithdraw(address _thePool) public constant returns (bool) {}
+    function getInflationFactor(address _group) public constant returns (uint) {}
 }
 
-contract Inflation is SafeMath, InflationFace {
+contract Inflation is SafeMath {
 
     struct Performer {
   	    uint claimedTokens;
@@ -234,6 +235,10 @@ contract Inflation is SafeMath, InflationFace {
 
     function canWithdraw(address _thePool) public constant returns (bool) {
     	return (now >= performers[_thePool].endTime ? true : false);
+    }
+
+    function getInflationFactor(address _group) public constant returns (uint) {
+        return groups[_group].epochReward;
     }
 
     uint public period = 12 weeks; //(inflation tokens can be minted every 3 months)
