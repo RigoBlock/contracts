@@ -1,22 +1,20 @@
-/*
+//! the inflation contract.
+//!
+//! Copyright 2017-2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
+//!
+//! Licensed under the Apache License, Version 2.0 (the "License");
+//! you may not use this file except in compliance with the License.
+//! You may obtain a copy of the License at
+//!
+//!     http://www.apache.org/licenses/LICENSE-2.0
+//!
+//! Unless required by applicable law or agreed to in writing, software
+//! distributed under the License is distributed on an "AS IS" BASIS,
+//! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//! See the License for the specific language governing permissions and
+//! limitations under the License.
 
-  Copyright 2017 RigoBlock, Rigo Investment Sagl.
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-
-*/
-
-pragma solidity 0.4.16;
+pragma solidity 0.4.19;
 
 contract SafeMath {
 
@@ -141,129 +139,108 @@ contract RigoTok {
     function getInflationFactor() constant returns (uint) {}
 }
 
-contract ProofOfPerformance {
+contract InflationFace {
 
-    function setRegistry(address _dragoRegistry) {}
-    function setRigoblock(address _rigoblock) {}
-    function setMinimumRigo(uint256 _amount) {}
+    // NON-CONSTANT METHODS
+
+    function mintInflation(address _thePool, uint _reward) external returns (bool) {}
+    function setInflationFactor(address _group, uint _inflationFactor) public {}
+    function setMinimumRigo(uint _minimum) public {}
+    function setRigoblock(address _newRigoblock) public {}
+    function setPeriod(uint _newPeriod) public {}
     
-    function calcNetworkValue() constant returns (uint256 totalAum) {}
-    function calcPoolValue(uint256 _ofPool) internal constant returns (uint256 poolAum) {}
-    function proofOfPerformance(uint _ofPool) constant returns (uint256 PoP) {}
-    function getPoolAddress(uint _ofPool) public constant returns (address) {}
+    // CONSTANT METHODS
+    
+    function canWithdraw(address _thePool) public constant returns (bool) {}
 }
 
 contract Inflation is SafeMath {
 
     struct Performer {
-  	    uint deposit;
   	    uint claimedTokens;
-	    //bool hasClaimed; //not used
 	    mapping(uint => bool) claim;
+        uint startTime;
+        uint endTime;
+        uint epoch;
+    }
+    
+    struct Group {
+        uint epochReward;
     }
 
-     modifier only_pool_owner(address thePool) {
-        Pool pool = Pool(thePool);
-        assert(msg.sender == pool.getOwner());
-        _;
-    }
-    
     //in order to qualify for PoP user has to told at least some rigo token
-    modifier minimum_rigoblock {
+    modifier minimum_rigoblock(address ofPool) {
         RigoTok rigoToken = RigoTok(rigoblock);
-        assert(minimumRigo <= rigoToken.balanceOf(msg.sender));
+        Pool pool = Pool(pool);
+        assert(minimumRigo <= rigoToken.balanceOf(pool.getOwner()));
         _;
     }
-    
+
     modifier only_rigoblock {
         require(msg.sender == rigoblock); _;
     }
     
-    modifier time_at_least {
-        require(now >= endTime); _;
+    modifier only_proof_of_performance {
+        require(msg.sender == proofOfPerformance); _;
     }
 
-    modifier has_not_withdrawn_epoch(address _thePool) {
-    	require(performers[_thePool].claim[epoch] != true); _;
-    	//require(performers[_thePool].hasClaimed != true); _; //this has to be corrected for sure
+    modifier time_at_least(address _thePool) {
+        require(now >= performers[_thePool].endTime); _;
     }
-    
-    function Inflation(address _rigoToken, address _proofOfPerformance, uint _inflationFactor) only_rigoblock {
-        RigoTok rigoToken = RigoTok(_rigoToken);
+
+    function Inflation(address _rigoToken, address _proofOfPerformance) public only_rigoblock {
         rigo = _rigoToken;
 	    rigoblock = msg.sender;
-        rigoToken.setInflationFactor(_inflationFactor);
-	    startTime = now;
-	    endTime = now + period;
 	    proofOfPerformance = _proofOfPerformance;
     }
 
-    function mintInflation() external only_rigoblock time_at_least {
-    	startTime = now;
-	    endTime = now + period;
-	    ++epoch;
+    function mintInflation(address _thePool, uint _reward)
+        external
+        only_proof_of_performance
+        minimum_rigoblock(_thePool)
+        time_at_least(_thePool)
+        returns (bool)
+    {
+    	performers[_thePool].startTime = now;
+	    performers[_thePool].endTime = now + period;
+	    ++performers[_thePool].epoch;
+        uint reward = _reward * 95 / 100; //5% royalty to rigoblock
+        uint rigoblockReward = safeSub(_reward, reward);
+        Pool pool = Pool(_thePool);
+        address poolOwner = pool.getOwner();
         RigoTok rigoToken = RigoTok(rigo);
-	    var inflation = rigoToken.totalSupply() * rigoToken.getInflationFactor() / 100 * 12 / 42; //quartetly inflation of an annual rate
-        rigoToken.mintToken(this, inflation);
-	    delete inflationTokens; //if we ignore this, late users might be able to recover a portion
-        inflationTokens = safeAdd(inflationTokens, inflation);
-	    performers[this].deposit = safeAdd(performers[this].deposit, inflationTokens); //claim);
+        rigoToken.mintToken(poolOwner, reward);
+        rigoToken.mintToken(rigoblock, rigoblockReward);
+        return true;
     }
-    
-    function proof(address _pool, uint _ofPool) external only_pool_owner(_pool) minimum_rigoblock has_not_withdrawn_epoch(_pool) {
-    	RigoTok rigoToken = RigoTok(rigo);
-    	ProofOfPerformance pop = ProofOfPerformance(proofOfPerformance);
-    	//address thePool = pop.getPoolAddress(_ofPool); //NOT USED, IN CASPER DEPOSITS ARE LOOKED UP FROM ID VALIDATOR, DOUBLE CHECK WHETHER IT'S A SMART MOVE HERE AS WELL
-	    var networkContribution = pop.proofOfPerformance(_ofPool);
-	    var claim = networkContribution * inflationTokens;
-	    performers[this].deposit = safeSub(performers[this].deposit, claim);
-	    performers[_pool].claimedTokens = safeAdd(performers[_pool].claimedTokens, claim);
-	    performers[_pool].claim[epoch] = true;
-	    //performers[_pool].hasClaimed = true; //we have to map per epoch, one claim allowed for each subperiod
-	    require(rigoToken.transferFrom(this, msg.sender, claim));	
-    }
-    
-    /* //TODO: double check as it is being used in Proof-of-Performance
-    function proofTokens(address _pool) internal returns(uint) { //or constant?
-    	RigoTok rigoToken = RigoTok(_rigoTok);
-  	    var newTokens = inflationTokens - performers[_pool].claimedTokens;
-  	    return (performers[_pool].deposit * newTokens) / rigoTok.totalSupply();
-    }
-    */
 
-    function setInflationFactor(uint _inflationFactor, address _rigoTok) only_rigoblock {
-	    RigoTok rigoToken = RigoTok(_rigoTok);
-        rigoToken.setInflationFactor(_inflationFactor);
+    function setInflationFactor(address _group, uint _inflationFactor) public only_rigoblock {
+        groups[_group].epochReward = _inflationFactor;
     }
-    
+
     //TODO: check whether this functions should be moved to authority or rigoDAO
-    function setMinimumRigo(uint _minimum) only_rigoblock {
+    function setMinimumRigo(uint _minimum) public only_rigoblock {
         minimumRigo = _minimum;
     }
-    
-    function setRigoblock(address _newRigoblock) only_rigoblock {
+
+    function setRigoblock(address _newRigoblock) public only_rigoblock {
     	rigoblock = _newRigoblock;
     }
-    
+
     //set period on shorter subsets of time for testing
-    function setPeriod(uint _newPeriod) only_rigoblock {
+    function setPeriod(uint _newPeriod) public only_rigoblock {
     	period = _newPeriod;
     }
-    
-    function epochWithdrawal(address _pool) constant returns (bool) {
-    	return performers[_pool].claim[epoch]; //indexing by epoch
-    	//return performers[_pool].hasClaimed; //indexing by epoch. this function has to be amended
+
+    function canWithdraw(address _thePool) public constant returns (bool) {
+    	return (now >= performers[_thePool].endTime ? true : false);
     }
-    
-    uint public inflationTokens;
-    uint startTime; //in order to reset at each subperiod
-    uint endTime; //maybe each quarter, or even on a daily basis
+
     uint public period = 12 weeks; //(inflation tokens can be minted every 3 months)
-    uint public epoch; //mapping(uint=>bool/uint);
     uint minimumRigo; //double check whether to get minimumRigo from an authority/Dao contract
-    bool has_withdrawn_in_epoch;
-    address public rigoblock;
     address public proofOfPerformance;
-    address public rigo; //double check whether we can find it differently
+    address public rigoblock;
+    address public rigo; //this is the address of the Rigo token //double check whether we can find it differently
     mapping(address => Performer) performers;
+    mapping(address => Group) groups;
 }
