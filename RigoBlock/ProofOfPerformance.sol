@@ -151,8 +151,8 @@ contract ProofOfPerformanceFace {
     function setMinimumRigo(uint256 _amount) external {}
     
     function addressFromId(uint _ofPool) public constant returns (address) {}
-    function calcPoolValue(uint256 _ofPool) public constant returns (uint256) {}
-    function calcNetworkValue() public constant returns (uint256 totalAum) {}
+    //temp commt function calcPoolValue(uint256 _ofPool) public constant returns (uint256 aum, bool success) {}
+    //temporary comment //function calcNetworkValue() public constant returns (uint networkValue) {}
     function proofOfPerformance(uint _ofPool) public constant returns (uint256 PoP) {}
     //function getPoolAddress(uint _ofPool) public constant returns (address) {}
 }
@@ -187,6 +187,7 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         _;
     }
     
+    //TODO: consider renaming _rigoblock and rigoblock as rigoblocktoken in this context
     function ProofOfPerformance(address _rigoblock, address _dragoRegistry) public {
         rigoblock = _rigoblock;
         dragoRegistry = _dragoRegistry;
@@ -199,10 +200,18 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
     function setRigoblock(address _rigoblock) external /*only_rigoblock*/ {
         rigoblock = _rigoblock;
     }
+    
+    function isActive(uint _ofPool) public constant returns (bool) {
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
+        var (a,b,c,d,e,f) = registry.drago(_ofPool);
+        if (a != address(0)) {
+            return true;
+        }
+    }
 
     function addressFromId(uint _ofPool) public constant returns (address) {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
-        var(a,b,c,d,e,f) = registry.drago(_ofPool);//.address[0];
+        var(a,b,c,d,e,f) = registry.drago(_ofPool);
         return address(a); //modified to address in order to test calcPoolValue
     }
 
@@ -224,34 +233,30 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         return (aum = price * supply / 1000000, true); //1000000 is the base (decimals)
         //return safeMul(poolPrice, poolTokens); //check whether to divide by a factor in order to prevent overflow
     }
-    
-    function isActive(uint _ofPool) public /*internal*/ constant returns (bool) {
-        var(poolValue, active) = calcPoolValue(_ofPool);
-        active = !! active;
-        return active;
-    }
 
-    function calcNetworkValue() public constant returns (uint) {
-        uint networkValue;
+    function calcNetworkValue() public constant returns (uint networkValue, uint numberOfFunds) {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         uint length = registry.dragoCount();
-        for (uint i = 0; i < length; i++) {
-            if (!isActive(i)) {
-                continue;
+        for (uint i = 0; i < length; ++i) {
+            bool active = isActive(i);
+            if (!active) {
+                 continue;
             }
-            /*var (m, isActive) = calcPoolValue(i);*/
-            //var pools = m;
-            var pools = uint(12 ether); //works with constant value
+            var (m, n) = calcPoolValue(i);
+            var pools = m;
             networkValue += pools;
         }
-        //return networkValue;
+        return (networkValue, length);
     }
 
-    function proofOfPerformance(uint _ofPool) public constant only_pool_owner(_ofPool) minimum_rigoblock returns (uint256 PoP) {
+
+    function proofOfPerformance(uint _ofPool) public constant /*only_pool_owner(_ofPool) minimum_rigoblock*/ returns (uint256 PoP) {
         //DragoRegistry registry = DragoRegistry(dragoRegistry);
-        var poolValue = calcPoolValue(_ofPool);
+        var (z,y) = calcPoolValue(_ofPool);
+        var poolValue = z;
         require(poolValue != 0);
-        var networkValue = calcNetworkValue();
+        var (a,b) = calcNetworkValue();
+        var networkValue = a;
         RigoTok rigoToken = RigoTok(rigoblock);
         var rigoblockTokens = rigoToken.totalSupply();
         return PoP = (rigoblockTokens * poolValue) / networkValue;  //TODO: double check for overflow
@@ -259,6 +264,22 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         //mapping of value per user
         //can claim in proportion to participation in excess to what has already been claimed
     }
+
+
+
+    //this is probably best implemented in inflation
+//    function proofOfPerformance(uint _ofPool) public constant /*only_pool_owner(_ofPool)*/ minimum_rigoblock returns (uint PoP) {
+/*        var (z,y) = calcPoolValue(_ofPool);
+        var poolValue = z;
+        require(poolValue != 0);
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
+        var(a,b,c,d,e,f) = registry.drago(_ofPool);
+        address group = f;
+        Inflation infl = Inflation(inflation);
+        var reward = calcEpochReward(group);
+        return PoP = z * reward;
+    }
+*/
 
 /*
     function getPoolAddress(uint _ofPool) public constant returns (address) {
