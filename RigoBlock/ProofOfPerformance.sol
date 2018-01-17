@@ -228,8 +228,13 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         _;
     }
 
-    //TODO: consider renaming _rigoblock and rigoblock as rigoblocktoken in this context
-    function ProofOfPerformance(address _rigoblockToken, address _rigoblockDao, address _dragoRegistry, address _inflation) public {
+    function ProofOfPerformance(
+        address _rigoblockToken,
+        address _rigoblockDao,
+        address _dragoRegistry,
+        address _inflation)
+        public
+    {
         rigoblockToken = _rigoblockToken;
         rigoblockDao = rigoblockDao;
         dragoRegistry = _dragoRegistry;
@@ -262,12 +267,12 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         minimumRigo = _amount;
     }
 
+    //! only_rigoblock_dao can set ratio, as it determines the inflation of tokens
     function setRatio(address _ofGroup, uint _ratio)
         public
         only_rigoblock_dao
-        //maybe only_authority
-        //and in authority associate authority array to each factory
-    {
+    {   
+        require(_ratio <= 10000); //(from 0 to 10000)
         groups[_ofGroup].rewardRatio = _ratio;
     }
 
@@ -335,18 +340,21 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         if (poolPrice[_ofPool].highwatermark == 0) {
             poolPrice[_ofPool].highwatermark = 1 ether;
         }
-        var (z,y) = calcPoolValue(_ofPool);
-        var poolValue = z;
+        var (poolValue, y) = calcPoolValue(_ofPool);
         require(poolValue != 0);
-        var (a,b) = getPoolPrice(_ofPool);
-        require (a >= poolPrice[_ofPool].highwatermark);
+        var (newPrice, tokenSupply) = getPoolPrice(_ofPool);
+        require (newPrice >= poolPrice[_ofPool].highwatermark);
         var epochReward = getEpochReward(_ofPool);
         var rewardRatio = getRatio(_ofPool);
         var prevPrice = poolPrice[_ofPool].highwatermark;
-        uint priceDiff = safeSub(a, prevPrice);
-        uint performanceReward = priceDiff * epochReward * rewardRatio; //reward ratio per group should be controlled by the authority of the group
-        uint assetsReward = z * epochReward * (100 - rewardRatio);
+        uint priceDiff = safeSub(newPrice, prevPrice);
+        //epoch reward should be big enough that it can be decreased if number of funds increases
+        //should be at least 10^6, just as pool base to start with
+        uint performanceReward = priceDiff * tokenSupply * epochReward * rewardRatio / 10000 ether;
+        uint assetsReward = poolValue * epochReward * (10000 - rewardRatio) * 1000000 / 1 ether;
         return performanceReward + assetsReward;
+        //with 18 decimals we would get more precision and give smaller rewards
+        //have to work on the calculations
     }
 
     function getHwm(uint _ofPool) public constant returns (uint) {
@@ -356,9 +364,7 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
     address public dragoRegistry;
     address public rigoblockToken;
     address public rigoblockDao;
-    uint256 public totalAum;
     uint256 public minimumRigo;
-    //uint256 PoP;
     address inflation;
     mapping (uint => PoolPrice) poolPrice;
     mapping (address => Group) groups;
