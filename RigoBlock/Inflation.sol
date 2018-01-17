@@ -154,7 +154,7 @@ contract InflationFace {
     function canWithdraw(address _thePool) public constant returns (bool) {}
 }
 
-contract Inflation is SafeMath {
+contract Inflation is SafeMath, InflationFace {
 
     struct Performer {
   	    uint claimedTokens;
