@@ -1,6 +1,6 @@
 //! The drago-library contract.
 //!
-//! Copyright 2017 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
+//! Copyright 2017-2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
 //!
 //! Licensed under the Apache License, Version 2.0 (the "License");
 //! you may not use this file except in compliance with the License.
@@ -266,6 +266,8 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 	modifier when_approved_exchange(address _exchange) { Authority auth = Authority(admin.authority); if (auth.isWhitelistedExchange(_exchange)) _; }
 	modifier minimum_stake(uint amount) { require (amount >= admin.minOrder); _; }
     modifier minimum_period_past { if (block.timestamp < accounts[msg.sender].receipt.activation) return; _; }
+    modifier buy_price_higher_or_equal(uint _sellPrice, uint _buyPrice) { if (_sellPrice >= _buyPrice) return; _; }
+    modifier not_price_error(uint _sellPrice, uint _buyPrice) { if (_sellPrice <= data.sellPrice / 10 || _buyPrice >= data.buyPrice * 10) return; _; }
     //modifier minimum_period_past(uint buyPrice, uint amount) { if (now < accounts[msg.sender].receipt[buyPrice].activation) return; _; }
 
 	event Buy(address indexed from, address indexed to, uint indexed _amount, uint _revenue);
@@ -326,7 +328,12 @@ contract Drago is Owned, ERC20, SafeMath, DragoFace {
 		return (net_revenue, true);
 	}
 	
-	function setPrices(uint _newSellPrice, uint _newBuyPrice) public only_owner {
+	function setPrices(uint _newSellPrice, uint _newBuyPrice)
+	    public
+        only_owner
+        buy_price_higher_or_equal(_newSellPrice, _newBuyPrice)
+        not_price_error(_newSellPrice, _newBuyPrice)
+    {
 		Eventful events = Eventful(getEventful());
 		if (!events.setDragoPrice(msg.sender, this, _newSellPrice, _newBuyPrice)) return;
 		data.sellPrice = _newSellPrice;
