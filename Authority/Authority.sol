@@ -1,9 +1,22 @@
-//! Authority contract.
-//! By Gabriele Rigo (Rigo Investment Sagl), 2017.
-//! Released under the Apache Licence 2.
+//! the Authority contract.
+//!
+//! Copyright 2017-2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
+//!
+//! Licensed under the Apache License, Version 2.0 (the "License");
+//! you may not use this file except in compliance with the License.
+//! You may obtain a copy of the License at
+//!
+//!     http://www.apache.org/licenses/LICENSE-2.0
+//!
+//! Unless required by applicable law or agreed to in writing, software
+//! distributed under the License is distributed on an "AS IS" BASIS,
+//! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//! See the License for the specific language governing permissions and
+//! limitations under the License.
+//!
 //! Auth has the possibility of blocking/unblocking single user, drago, gabcoin, factory.
 
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.19;
 
 contract Owned {
 
@@ -129,8 +142,7 @@ contract Authority is Owned, AuthorityFace {
         accounts[_authority].account = _authority;
         accounts[_authority].authorized = _isWhitelisted;
         accounts[_authority].groups[_isWhitelisted].authority = _isWhitelisted;
-	//TODO: test setting authority as whitelister as per following function:
-	// setWhitelister(_authority, _isWhitelisted);
+	    setWhitelister(_authority, _isWhitelisted);
         types.list.push(List(_authority));
         SetAuthority(_authority);
     }
