@@ -303,6 +303,23 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         */
         totalTokens = pool.totalSupply();
     }
+    
+    function getPoolPrices() public constant returns (address[] pools, uint[] poolPrices, uint[] totalTokens) {
+        DragoRegistry registry = DragoRegistry(dragoRegistry);
+        uint length = registry.dragoCount();
+        for (uint i = 0; i < length; ++i) {
+            bool active = isActive(i);
+            if (!active) {
+                 continue;
+            }
+            var (fund,group) = addressFromId(i);
+            pools[i] = fund;
+            Pool pool = Pool(fund);
+            var(a,b,c,d) = pool.getData();
+            poolPrices[i] = c;
+            totalTokens[i] = pool.totalSupply();
+        }
+    }
 
     function calcPoolValue(uint256 _ofPool) public /*internal*/ constant returns (uint256 aum, bool success) {
         var(price,supply) = getPoolPrice(_ofPool);
