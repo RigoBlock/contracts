@@ -1,10 +1,25 @@
-//! Gabcoin EVO contract.
-//! By Gabriele Rigo (Rigo Investment Sagl), 2017.
-//! Released under the Apache Licence 2.
-//! This is the new generation of gabcoin contracts.
+//! the Gabcoin EVO contract.
+//!
+//! Copyright 2017-2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
+//!
+//! Licensed under the Apache License, Version 2.0 (the "License");
+//! you may not use this file except in compliance with the License.
+//! You may obtain a copy of the License at
+//!
+//!     http://www.apache.org/licenses/LICENSE-2.0
+//!
+//! Unless required by applicable law or agreed to in writing, software
+//! distributed under the License is distributed on an "AS IS" BASIS,
+//! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//! See the License for the specific language governing permissions and
+//! limitations under the License.
+//!
+//! This code may be distributed under the terms of the Apache Licence
+//! version 2.0 (see above) or the MIT-license, at your choice.
+//!
 //! Includes proof of stake pooled mining
 
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.19;
 
 contract Owned {
     
@@ -205,6 +220,7 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 	modifier only_gabcoinDAO { if (msg.sender != gabcoinDAO) return; _; }
 	modifier only_owner { if (msg.sender != owner) return; _; }
 	modifier casper_contract_only { Authority auth = Authority(authority); if (msg.sender != auth.getCasper()) throw; _; }
+    //casper contract should be an array as to allow withdraws in case the EF updates the casper address
     modifier minimum_stake(uint _amount) { if (_amount < min_order) throw; _; }
 	modifier minimum_period_past { if (now < accounts[msg.sender].receipt.activation) return; _; }
 
@@ -232,8 +248,12 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 	    require(sellGabcoin(_amount));
 	    return true;
 	}
-
+	
 	function buyGabcoin() payable minimum_stake(msg.value) returns (bool success) {
+	    require(buyGabcoinOnBehalf(msg.sender));
+	}
+
+	function buyGabcoinOnBehalf(address _hodler) payable minimum_stake(msg.value) returns (bool success) {
 		//if (!approvedAccount[msg.sender]) throw;
 		uint gross_amount = safeDiv(msg.value * base, price);
 		uint fee = safeMul(gross_amount, transactionFee);
@@ -243,10 +263,10 @@ contract Gabcoin is Owned, ERC20Face, SafeMath, GabcoinFace {
 		Authority auth = Authority(authority);
 		GabcoinEventful events = GabcoinEventful(auth.getGabcoinEventful());
 		require(events.buyGabcoin(msg.sender, this, msg.value, amount));
-		balances[msg.sender] = safeAdd(balances[msg.sender], amount);
+		balances[_hodler] = safeAdd(balances[_hodler], amount);
 		balances[feeCollector] = safeAdd(balances[feeCollector] ,fee_gabcoin);
 		balances[gabcoinDAO] = safeAdd(balances[gabcoinDAO], fee_gabcoinDAO);
-		accounts[msg.sender].receipt.activation = uint32(now) + minPeriod;
+		accounts[_hodler].receipt.activation = uint32(now) + minPeriod;
 		totalSupply = safeAdd(totalSupply, gross_amount);
 		Buy(msg.sender, this, msg.value, amount);
 		return true;
