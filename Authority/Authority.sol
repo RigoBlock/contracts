@@ -129,6 +129,8 @@ contract Authority is Owned, AuthorityFace {
         accounts[_authority].account = _authority;
         accounts[_authority].authorized = _isWhitelisted;
         accounts[_authority].groups[_isWhitelisted].authority = _isWhitelisted;
+	//TODO: test setting authority as whitelister as per following function:
+	// setWhitelister(_authority, _isWhitelisted);
         types.list.push(List(_authority));
         SetAuthority(_authority);
     }
