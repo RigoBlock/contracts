@@ -304,6 +304,8 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         totalTokens = pool.totalSupply();
     }
     
+    // maybe even return the group here
+    // consider retrieving these data from registry and move these functions there
     function getPoolPrices() public constant returns (address[] pools, uint[] poolPrices, uint[] totalTokens) {
         DragoRegistry registry = DragoRegistry(dragoRegistry);
         uint length = registry.dragoCount();
