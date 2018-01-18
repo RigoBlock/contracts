@@ -353,6 +353,9 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         return groups[group].rewardRatio;
     }
 
+    //epoch reward should be big enough that it can be decreased if number of funds increases
+    //should be at least 10^6, just as pool base to start with
+    //rigo token has 10^18 decimals
     function proofOfPerformance(uint _ofPool) public constant returns (uint256) {
         if (poolPrice[_ofPool].highwatermark == 0) {
             poolPrice[_ofPool].highwatermark = 1 ether;
@@ -365,13 +368,9 @@ contract ProofOfPerformance is SafeMath, ProofOfPerformanceFace {
         var rewardRatio = getRatio(_ofPool);
         var prevPrice = poolPrice[_ofPool].highwatermark;
         uint priceDiff = safeSub(newPrice, prevPrice);
-        //epoch reward should be big enough that it can be decreased if number of funds increases
-        //should be at least 10^6, just as pool base to start with
         uint performanceReward = priceDiff * tokenSupply * epochReward * rewardRatio / 10000 ether;
-        uint assetsReward = poolValue * epochReward * (10000 - rewardRatio) * 1000000 / 1 ether;
+        uint assetsReward = poolValue * epochReward * (10000 - rewardRatio) / 10000 ether;
         return performanceReward + assetsReward;
-        //with 18 decimals we would get more precision and give smaller rewards
-        //have to work on the calculations
     }
 
     function getHwm(uint _ofPool) public constant returns (uint) {
