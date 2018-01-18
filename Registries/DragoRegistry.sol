@@ -1,9 +1,22 @@
-//! Drago Registry contract.
-//! By Gabriele Rigo (Rigo Investment), 2017.
-//! Released under the Apache Licence 2.
+//! the Drago Registry contract.
+//!
+//! Copyright 2017-2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
+//!
+//! Licensed under the Apache License, Version 2.0 (the "License");
+//! you may not use this file except in compliance with the License.
+//! You may obtain a copy of the License at
+//!
+//!     http://www.apache.org/licenses/LICENSE-2.0
+//!
+//! Unless required by applicable law or agreed to in writing, software
+//! distributed under the License is distributed on an "AS IS" BASIS,
+//! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//! See the License for the specific language governing permissions and
+//! limitations under the License.
+//!
 //! Inspired by https://github.com/paritytech/contracts/blob/master/TokenReg.sol
 
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.19;
 
 contract Owned {
     
@@ -21,6 +34,55 @@ contract Owned {
 	}
 
 	address public owner = msg.sender;
+}
+
+contract Authority {
+
+    // EVENTS
+
+    event SetAuthority (address indexed authority);
+    event SetWhitelister (address indexed whitelister);
+    event SetEventful(address indexed eventful);
+    event WhitelistedUser(address indexed target, bool approved);
+    event WhitelistedAsset(address indexed asset, bool approved);
+    event WhitelistedExchange(address indexed exchange, bool approved);
+    event WhitelistedRegistry(address indexed registry, bool approved);
+    event WhitelistedFactory(address indexed factory, bool approved);
+    event WhitelistedGabcoin(address indexed gabcoin, bool approved);
+    event WhitelistedDrago(address indexed drago, bool approved);
+    event NewEventful(address indexed eventful);
+
+    // METHODS
+
+    function setAuthority(address _authority, bool _isWhitelisted) public {}
+    function setWhitelister(address _whitelister, bool _isWhitelisted) public {}
+    function whitelistUser(address _target, bool _isWhitelisted) public {}
+    function whitelistAsset(address _asset, bool _isWhitelisted) public {}
+    function whitelistExchange(address _exchange, bool _isWhitelisted) public {}
+    function whitelistDrago(address _drago, bool _isWhitelisted) public {}
+    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) public {}
+    function whitelistRegistry(address _registry, bool _isWhitelisted) public {}
+    function whitelistFactory(address _factory, bool _isWhitelisted) public {}
+    function setEventful(address _eventful) public {}
+    function setGabcoinEventful(address _gabcoinEventful) public {}
+    function setExchangeEventful(address _exchangeEventful) public {}
+    function setCasper(address _casper) public {}
+
+    function isWhitelistedUser(address _target) public constant returns (bool) {}
+    function isWhitelister(address _whitelister) public constant returns (bool) {}
+    function isAuthority(address _authority) public constant returns (bool) {}
+    function isWhitelistedAsset(address _asset) public constant returns (bool) {}
+    function isWhitelistedExchange(address _exchange) public constant returns (bool) {}
+    function isWhitelistedRegistry(address _registry) public constant returns (bool) {}
+    function isWhitelistedDrago(address _drago) public constant returns (bool) {}
+    function isWhitelistedGabcoin(address _gabcoin) public constant returns (bool) {} 
+    function isWhitelistedFactory(address _factory) public constant returns (bool) {}
+    function getEventful() public constant returns (address) {}
+    function getGabcoinEventful() public constant returns (address) {}
+    function getExchangeEventful() public constant returns (address) {}
+    function getCasper() public constant returns (address) {}
+    function getOwner() public constant returns (address) {}
+    function getListsByGroups(string _group) public constant returns (address[]) {}
 }
 
 contract DragoRegistryFace {
@@ -84,10 +146,15 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	modifier only_drago_owner(uint _id) { if (dragos[_id].owner != msg.sender) return; _; }
 	modifier when_name_free(string _name) { if (mapFromName[_name] != 0) return; _; }
 	modifier when_has_name(string _name) { if (mapFromName[_name] == 0) return; _; }
+	modifier only_authority { Authority auth = Authority(authority); if (!auth.isAuthority(msg.sender)) return; _; } //this modifier has to be tested
     
 	// METHODS
 	
-	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable returns (bool) {
+	function DragoRegistry(address _authority) public {
+	    authority = _authority;
+	}
+	
+	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable only_authority returns (bool) {
 		return registerAs(_drago, _name, _symbol, _dragoID, _owner, msg.sender);
 	}
 
@@ -231,4 +298,5 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	uint public fee = 0;
 	uint public version;
 	Drago[] dragos;
+	address public authority;
 }
