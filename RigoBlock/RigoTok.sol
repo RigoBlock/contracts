@@ -1,8 +1,39 @@
-//! RigoBlock Token contract.
-//! By Gabriele Rigo (Rigo Investment), 2017.
-//! Released under the Apache Licence 2.
+//! the RigoBlock Token contract.
+//!
+//! The proof-of-performance contract.
+//!
+//! Copyright 2017-2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
+//!
+//! Licensed under the Apache License, Version 2.0 (the "License");
+//! you may not use this file except in compliance with the License.
+//! You may obtain a copy of the License at
+//!
+//!     http://www.apache.org/licenses/LICENSE-2.0
+//!
+//! Unless required by applicable law or agreed to in writing, software
+//! distributed under the License is distributed on an "AS IS" BASIS,
+//! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//! See the License for the specific language governing permissions and
+//! limitations under the License.
 
 pragma solidity ^0.4.19;
+
+
+contract Inflation {
+
+    // NON-CONSTANT METHODS
+
+    function mintInflation(address _thePool, uint _reward) external returns (bool) {}
+    function setInflationFactor(address _group, uint _inflationFactor) public {}
+    function setMinimumRigo(uint _minimum) public {}
+    function setRigoblock(address _newRigoblock) public {}
+    function setPeriod(uint _newPeriod) public {}
+    
+    // CONSTANT METHODS
+    
+    function canWithdraw(address _thePool) public constant returns (bool) {}
+    function getInflationFactor(address _group) public constant returns (uint) {}
+}
 
 contract SafeMath {
 
@@ -140,16 +171,13 @@ contract RigoTokFace {
 
     // NON-CONSTANT METHODS
 
-    function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) public {}
+    function RigoTok(address setMinter, address setRigoblock) public {}
     function mintToken(address recipient, uint amount) external {}
     //function transfer(address recipient, uint amount) public returns (bool success) {}
     //function transferFrom(address sender, address recipient, uint amount) public returns (bool success) {}
     function changeMintingAddress(address newAddress) public {}
     function changeRigoblockAddress(address newAddress) public {}
-    function setStartTime(uint _startTime) public {}
-    function setEndTime(uint _endTime) public {}
-    function setInflationFactor(uint _inflationFactor) public {}
-    
+
     // CONSTANT METHODS
 
     //function balanceOf(address _owner) constant returns (uint256 balance) {}
@@ -157,11 +185,9 @@ contract RigoTokFace {
     function getName() public constant returns (string) {}
     function getSymbol() public constant returns (string) {}
     function getDecimals() public constant returns (uint) {}
-    function getStartTime() public constant returns (uint) {}
-    function getEndTime() public constant returns (uint) {}
     function getMinter() public constant returns (address) {}
     function getRigoblock() public constant returns (address) {}
-    function getInflationFactor() public constant returns (uint) {}
+    function getInflationFactor(address _group) public constant returns (uint) {}
 }
 
 contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //UnlimitedAllowanceToken is ERC20
@@ -182,20 +208,11 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
         _;
     }
     
-    modifier is_later_than(uint time) {
-        assert(now > time);
-        _;
-    }
-    
     // MOTHODS
 
-    function RigoTok(address setMinter, address setRigoblock, uint setStartTime, uint setEndTime) 
-        public
-    {
-        minter = setMinter;
-        rigoblock = setRigoblock;
-        startTime = setStartTime;
-        endTime = setEndTime;
+    function RigoTok(address _setMinter, address _setRigoblock) public {
+        minter = _setMinter;
+        rigoblock = _setRigoblock;
         balances[msg.sender] = totalSupply; //ALT: balances[rigoblock] = totalSupply;
     }
 
@@ -204,11 +221,11 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
         totalSupply = safeAdd(totalSupply, amount);
     }
 
-    function transfer(address recipient, uint amount) is_later_than(endTime) public returns (bool success) {
+    function transfer(address recipient, uint amount) public returns (bool success) {
         return super.transfer(recipient, amount);
     }
 
-    function transferFrom(address sender, address recipient, uint amount) public is_later_than(endTime) returns (bool success) {
+    function transferFrom(address sender, address recipient, uint amount) public returns (bool success) {
         return super.transferFrom(sender, recipient, amount);
     }
 
@@ -219,53 +236,34 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     function changeRigoblockAddress(address newAddress) public only_rigoblock {
         rigoblock = newAddress;
     }
-    
-    function setStartTime(uint _startTime) public only_rigoblock {
-        startTime = _startTime;
-    }
-    
-    function setEndTime(uint _endTime) public only_rigoblock {
-        endTime = _endTime;
-    }
-   
-    function setInflationFactor(uint _inflationFactor) public only_rigoblock {
-        inflationFactor = _inflationFactor;
-    }
 
     // CONSTANT METHODS
 
     function getName() public constant returns (string) {
         return name;
     }
-    
+
     function getSymbol() public constant returns (string) {
         return symbol;
     }
-    
+
     function getDecimals() public constant returns (uint) {
         return decimals;
     }
-    
-    function getStartTime() public constant returns (uint) {
-        return startTime;
-    }
-    
-    function getEndTime() public constant returns (uint) {
-        return endTime;
-    }
-    
+
     function getMinter() public constant returns (address) {
         return minter;
     }
-    
+
     function getRigoblock() public constant returns (address) {
         return rigoblock;
     }
-    
-    function getInflationFactor() public constant returns (uint) {
-        return inflationFactor;
+
+    function getInflationFactor(address _group) public constant returns (uint) {
+        Inflation inflation = Inflation(minter);
+        inflation.getInflationFactor(_group);
     }
-   
+
     string public constant name = "Rigo Token";
     string public constant symbol = "GRG";
     uint public constant decimals = 18;
@@ -273,6 +271,5 @@ contract RigoTok is UnlimitedAllowanceToken, SafeMath, RigoTokFace { //Unlimited
     uint public startTime;
     uint public endTime;
     address public minter;
-    address public rigoblock; 
-    uint public inflationFactor = 1; // an inflation factor of 5 is equal to an inflation of 5%
+    address public rigoblock;
 }
