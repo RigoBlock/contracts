@@ -1,4 +1,4 @@
-//! the inflation contract.
+//! the Inflation contract.
 //!
 //! Copyright 2017-2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
 //!
@@ -139,6 +139,55 @@ contract RigoTok {
     function getInflationFactor() constant returns (uint) {}
 }
 
+contract Authority {
+
+    // EVENTS
+
+    event SetAuthority (address indexed authority);
+    event SetWhitelister (address indexed whitelister);
+    event SetEventful(address indexed eventful);
+    event WhitelistedUser(address indexed target, bool approved);
+    event WhitelistedAsset(address indexed asset, bool approved);
+    event WhitelistedExchange(address indexed exchange, bool approved);
+    event WhitelistedRegistry(address indexed registry, bool approved);
+    event WhitelistedFactory(address indexed factory, bool approved);
+    event WhitelistedGabcoin(address indexed gabcoin, bool approved);
+    event WhitelistedDrago(address indexed drago, bool approved);
+    event NewEventful(address indexed eventful);
+
+    // METHODS
+
+    function setAuthority(address _authority, bool _isWhitelisted) public {}
+    function setWhitelister(address _whitelister, bool _isWhitelisted) public {}
+    function whitelistUser(address _target, bool _isWhitelisted) public {}
+    function whitelistAsset(address _asset, bool _isWhitelisted) public {}
+    function whitelistExchange(address _exchange, bool _isWhitelisted) public {}
+    function whitelistDrago(address _drago, bool _isWhitelisted) public {}
+    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) public {}
+    function whitelistRegistry(address _registry, bool _isWhitelisted) public {}
+    function whitelistFactory(address _factory, bool _isWhitelisted) public {}
+    function setEventful(address _eventful) public {}
+    function setGabcoinEventful(address _gabcoinEventful) public {}
+    function setExchangeEventful(address _exchangeEventful) public {}
+    function setCasper(address _casper) public {}
+
+    function isWhitelistedUser(address _target) public constant returns (bool) {}
+    function isWhitelister(address _whitelister) public constant returns (bool) {}
+    function isAuthority(address _authority) public constant returns (bool) {}
+    function isWhitelistedAsset(address _asset) public constant returns (bool) {}
+    function isWhitelistedExchange(address _exchange) public constant returns (bool) {}
+    function isWhitelistedRegistry(address _registry) public constant returns (bool) {}
+    function isWhitelistedDrago(address _drago) public constant returns (bool) {}
+    function isWhitelistedGabcoin(address _gabcoin) public constant returns (bool) {} 
+    function isWhitelistedFactory(address _factory) public constant returns (bool) {}
+    function getEventful() public constant returns (address) {}
+    function getGabcoinEventful() public constant returns (address) {}
+    function getExchangeEventful() public constant returns (address) {}
+    function getCasper() public constant returns (address) {}
+    function getOwner() public constant returns (address) {}
+    function getListsByGroups(string _group) public constant returns (address[]) {}
+}
+
 contract InflationFace {
 
     // NON-CONSTANT METHODS
@@ -147,6 +196,7 @@ contract InflationFace {
     function setInflationFactor(address _group, uint _inflationFactor) public {}
     function setMinimumRigo(uint _minimum) public {}
     function setRigoblock(address _newRigoblock) public {}
+    function setAuthority(address _authority) public {}
     function setPeriod(uint _newPeriod) public {}
     
     // CONSTANT METHODS
@@ -184,15 +234,25 @@ contract Inflation is SafeMath {
     modifier only_proof_of_performance {
         require(msg.sender == proofOfPerformance); _;
     }
+    
+    modifier is_approved_factory(address _factory) {
+        Authority auth = Authority(authority);
+        require(auth.isWhitelistedFactory(_factory));
+        _;
+    }
 
     modifier time_at_least(address _thePool) {
         require(now >= performers[_thePool].endTime); _;
     }
 
-    function Inflation(address _rigoToken, address _proofOfPerformance) public only_rigoblock {
+    function Inflation(address _rigoToken, address _proofOfPerformance, address _authority)
+        public
+        only_rigoblock
+    {
         rigo = _rigoToken;
 	    rigoblock = msg.sender;
 	    proofOfPerformance = _proofOfPerformance;
+	    authority = _authority;
     }
 
     function mintInflation(address _thePool, uint _reward)
@@ -215,7 +275,11 @@ contract Inflation is SafeMath {
         return true;
     }
 
-    function setInflationFactor(address _group, uint _inflationFactor) public only_rigoblock {
+    function setInflationFactor(address _group, uint _inflationFactor)
+        public
+        only_rigoblock
+        is_approved_factory(_group)
+    {
         groups[_group].epochReward = _inflationFactor;
     }
 
@@ -226,6 +290,10 @@ contract Inflation is SafeMath {
 
     function setRigoblock(address _newRigoblock) public only_rigoblock {
     	rigoblock = _newRigoblock;
+    }
+    
+    function setAuthority(address _authority) public only_rigoblock {
+        authority = _authority;
     }
 
     //set period on shorter subsets of time for testing
@@ -243,7 +311,8 @@ contract Inflation is SafeMath {
 
     uint public period = 12 weeks; //(inflation tokens can be minted every 3 months)
     uint minimumRigo; //double check whether to get minimumRigo from an authority/Dao contract
-    address public proofOfPerformance;
+    address public proofOfPerformance; //what if we upgrade?
+    address public authority;
     address public rigoblock;
     address public rigo; //this is the address of the Rigo token //double check whether we can find it differently
     mapping(address => Performer) performers;
