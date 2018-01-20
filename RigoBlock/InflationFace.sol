@@ -1,4 +1,4 @@
-//! the inflation interface contract.
+//! the Inflation Interface contract.
 //!
 //! Copyright 2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
 //!
@@ -24,9 +24,11 @@ contract InflationFace {
     function setInflationFactor(address _group, uint _inflationFactor) public {}
     function setMinimumRigo(uint _minimum) public {}
     function setRigoblock(address _newRigoblock) public {}
+    function setAuthority(address _authority) public {}
     function setPeriod(uint _newPeriod) public {}
     
     // CONSTANT METHODS
     
     function canWithdraw(address _thePool) public constant returns (bool) {}
+    function getInflationFactor(address _group) public constant returns (uint) {}
 }
