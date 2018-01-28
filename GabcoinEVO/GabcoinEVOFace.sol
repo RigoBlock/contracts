@@ -1,4 +1,4 @@
-//! the Gabcoin EVO contract.
+//! the Vault Interaace contract.
 //!
 //! Copyright 2017-2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
 //!
@@ -19,35 +19,38 @@
 
 pragma solidity ^0.4.19;
 
-contract GabcoinFace {
+contract VaultFace {
+    
+    // EVENTS
 
 	event Buy(address indexed from, address indexed to, uint256 indexed amount, uint256 revenue);
 	event Sell(address indexed from, address indexed to, uint256 indexed amount,uint256 revenue);
 	event DepositCasper(uint amount, address indexed who, address indexed validation, address indexed withdrawal);
  	event WithdrawCasper(uint deposit, address indexed who, address casper);
- 
+
+    // METHODS
+
 	function() payable {}
 	function deposit(address _token, uint _amount) payable returns (bool success) {}
 	function withdraw(address _token, uint _amount) returns (bool success) {}
-	function buyGabcoin() payable returns (bool success) {}
-	function buyGabcoinOnBehalf(address _hodler) payable returns (bool success) {}
-	function sellGabcoin(uint256 amount) returns (bool success) {}
+	function buyVault() payable returns (bool success) {}
+	function buyVaultOnBehalf(address _hodler) payable returns (bool success) {}
+	function sellVault(uint256 amount) returns (bool success) {}
 	function depositCasper(address _validation, address _withdrawal, uint _amount) returns (bool success) {}
 	function withdrawCasper(uint _validatorIndex) {}
 	function changeRatio(uint256 _ratio) {}	
 	function setTransactionFee(uint _transactionFee) {}	
 	function changeFeeCollector(address _feeCollector) {}	
-	function changeGabcoinDAO(address _gabcoinDAO) {}
+	function changeVaultDAO(address _vaultDAO) {}
 	function updatePrice() {}
 	function changeMinPeriod(uint32 _minPeriod) {}
-
-	function getMinPeriod() constant returns (uint32) {}
-	function balanceOf(address _from) constant returns (uint) {}
-	function getVersion() constant returns (string) {}
-	function getName() constant returns (string) {}
-	function getSymbol() constant returns (string) {}
-	function getPrice() constant returns (uint) {}
-	function getCasper() constant returns (address) {}
-	function getTransactionFee() constant returns (uint) {}
-	function getFeeCollector() constant returns (address) {}
+	
+	function balanceOf(address _who) public constant returns (uint) {}
+	function getEventful() public constant returns (address) {}
+	function getData() public constant returns (string name, string symbol, uint sellPrice, uint buyPrice) {}
+	function getAdminData() public constant returns (address feeCollector, address vaultDAO, uint ratio, uint transactionFee, uint32 minPeriod) {}
+	function getOwner() public constant returns (address) {}
+	function totalSupply() public constant returns (uint256) {}
+	function getCasper() public constant returns (address) {}
+	function getVersion() public constant returns (string) {}
 }
