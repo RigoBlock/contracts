@@ -1,5 +1,5 @@
 //! CFD contract.
-//! By Gabriele Rigo (Rigo Investment Sagl), 2017.
+//! By Gabriele Rigo (Rigo Investment Sagl), 2017-2018.
 //! Released under the Apache Licence 2.
 //! This contract is a hybrid CFD/Option contract that allows for leveraged ETHUSDtrading
 //! STILL NEEDS IMPROVEMENT ON PRICE INPUT, SETTLEMENT AND ROLLOVER PROCESS
@@ -492,7 +492,7 @@ contract CFD is SafeMath, CFDFace {
 	mapping (uint32 => Deal) public deals;
 	uint32 public head;			// insert into linked ring; no order.
 	
-	uint128 min_stake = 100 finney;	// minimum stake to avoid dust clogging things up.
+	uint128 min_stake = 1 finney;	// minimum stake to avoid dust clogging things up.
 	uint24 public maxLev = 1;
     
 	mapping (address => uint) public accounts;
