@@ -1,3 +1,8 @@
+//! oasisdex also works with a proxy for wrapped ether
+//! must get maker guys to help. References:
+//! https://github.com/makerdao/oasis-direct-proxy/blob/master/src/OasisDirectProxy.sol
+//! https://github.com/makerdao/maker-otc/blob/master/src/matching_market.sol
+
 pragma solidity ^0.4.19;
 
 contract ERC20 {
