@@ -117,6 +117,7 @@ contract CFD {
 	function setMaxLeverage(uint24 _maxLeverage) {}
 	function setExchange (address _exchange) {}
 
+    function getDealSettlementValue(uint24 id) external view returns(address stable, uint stableGets, address leveraged, uint leveragedGets) {}
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
 	function bestAdjustmentFor(bool _is_stable, uint128 _stake) constant returns (uint32) {}
 	function dealDetails(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time, uint VAR) {}
@@ -184,7 +185,7 @@ contract ExchangeFace {
 	event Order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event OrderPlaced(address indexed cfd, address indexed who, bool indexed is_stable, uint32 adjustment, uint128 stake);
 	event OrderMatched(address indexed cfd, address indexed stable, address indexed leveraged, bool is_stable, uint32 deal, uint64 strike, uint128 stake);
-	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
+	//event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event OrderCancelled(address indexed cfd, uint32 indexed id, address indexed who, uint128 stake);
 	event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, address user);
 	event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
@@ -301,14 +302,16 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
 		//cfd has callback to addCredits of P&L
 		ExchangeEventful eventful = ExchangeEventful(getExchangeEventful());
 		require(eventful.finalize(msg.sender, this, _cfd, _id, cfd.getStable(_id), cfd.getLeveraged(_id), uint64(cfd.getPrice())));
+		require(addCredits(_cfd, _id));
 		DealFinalized(_cfd, _id, cfd.getStable(_id), cfd.getLeveraged(_id), uint64(cfd.getPrice()));
 	}
 	
-	function addCredits(address stable, uint stable_gets, address leveraged, uint leveraged_gets, uint24 id) approved_asset(msg.sender) returns (bool success) {
+	function addCredits(address _cfd, uint24 _id) internal returns (bool success) {
+	    CFD cfd = CFD(_cfd);
+	    var(stable, stable_gets, leveraged, leveraged_gets) = cfd.getDealSettlementValue(_id);
 		tokens[address(0)][stable] += stable_gets;
 		tokens[address(0)][leveraged] += leveraged_gets;
-		CFD cfd = CFD(msg.sender);
-		var depositClaim = cfd.getDealStake(id) / cfd. getDealLev(id); //accounts are decreased by the margin
+		var depositClaim = cfd.getDealStake(_id) / cfd. getDealLev(_id); //accounts are decreased by the margin
 		accounts[stable].balance -= depositClaim;
 		accounts[leveraged].balance -= depositClaim;
 		return true;
@@ -362,7 +365,7 @@ contract CFDExchange is ExchangeFace, SafeMath, Owned {
   	//uint public feeMake; //percentage times (1 ether)
   	//uint public feeTake; //percentage times (1 ether)
   	//uint public feeRebate;
-	uint min_order = 100 finney;
+	uint min_order = 1 finney;
 	//uint public next_id;
   	//address public feeAccount; //the account that will receive fees
   	//address public accountLevelsAddr;
