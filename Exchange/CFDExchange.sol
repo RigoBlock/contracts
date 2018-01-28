@@ -1,5 +1,5 @@
 //! CFD Exchange contract.
-//! By Gabriele Rigo (Rigo Investment Sagl), 2017.
+//! By Gabriele Rigo (Rigo Investment Sagl), 2017-2018.
 //! Released under the Apache Licence 2.
 
 pragma solidity ^0.4.11;
