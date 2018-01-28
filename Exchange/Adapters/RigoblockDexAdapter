@@ -1,0 +1,130 @@
+//! the RigoBlock Exchange Adapter contract.
+//! Copyright 2017-2018 Gabriele Rigo, RigoBlock, Rigo Investment Sagl.
+//!
+//! Licensed under the Apache License, Version 2.0 (the "License");
+//! you may not use this file except in compliance with the License.
+//! You may obtain a copy of the License at
+//!
+//!     http://www.apache.org/licenses/LICENSE-2.0
+//!
+//! Unless required by applicable law or agreed to in writing, software
+//! distributed under the License is distributed on an "AS IS" BASIS,
+//! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//! See the License for the specific language governing permissions and
+//! limitations under the License.
+
+pragma solidity ^0.4.19;
+
+contract ERC20 {
+
+	event Transfer(address indexed _from, address indexed _to, uint256 _value);
+	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+  
+	function transfer(address _to, uint256 _value) public returns (bool success) {}
+	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {}
+	function approve(address _spender, uint256 _value) public returns (bool success) {}
+
+	function totalSupply() public constant returns (uint256) {}
+	function balanceOf(address _who) public constant returns (uint256) {}
+	function allowance(address _owner, address _spender) public constant returns (uint256) {}
+}
+
+contract Exchange {
+
+	// METHODS
+
+	function deposit(address _token, uint _amount) public payable returns (bool success) {}
+	function withdraw(address _token, uint _amount) public returns (bool success) {}
+	function orderCFD(address _cfd, bool _is_stable, uint32 _adjustment, uint128 _stake) public returns (uint32 id) {}
+	function cancel(address _cfd, uint32 _id) public {}
+	function finalize(address _cfd, uint24 _id) public {}
+}
+
+contract RigoblockExAdapter {
+    
+    function fillOrder(
+        address _exchange,
+        address[5] orderAddresses,
+        uint[6] orderValues,
+        uint fillTakerTokenAmount,
+        bool shouldThrowOnInsufficientBalanceOrAllowance,
+        uint8 v,
+        bytes32 r,
+        bytes32 s)
+        public
+    {
+        Exchange exchange = Exchange(_exchange);
+        exchange.orderCFD(
+            orderAddresses[0],
+            shouldThrowOnInsufficientBalanceOrAllowance,
+            uint32(orderValues[0]),
+            uint128(orderValues[1])
+        );
+    }
+    
+    function fillOrKill(
+        address _exchange,
+        address[5] orderAddresses,
+        uint[6] orderValues,
+        uint fillTakerTokenAmount,
+        uint8 v,
+        bytes32 r,
+        bytes32 s)
+        public
+    {
+        Exchange exchange = Exchange(_exchange);
+        exchange.withdraw(
+            orderAddresses[0],
+            orderValues[0]
+        );
+    }
+    
+    function buy(
+        address _exchange,
+        address[5] orderAddresses,
+        uint[6] orderValues,
+        uint fillTakerTokenAmount,
+        uint8 v,
+        bytes32 r,
+        bytes32 s)
+        public
+    {
+        Exchange exchange = Exchange(_exchange);
+        exchange.deposit(
+            orderAddresses[0],
+            orderValues[0]
+        );
+    }
+    
+    function take(
+        address _exchange,
+        address[5] orderAddresses,
+        uint[6] orderValues,
+        uint fillTakerTokenAmount,
+        uint8 v,
+        bytes32 r,
+        bytes32 s)
+        public
+    {
+        Exchange exchange = Exchange(_exchange);
+        exchange.finalize(
+            orderAddresses[0],
+            uint24(orderValues[0])
+        );
+    }    
+    
+    function cancelOrder(
+        address _exchange, 
+        address[5] orderAddresses,
+        uint[6] orderValues,
+        uint cancelTakerTokenAmount
+        )
+        public
+    {
+        Exchange exchange = Exchange(_exchange);
+        exchange.cancel(
+            orderAddresses[0],
+            uint32(orderValues[0])
+        );
+    }
+}
