@@ -96,7 +96,8 @@ contract CFDFace {
 	function finalizeExchange(uint24 _id, address _who) returns (bool success) {}
 	function setMaxLeverage(uint24 _maxLeverage) {}
 	function setExchange (address _exchange) {}
-
+	
+	function getDealSettlementValue(uint24 id) external view returns(address stable, uint stableGets, address leveraged, uint leveragedGets) {}
 	function bestAdjustment(bool _is_stable) constant returns (uint32) {}
 	function bestAdjustmentFor(bool _is_stable, uint128 _stake) constant returns (uint32) {}
 	function dealDetails(uint32 _id) constant returns (address stable, address leveraged, uint64 strike, uint128 stake, uint32 end_time, uint VAR) {}
@@ -230,32 +231,52 @@ contract CFD is SafeMath, CFDFace {
 	/// lock the current price into a now-ended or out-of-bounds deal.
 	function finalize(uint24 id, address who) internal {
 	    if (deals[id].stable == who || deals[id].leveraged == who) {
-		var price = uint64(oracle.get());
-		var strike = deals[id].strike;
-		var thisLev = deals[id].lev; //refactor P&L by exposure
+		    var price = uint64(oracle.get());
+		    var strike = deals[id].strike;
+		    var thisLev = deals[id].lev; //refactor P&L by exposure
 
-		// can't handle the price dropping by over 50%.
-		//var early_exit = price < strike / 2; //allow for leverage
-		var early_exit = price < strike - (strike / (2 * thisLev));
-		if (early_exit)
-			//price = strike / 2;
-			price = strike - (strike / (2 * uint64(thisLev)));
+    		// can't handle the price dropping by over 50%.
+	    	//var early_exit = price < strike / 2; //allow for leverage
+		    var early_exit = price < strike - (strike / (2 * thisLev));
+		    if (early_exit)
+			    //price = strike / 2;
+			    price = strike - (strike / (2 * uint64(thisLev)));
 
-		if (now >= deals[id].end_time || early_exit) {
-			var stake = deals[id].stake;
-			//var stable_gets = stake * strike / price;
-			var stable_gets = stake / thisLev * strike / price;
-			//var leveraged_gets = stake * 2 - stable_gets;
-			var leveraged_gets = stake * 2 / thisLev - stable_gets;
-			
-		    //THIS CALLBACK TO EXCHANGE IS IMPORTANT TO PROPERLY CREDIT P&L	
-			Exchange exch = Exchange(exchange);
-	        if (!exch.addCredits(deals[id].stable, stable_gets, deals[id].leveraged, leveraged_gets, id)) return;
+		    if (now >= deals[id].end_time || early_exit) {
+			    var stake = deals[id].stake;
+			    //var stable_gets = stake * strike / price;
+			    var stable_gets = stake / thisLev * strike / price;
+			    //var leveraged_gets = stake * 2 - stable_gets;
+			    var leveraged_gets = stake * 2 / thisLev - stable_gets;
 	      
-			DealFinalized(id, deals[id].stable, deals[id].leveraged, price);
-			removeDeal(id);
-		}
+			    DealFinalized(id, deals[id].stable, deals[id].leveraged, price);
+			    removeDeal(id);
+		    }
 	    }
+	}
+	
+	//view function to avoid loop
+	function getDealSettlementValue(uint24 id) 
+	    external 
+	    view 
+	    returns(
+	        address stable, 
+	        uint stableGets, 
+	        address leveraged, 
+	        uint leveragedGets)
+	{
+	    var price = uint64(oracle.get());
+	    var strike = deals[id].strike;
+	    var thisLev = deals[id].lev;
+	    var stake = deals[id].stake;
+	    var stable_gets = stake / thisLev * strike / price;
+	    var leveraged_gets = stake * 2 / thisLev - stable_gets;
+	    return(
+	        deals[id].stable,
+	        stable_gets,
+	        deals[id].leveraged,
+	        leveraged_gets
+	    );
 	}
 
 	// inserts the order into one of the two lists, ordered according to adjustment.
