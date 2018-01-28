@@ -60,7 +60,7 @@ contract Exchange {
     function take(bytes32 id, uint128 maxTakeAmount) public {}
 }
 
-contract ZeroExAdapter {
+contract OasisDexAdapter {
     
     function fillOrder(
         address _exchange,
