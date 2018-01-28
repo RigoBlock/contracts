@@ -40,7 +40,7 @@ contract Exchange {
 	function finalize(address _cfd, uint24 _id) public {}
 }
 
-contract RigoblockExAdapter {
+contract RigoblockDexAdapter {
     
     function fillOrder(
         address _exchange,
