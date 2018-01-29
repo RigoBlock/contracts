@@ -1,4 +1,5 @@
 oasisdex kovan addresses:
+https://github.com/OasisDEX/oasis-direct-base/blob/master/src/settings.json
 
 "kovan": {
       "otc": "0x8cf1cab422a0b6b554077a361f8419cdf122a9f9",
