@@ -25,7 +25,7 @@ contract Owned {
 
 	modifier only_owner { require(msg.sender == owner); _; }
 
-    event NewOwner(address indexed old, address indexed current);
+	event NewOwner(address indexed old, address indexed current);
 
 	function setOwner(address _new) public only_owner {
 		owner = _new;
@@ -33,7 +33,7 @@ contract Owned {
 	}
 
 	function getOwner() public constant returns (address) {
-	    return owner;
+		return owner;
 	}
 
 	address public owner; //= msg.sender; commented as otherwise cannot set owner at creation
@@ -41,11 +41,11 @@ contract Owned {
 
 contract SafeMath {
 
-    function safeMul(uint a, uint b) internal pure returns (uint) {
-        uint c = a * b;
-        assert(a == 0 || c / a == b);
-        return c;
-    }
+	function safeMul(uint a, uint b) internal pure returns (uint) {
+ 		uint c = a * b;
+		assert(a == 0 || c / a == b);
+		return c;
+	}
     
     function safeDiv(uint a, uint b) internal pure returns (uint) {
         assert(b > 0);
