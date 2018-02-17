@@ -19,16 +19,16 @@
 pragma solidity ^0.4.19;
 
 contract Owned {
-    
+
 	modifier only_owner { require(msg.sender == owner); _; }
 
 	event NewOwner(address indexed old, address indexed current);
-   
+
 	function setOwner(address _new) public only_owner {
 		owner = _new;
 		NewOwner(owner, _new);
 	}
-	
+
 	function getOwner() public constant returns (address) {
 	    return owner;
 	}
@@ -38,51 +38,51 @@ contract Owned {
 
 contract Authority {
 
-    // EVENTS
+  // EVENTS
 
-    event SetAuthority (address indexed authority);
-    event SetWhitelister (address indexed whitelister);
-    event SetEventful(address indexed eventful);
-    event WhitelistedUser(address indexed target, bool approved);
-    event WhitelistedAsset(address indexed asset, bool approved);
-    event WhitelistedExchange(address indexed exchange, bool approved);
-    event WhitelistedRegistry(address indexed registry, bool approved);
-    event WhitelistedFactory(address indexed factory, bool approved);
-    event WhitelistedGabcoin(address indexed gabcoin, bool approved);
-    event WhitelistedDrago(address indexed drago, bool approved);
-    event NewEventful(address indexed eventful);
+  event SetAuthority (address indexed authority);
+  event SetWhitelister (address indexed whitelister);
+  event SetEventful(address indexed eventful);
+  event WhitelistedUser(address indexed target, bool approved);
+  event WhitelistedAsset(address indexed asset, bool approved);
+  event WhitelistedExchange(address indexed exchange, bool approved);
+  event WhitelistedRegistry(address indexed registry, bool approved);
+  event WhitelistedFactory(address indexed factory, bool approved);
+  event WhitelistedGabcoin(address indexed gabcoin, bool approved);
+  event WhitelistedDrago(address indexed drago, bool approved);
+  event NewEventful(address indexed eventful);
 
-    // METHODS
+  // METHODS
 
-    function setAuthority(address _authority, bool _isWhitelisted) public {}
-    function setWhitelister(address _whitelister, bool _isWhitelisted) public {}
-    function whitelistUser(address _target, bool _isWhitelisted) public {}
-    function whitelistAsset(address _asset, bool _isWhitelisted) public {}
-    function whitelistExchange(address _exchange, bool _isWhitelisted) public {}
-    function whitelistDrago(address _drago, bool _isWhitelisted) public {}
-    function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) public {}
-    function whitelistRegistry(address _registry, bool _isWhitelisted) public {}
-    function whitelistFactory(address _factory, bool _isWhitelisted) public {}
-    function setEventful(address _eventful) public {}
-    function setGabcoinEventful(address _gabcoinEventful) public {}
-    function setExchangeEventful(address _exchangeEventful) public {}
-    function setCasper(address _casper) public {}
+  function setAuthority(address _authority, bool _isWhitelisted) public {}
+  function setWhitelister(address _whitelister, bool _isWhitelisted) public {}
+  function whitelistUser(address _target, bool _isWhitelisted) public {}
+  function whitelistAsset(address _asset, bool _isWhitelisted) public {}
+  function whitelistExchange(address _exchange, bool _isWhitelisted) public {}
+  function whitelistDrago(address _drago, bool _isWhitelisted) public {}
+  function whitelistGabcoin(address _gabcoin, bool _isWhitelisted) public {}
+  function whitelistRegistry(address _registry, bool _isWhitelisted) public {}
+  function whitelistFactory(address _factory, bool _isWhitelisted) public {}
+  function setEventful(address _eventful) public {}
+  function setGabcoinEventful(address _gabcoinEventful) public {}
+  function setExchangeEventful(address _exchangeEventful) public {}
+  function setCasper(address _casper) public {}
 
-    function isWhitelistedUser(address _target) public constant returns (bool) {}
-    function isWhitelister(address _whitelister) public constant returns (bool) {}
-    function isAuthority(address _authority) public constant returns (bool) {}
-    function isWhitelistedAsset(address _asset) public constant returns (bool) {}
-    function isWhitelistedExchange(address _exchange) public constant returns (bool) {}
-    function isWhitelistedRegistry(address _registry) public constant returns (bool) {}
-    function isWhitelistedDrago(address _drago) public constant returns (bool) {}
-    function isWhitelistedGabcoin(address _gabcoin) public constant returns (bool) {} 
-    function isWhitelistedFactory(address _factory) public constant returns (bool) {}
-    function getEventful() public constant returns (address) {}
-    function getGabcoinEventful() public constant returns (address) {}
-    function getExchangeEventful() public constant returns (address) {}
-    function getCasper() public constant returns (address) {}
-    function getOwner() public constant returns (address) {}
-    function getListsByGroups(string _group) public constant returns (address[]) {}
+  function isWhitelistedUser(address _target) public constant returns (bool) {}
+  function isWhitelister(address _whitelister) public constant returns (bool) {}
+  function isAuthority(address _authority) public constant returns (bool) {}
+  function isWhitelistedAsset(address _asset) public constant returns (bool) {}
+  function isWhitelistedExchange(address _exchange) public constant returns (bool) {}
+  function isWhitelistedRegistry(address _registry) public constant returns (bool) {}
+  function isWhitelistedDrago(address _drago) public constant returns (bool) {}
+  function isWhitelistedGabcoin(address _gabcoin) public constant returns (bool) {}
+  function isWhitelistedFactory(address _factory) public constant returns (bool) {}
+  function getEventful() public constant returns (address) {}
+  function getGabcoinEventful() public constant returns (address) {}
+  function getExchangeEventful() public constant returns (address) {}
+  function getCasper() public constant returns (address) {}
+  function getOwner() public constant returns (address) {}
+  function getListsByGroups(string _group) public constant returns (address[]) {}
 }
 
 contract DragoRegistryFace {
@@ -92,14 +92,15 @@ contract DragoRegistryFace {
 	event Registered(string name, string symbol, uint id, address indexed drago, address indexed owner, address indexed group);
 	event Unregistered(string indexed symbol, uint indexed id);
 	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
-	
+
 	// METHODS
 
 	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable returns (bool) {}
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) internal returns (bool) {} //amended to internal function
+	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) public payable returns (bool) {}
 	function unregister(uint _id) public {}
 	function setMeta(uint _id, bytes32 _key, bytes32 _value) public {}
-	function setFee(uint _fee) public {}
+  function addGroup(address _group) public {}
+  function setFee(uint _fee) public {}
 	function upgrade(address _newAddress) public payable {} //payable as there is a transfer of value, otherwise opcode might throw an error
 	function setUpgraded(uint _version) public {}
 	function drain() public {}
@@ -112,14 +113,27 @@ contract DragoRegistryFace {
 	function fromName(string _name) public constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
 	function fromNameSymbol(string _name, string _symbol) public constant returns (address) {}
 	function getNameFromAddress(address _pool) external constant returns (bytes32) {}
-    function getSymbolFromAddress(address _pool) external constant returns (bytes32) {}
+  function getSymbolFromAddress(address _pool) external constant returns (bytes32) {}
 	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {}
-	function getGroups(address _group) public constant returns (address[]) {}
-	function getFee() public constant returns (uint) {}
+  function getGroups() public constant returns (address[]) {}
+  function getFee() public constant returns (uint) {}
 }
 
 contract DragoRegistry is DragoRegistryFace, Owned {
-    
+
+  address public constant AUTHORITY;
+  uint public constant VERSION;
+
+  uint public fee = 0;
+  address[] groups;
+
+  Drago[] dragos;
+
+  mapping (bytes32 => address) mapFromKey;
+  mapping (address => uint) mapFromAddress;
+  mapping (string => uint) mapFromName;
+  mapping (string => uint) mapFromSymbol;
+
 	struct Drago {
 		address drago;
 		string name;
@@ -129,42 +143,91 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		address group;
 		mapping (bytes32 => bytes32) meta;
 	}
-    
+
 	// EVENTS
 
 	event Registered(string name, string symbol, uint id, address indexed drago, address indexed owner, address indexed group);
 	event Unregistered(string indexed name, string indexed symbol, uint indexed id);
 	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
-	
+
 	// MODIFIERS
-	
-	modifier when_fee_paid { if (msg.value < fee) return; _; }
-	modifier when_address_free(address _drago) { if (mapFromAddress[_drago] != 0) return; _; }
-	//modifier when_symbol_free(string _symbol) { if (mapFromSymbol[_symbol] != 0) return; _; }
-	modifier when_is_symbol(string _symbol) { if (bytes(_symbol).length != 3) return; _; }
-	modifier when_has_symbol(string _symbol) { if (mapFromSymbol[_symbol] == 0) return; _; }
-	modifier only_drago_owner(uint _id) { if (dragos[_id].owner != msg.sender) return; _; }
-	modifier when_name_free(string _name) { if (mapFromName[_name] != 0) return; _; }
-	modifier when_has_name(string _name) { if (mapFromName[_name] == 0) return; _; }
-	modifier only_authority { Authority auth = Authority(authority); if (!auth.isAuthority(msg.sender)) return; _; } //this modifier has to be tested
-    
+
+	modifier when_fee_paid {
+    require(msg.value >= fee);
+    _;
+  }
+
+	modifier when_address_free(address _drago) {
+    require(mapFromAddress[_drago] == 0);
+    _;
+  }
+
+  modifier when_is_symbol(string _symbol) {
+    require(bytes(_symbol).length == 3);
+    _;
+  }
+
+  modifier when_has_symbol(string _symbol) {
+    require(mapFromSymbol[_symbol] != 0);
+    _;
+  }
+
+  modifier only_drago_owner(uint _id) {
+    require(dragos[_id].owner == msg.sender);
+    _;
+  }
+
+  modifier when_name_free(string _name) {
+    require(mapFromName[_name] == 0);
+    _;
+  }
+
+  modifier when_has_name(string _name) {
+    require(mapFromName[_name] != 0);
+    _;
+  }
+
+  modifier only_authority {
+    Authority auth = Authority(AUTHORITY);
+    require(auth.isAuthority(msg.sender) == true);
+    _;
+  }
+
 	// METHODS
-	
+
 	function DragoRegistry(address _authority) public {
-	    authority = _authority;
+	  AUTHORITY = _authority;
 	}
-	
-	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable only_authority returns (bool) {
+
+	function register(
+    address _drago,
+    string _name,
+    string _symbol,
+    uint _dragoID,
+    address _owner)
+    public
+    payable
+    only_authority
+    returns (bool)
+  {
 		return registerAs(_drago, _name, _symbol, _dragoID, _owner, msg.sender);
 	}
 
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) 
-	    internal 
-	    when_fee_paid 
-	    when_address_free(_drago) 
-	    when_name_free(_name) 
-	    when_is_symbol(_symbol) 
-	    returns (bool) 
+	function registerAs(
+    address _drago,
+    string _name,
+    string _symbol,
+    uint _dragoID,
+    address _owner,
+    address _group)
+    public
+    payable
+	  only_authority
+	  when_fee_paid
+	  when_address_free(_drago)
+	  when_name_free(_name)
+	  when_is_symbol(_symbol)
+	  returns (bool)
 	{
 		dragos.push(Drago(_drago, _name, _symbol, _dragoID, _owner, _group));
 		mapFromAddress[_drago] = dragos.length;
@@ -173,7 +236,7 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		Registered(_name, _symbol, dragos.length - 1, _drago, _owner, _group);
 		return true;
 	}
-	
+
 	function unregister(uint _id) public only_owner {
 		Unregistered(dragos[_id].name, dragos[_id].symbol, _id);
 		delete mapFromAddress[dragos[_id].drago];
@@ -181,43 +244,64 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		delete mapFromSymbol[dragos[_id].symbol];
 		delete dragos[_id];
 	}
-	
-	function setMeta(uint _id, bytes32 _key, bytes32 _value) public only_drago_owner(_id) {
+
+	function setMeta(uint _id, bytes32 _key, bytes32 _value)
+    public
+    only_drago_owner(_id)
+  {
 		dragos[_id].meta[_key] = _value;
 		MetaChanged(_id, _key, _value);
 	}
-	
+
+  function addGroup(address _group)
+    public
+    only_owner
+  {
+  	groups.push(_group);
+  }
+
 	function setFee(uint _fee) public only_owner {
 		fee = _fee;
 	}
 
-	//watch out, when the registry gets upgraded, a migration of all funds has to be perfromed
+	//watch out, when the registry gets upgraded, a migration of all funds has to be performed
 	function upgrade(address _newAddress) public payable only_owner {
 		DragoRegistry registry = DragoRegistry(_newAddress);
-		++version;
-		registry.setUpgraded(version);
+		++VERSION;
+		registry.setUpgraded(VERSION);
 		address(registry).transfer(this.balance);
 	}
 
 	function setUpgraded(uint _version) public only_owner {
-    	version = _version;
+    	VERSION = _version;
   	}
-	
+
 	function drain() public only_owner {
 		msg.sender.transfer(this.balance);
 	}
-	
+
 	function kill() public only_owner {
 	    selfdestruct(msg.sender);
 	}
 
 	// CONSTANT METHODS
-	
-	function dragoCount() public constant returns (uint) { 
-	    return dragos.length; 
+
+	function dragoCount() public constant returns (uint) {
+	    return dragos.length;
 	}
-	
-	function fromId(uint _id) public constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {
+
+	function fromId(uint _id)
+    public
+    constant
+    returns (
+      address drago,
+      string name,
+      string symbol,
+      uint dragoID,
+      address owner,
+      address group
+    )
+  {
 		var t = dragos[_id];
 		drago = t.drago;
 		name = t.name;
@@ -227,7 +311,18 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 
-	function fromAddress(address _drago) public constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {
+	function fromAddress(address _drago)
+    public
+    constant
+    returns (
+      uint id,
+      string name,
+      string symbol,
+      uint dragoID,
+      address owner,
+      address group
+    )
+  {
 		id = mapFromAddress[_drago] - 1;
 		var t = dragos[id];
 		name = t.name;
@@ -237,7 +332,18 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 
-	function fromSymbol(string _symbol) public constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {
+	function fromSymbol(string _symbol)
+    public
+    constant
+    returns (
+      uint id,
+      address drago,
+      string name,
+      uint dragoID,
+      address owner,
+      address group
+    )
+  {
 		id = mapFromSymbol[_symbol] - 1;
 		var t = dragos[id];
 		drago = t.drago;
@@ -246,8 +352,19 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		owner = t.owner;
 		group = t.group;
 	}
-	
-	function fromName(string _name) public constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {
+
+	function fromName(string _name)
+    public
+    constant
+    returns (
+      uint id,
+      address drago,
+      string symbol,
+      uint dragoID,
+      address owner,
+      address group
+    )
+  {
 		id = mapFromName[_name] - 1;
 		var t = dragos[id];
 		symbol = t.symbol;
@@ -256,47 +373,57 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		owner = t.owner;
 		group = t.group;
 	}
-	
-	function fromNameSymbol(string _name, string _symbol) public constant returns (address) {
-	    var id = mapFromName[_name] - 1;
-	    var idCheck = mapFromSymbol[_symbol] - 1;
-	    var t = dragos[id];
-	    if (id != idCheck) return;
-	    address drago = t.drago;
-	    return drago;
+
+	function fromNameSymbol(string _name, string _symbol)
+    public
+    constant
+    returns (address)
+  {
+	  var id = mapFromName[_name] - 1;
+	  var idCheck = mapFromSymbol[_symbol] - 1;
+	  var t = dragos[id];
+	  require(id == idCheck);
+	  address drago = t.drago;
+	  return drago;
 	}
-	
-	function getNameFromAddress(address _pool) external constant returns (bytes32) {
-	    var id = mapFromAddress[_pool] - 1;
+
+	function getNameFromAddress(address _pool)
+    external
+    constant
+    returns (bytes32)
+  {
+	  var id = mapFromAddress[_pool] - 1;
 		var t = dragos[id];
 		return keccak256(t.name);
 	}
-	
-    function getSymbolFromAddress(address _pool) external constant returns (bytes32) {
-        var id = mapFromAddress[_pool] - 1;
+
+  function getSymbolFromAddress(address _pool)
+    external
+    constant
+    returns (bytes32)
+  {
+    var id = mapFromAddress[_pool] - 1;
 		var t = dragos[id];
 		return keccak256(t.symbol);
-    }
+  }
 
-	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {
+	function meta(uint _id, bytes32 _key)
+    public
+    constant
+    returns (bytes32)
+  {
 		return dragos[_id].meta[_key];
 	}
-	
-	function getGroups(address _group) public constant returns (address[]) {
-	    return mapFromGroup[_group];
+
+  function getGroups()
+    public
+    constant
+    returns (address[])
+  {
+	  return groups;
 	}
-	
+
 	function getFee() public constant returns (uint) {
 	    return fee;
 	}
-	 
-	mapping (bytes32 => address) mapFromKey;
-	mapping (address => uint) mapFromAddress;
-	mapping (string => uint) mapFromName;
-	mapping (string => uint) mapFromSymbol;
-	mapping (address=> address[]) mapFromGroup;
-	uint public fee = 0;
-	uint public version;
-	Drago[] dragos;
-	address public authority;
 }
