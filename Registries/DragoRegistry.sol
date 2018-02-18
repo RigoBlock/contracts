@@ -16,24 +16,28 @@
 //!
 //! Inspired by https://github.com/paritytech/contracts/blob/master/TokenReg.sol
 
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.20;
 
 contract Owned {
 
-	modifier only_owner { require(msg.sender == owner); _; }
+  address public owner;
 
-	event NewOwner(address indexed old, address indexed current);
+  event NewOwner(address indexed old, address indexed current);
 
-	function setOwner(address _new) public only_owner {
-		owner = _new;
-		NewOwner(owner, _new);
+  modifier only_owner { require(msg.sender == owner); _; }
+
+  function Owned() public {
+		owner = msg.sender;
 	}
 
-	function getOwner() public constant returns (address) {
-	    return owner;
-	}
+  function setOwner(address _new) public only_owner {
+    owner = _new;
+    NewOwner(owner, _new);
+  }
 
-	address public owner = msg.sender;
+  function getOwner() public constant returns (address) {
+    return owner;
+  }
 }
 
 contract Authority {
@@ -87,44 +91,44 @@ contract Authority {
 
 contract DragoRegistryFace {
 
-	//EVENTS
+  //EVENTS
 
-	event Registered(string name, string symbol, uint id, address indexed drago, address indexed owner, address indexed group);
-	event Unregistered(string indexed symbol, uint indexed id);
-	event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
+  event Registered(string name, string symbol, uint id, address indexed drago, address indexed owner, address indexed group);
+  event Unregistered(string indexed symbol, uint indexed id);
+  event MetaChanged(uint indexed id, bytes32 indexed key, bytes32 value);
 
-	// METHODS
+  // METHODS
 
-	function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable returns (bool) {}
-	function registerAs(address _drago, string _name, string _symbol, uint _dragoID, address _owner, address _group) public payable returns (bool) {}
-	function unregister(uint _id) public {}
-	function setMeta(uint _id, bytes32 _key, bytes32 _value) public {}
+  function register(address _drago, string _name, string _symbol, uint _dragoID, address _owner) public payable returns (bool) {}
+  function unregister(uint _id) public {}
+  function setMeta(uint _id, bytes32 _key, bytes32 _value) public {}
   function addGroup(address _group) public {}
   function setFee(uint _fee) public {}
-	function upgrade(address _newAddress) public payable {} //payable as there is a transfer of value, otherwise opcode might throw an error
-	function setUpgraded(uint _version) public {}
-	function drain() public {}
-	function kill() public {}
+  function upgrade(address _newAddress) public payable {} //payable as there is a transfer of value, otherwise opcode might throw an error
+  function setUpgraded(uint _version) external {}
+  function drain() public {}
+  function kill() public {}
 
-	function dragoCount() public constant returns (uint) {}
-	function fromId(uint _id) public constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
-	function fromAddress(address _drago) public constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
-	function fromSymbol(string _symbol) public constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
-	function fromName(string _name) public constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
-	function fromNameSymbol(string _name, string _symbol) public constant returns (address) {}
-	function getNameFromAddress(address _pool) external constant returns (bytes32) {}
+  function dragoCount() public constant returns (uint) {}
+  function fromId(uint _id) public constant returns (address drago, string name, string symbol, uint dragoID, address owner, address group) {}
+  function fromAddress(address _drago) public constant returns (uint id, string name, string symbol, uint dragoID, address owner, address group) {}
+  function fromSymbol(string _symbol) public constant returns (uint id, address drago, string name, uint dragoID, address owner, address group) {}
+  function fromName(string _name) public constant returns (uint id, address drago, string symbol, uint dragoID, address owner, address group) {}
+  function fromNameSymbol(string _name, string _symbol) public constant returns (address) {}
+  function getNameFromAddress(address _pool) external constant returns (bytes32) {}
   function getSymbolFromAddress(address _pool) external constant returns (bytes32) {}
-	function meta(uint _id, bytes32 _key) public constant returns (bytes32) {}
+  function meta(uint _id, bytes32 _key) public constant returns (bytes32) {}
   function getGroups() public constant returns (address[]) {}
   function getFee() public constant returns (uint) {}
 }
 
 contract DragoRegistry is DragoRegistryFace, Owned {
 
-  address public constant AUTHORITY;
-  uint public constant VERSION;
+  address public AUTHORITY;
+  uint public VERSION;
 
   uint public fee = 0;
+
   address[] groups;
 
   Drago[] dragos;
@@ -193,12 +197,18 @@ contract DragoRegistry is DragoRegistryFace, Owned {
     _;
   }
 
-	// METHODS
-
 	function DragoRegistry(address _authority) public {
 	  AUTHORITY = _authority;
 	}
 
+	// CORE METHODS
+
+	/// @dev Allows a factory which is an authority to register a pool
+	/// @param _drago Address of the pool
+	/// @param _name Name of the pool
+	/// @param _symbol Symbol of the pool
+	/// @param _dragoID ID number of the pool
+	/// @param _owner Address of the pool owner
 	function register(
     address _drago,
     string _name,
@@ -208,35 +218,17 @@ contract DragoRegistry is DragoRegistryFace, Owned {
     public
     payable
     only_authority
+		when_fee_paid
+	  when_address_free(_drago)
+	  when_name_free(_name)
+	  when_is_symbol(_symbol)
     returns (bool)
   {
 		return registerAs(_drago, _name, _symbol, _dragoID, _owner, msg.sender);
 	}
 
-	function registerAs(
-    address _drago,
-    string _name,
-    string _symbol,
-    uint _dragoID,
-    address _owner,
-    address _group)
-    public
-    payable
-	  only_authority
-	  when_fee_paid
-	  when_address_free(_drago)
-	  when_name_free(_name)
-	  when_is_symbol(_symbol)
-	  returns (bool)
-	{
-		dragos.push(Drago(_drago, _name, _symbol, _dragoID, _owner, _group));
-		mapFromAddress[_drago] = dragos.length;
-		mapFromName[_name] = dragos.length;
-		mapFromSymbol[_symbol] = dragos.length;
-		Registered(_name, _symbol, dragos.length - 1, _drago, _owner, _group);
-		return true;
-	}
-
+	/// @dev Allows owner to unregister a pool
+	/// @param _id Number of the pool
 	function unregister(uint _id) public only_owner {
 		Unregistered(dragos[_id].name, dragos[_id].symbol, _id);
 		delete mapFromAddress[dragos[_id].drago];
@@ -245,6 +237,10 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		delete dragos[_id];
 	}
 
+	/// @dev Allows pool owner to set metadata for a pool
+	/// @param _id Number corresponding to pool id
+	/// @param _key Bytes32 of the key
+	/// @param _value Bytes32 of the value
 	function setMeta(uint _id, bytes32 _key, bytes32 _value)
     public
     only_drago_owner(_id)
@@ -253,6 +249,8 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		MetaChanged(_id, _key, _value);
 	}
 
+	/// @dev Allows owner to add a group of pools (a factory)
+	/// @param _group Address of the new group
   function addGroup(address _group)
     public
     only_owner
@@ -260,11 +258,15 @@ contract DragoRegistry is DragoRegistryFace, Owned {
   	groups.push(_group);
   }
 
+	/// @dev Allows owner to set a fee to register pools
+  /// @param _fee Value of the fee in wei
 	function setFee(uint _fee) public only_owner {
 		fee = _fee;
 	}
 
-	//watch out, when the registry gets upgraded, a migration of all funds has to be performed
+	/// @dev Allows owner to create a new registry.
+	/// @dev When the registry gets upgraded, a migration of all funds is required
+  /// @param _newAddress Address of new registry.
 	function upgrade(address _newAddress) public payable only_owner {
 		DragoRegistry registry = DragoRegistry(_newAddress);
 		++VERSION;
@@ -272,24 +274,33 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		address(registry).transfer(this.balance);
 	}
 
-	function setUpgraded(uint _version) public only_owner {
-    	VERSION = _version;
-  	}
+	/// @dev Allows owner to update version on registry upgrade
+  /// @param _version Number of the new version
+	function setUpgraded(uint _version) external only_owner {
+		VERSION = _version;
+	}
 
+	/// @dev Allows owner to collect fees by draining the balance
 	function drain() public only_owner {
 		msg.sender.transfer(this.balance);
 	}
 
+	/// @dev Allows owner to selfdestruct old registry
 	function kill() public only_owner {
 	    selfdestruct(msg.sender);
 	}
 
 	// CONSTANT METHODS
 
+	/// @dev Provides the total number of registered pools
+	/// @return Number of pools
 	function dragoCount() public constant returns (uint) {
 	    return dragos.length;
 	}
 
+	/// @dev Provides a pool's struct data
+	/// @param _id Registration number of the pool
+	/// @return Pool struct data
 	function fromId(uint _id)
     public
     constant
@@ -311,6 +322,9 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 
+	/// @dev Provides a pool's struct data
+	/// @param _drago Address of the pool
+	/// @return Pool struct data
 	function fromAddress(address _drago)
     public
     constant
@@ -332,6 +346,9 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 
+	/// @dev Provides a pool's struct data
+	/// @param _symbol Symbol of the pool
+	/// @return Pool struct data
 	function fromSymbol(string _symbol)
     public
     constant
@@ -353,6 +370,9 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 
+	/// @dev Provides a pool's struct data
+	/// @param _name Name of the pool
+	/// @return Pool struct data
 	function fromName(string _name)
     public
     constant
@@ -374,6 +394,10 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		group = t.group;
 	}
 
+	/// @dev Provides a pool's struct data
+	/// @param _name Name of the pool
+	/// @param _symbol Symbol of the pool
+	/// @return Pool struct data
 	function fromNameSymbol(string _name, string _symbol)
     public
     constant
@@ -387,6 +411,9 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	  return drago;
 	}
 
+	/// @dev Provides a pool's name from its address
+	/// @param _pool Address of the pool
+	/// @return Name of the pool
 	function getNameFromAddress(address _pool)
     external
     constant
@@ -397,6 +424,9 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		return keccak256(t.name);
 	}
 
+	/// @dev Provides a pool's symbol from its address
+	/// @param _pool Address of the pool
+	/// @return Symbol of the pool
   function getSymbolFromAddress(address _pool)
     external
     constant
@@ -407,6 +437,10 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		return keccak256(t.symbol);
   }
 
+	/// @dev Provides a pool's metadata
+	/// @param _id ID number of the pool
+	/// @param _key Bytes32 key
+	/// @return Pool metadata
 	function meta(uint _id, bytes32 _key)
     public
     constant
@@ -415,6 +449,8 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 		return dragos[_id].meta[_key];
 	}
 
+	/// @dev Provides the addresses of the groups/factories
+	/// @return Array of addresses of the groups
   function getGroups()
     public
     constant
@@ -423,7 +459,36 @@ contract DragoRegistry is DragoRegistryFace, Owned {
 	  return groups;
 	}
 
+	/// @dev Provides the fee required to register a pool
+	/// @return Number of the fee in wei
 	function getFee() public constant returns (uint) {
 	    return fee;
+	}
+
+	// INTERNAL METHODS
+
+	/// @dev Allows authority to register a pool for a certain group
+	/// @param _drago Address of the pool
+	/// @param _name Name of the pool
+	/// @param _symbol Symbol of the pool
+	/// @param _dragoID ID number of the pool
+	/// @param _owner Address of the pool owner
+	/// @param _group Address of the group/factory
+	function registerAs(
+    address _drago,
+    string _name,
+    string _symbol,
+    uint _dragoID,
+    address _owner,
+    address _group)
+    internal
+	  returns (bool)
+	{
+		dragos.push(Drago(_drago, _name, _symbol, _dragoID, _owner, _group));
+		mapFromAddress[_drago] = dragos.length;
+		mapFromName[_name] = dragos.length;
+		mapFromSymbol[_symbol] = dragos.length;
+		Registered(_name, _symbol, dragos.length - 1, _drago, _owner, _group);
+		return true;
 	}
 }
