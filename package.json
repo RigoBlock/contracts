@@ -17,7 +17,7 @@
     "fund"
   ],
   "devDependencies": {
-    "truffle": "3.1.2",
-    "ethereumjs-testrpc": "3.0.3"
+    "truffle": "5.0.2",
+    "ethereumjs-testrpc": "6.0.3"
   }
 }
