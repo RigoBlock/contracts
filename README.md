@@ -1,5 +1,7 @@
 # Contracts
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/RigoBlock/contracts.svg?token=7999473681b73f71030e8aff09e233c91e695d552b852f7e81818bdaafdde434&ts=1547722249809)](https://greenkeeper.io/)
+
 Directory of our contracts.
 
 
